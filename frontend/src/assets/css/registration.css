@@ -1,0 +1,607 @@
+/* Registration Page Specific Styles - Matching Home Page Theme */
+
+/* Hero Section - Fully Responsive with 10% margins */
+.sah-registration-hero {
+  min-height: auto !important;
+  padding: clamp(30px, 5vw, 40px) 0 !important;
+  background: #c8c8c8 !important;
+  width: 100%;
+}
+
+.sah-registration-hero .sah-hero-bg {
+  background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80') !important;
+  background-size: cover !important;
+  background-position: center 30% !important;
+}
+
+.sah-registration-hero .sah-hero-bg::after {
+  background: linear-gradient(100deg, rgba(90,90,90,0.87) 0%, rgba(110,110,110,0.76) 45%, rgba(70,70,70,0.52) 100%) !important;
+}
+
+.sah-registration-hero .sah-hero-inner {
+  padding: clamp(15px, 3vw, 20px) 0 !important;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.sah-registration-hero .sah-hero-h1 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  word-break: break-word;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* Step Indicator - Fully Responsive */
+.sah-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 16px);
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  margin: clamp(16px, 3vw, 20px) auto 0;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 0 20px;
+}
+
+.sah-step-number {
+  background: rgba(255,255,255,0.15);
+  padding: 6px 16px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  flex-shrink: 0;
+}
+
+.sah-step-progress {
+  background: rgba(255,255,255,0.2);
+  border-radius: 100px;
+  height: 8px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.sah-step-progress-fill {
+  height: 8px;
+  background: var(--accent, #c9621a);
+  border-radius: 100px;
+  transition: width 0.3s ease;
+}
+
+/* Form Panel - 10% margin on both sides (80% width) */
+.sah-form-panel {
+  background: var(--white, #ffffff);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-lg, 0 12px 48px rgba(0,0,0,0.12));
+  width: min(80%, 1200px);
+  margin: clamp(30px, 5vw, 40px) auto clamp(50px, 7vw, 70px);
+  padding: clamp(24px, 4vw, 48px) clamp(20px, 4vw, 56px);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Ensure 10% margin on both sides */
+@media (max-width: 768px) {
+  .sah-form-panel {
+    width: 90%;
+    margin: 20px auto 40px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sah-form-panel {
+    width: 92%;
+    padding: 16px;
+  }
+}
+
+.sah-step-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 800;
+  color: var(--dark, #3a3a3a);
+  margin-bottom: clamp(8px, 2vw, 12px);
+  letter-spacing: -0.3px;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.sah-step-desc {
+  color: var(--muted, #888);
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+  padding-bottom: clamp(18px, 3vw, 22px);
+  margin-bottom: clamp(24px, 4vw, 32px);
+  font-family: 'DM Sans', sans-serif;
+  word-break: break-word;
+}
+
+/* Form Grid - Professional Two-Column Layout */
+.sah-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(20px, 3vw, 24px) clamp(20px, 3vw, 32px);
+}
+
+.sah-full-width {
+  grid-column: 1 / -1;
+}
+
+/* Responsive Break for Two-Column Layout */
+@media (max-width: 768px) {
+  .sah-form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Form Fields */
+.sah-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sah-field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mid, #555);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'DM Sans', sans-serif;
+  flex-wrap: wrap;
+  word-break: break-word;
+}
+
+.sah-field label i {
+  color: var(--accent, #c9621a);
+  width: 18px;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.sah-required-star {
+  color: var(--accent, #c9621a);
+  margin-left: 2px;
+}
+
+.sah-field input,
+.sah-field select,
+.sah-field textarea {
+  width: 100%;
+  padding: clamp(14px, 2vw, 16px) clamp(16px, 2vw, 18px);
+  border: 1.5px solid var(--border, rgba(0,0,0,0.08));
+  border-radius: var(--radius, 8px);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  color: var(--dark, #3a3a3a);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+/* Password Field with Eye Icon */
+.sah-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.sah-password-wrapper input {
+  flex: 1;
+  padding-right: 50px;
+  width: 100%;
+}
+
+.sah-toggle-pw {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--muted, #888);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+  z-index: 2;
+}
+
+.sah-toggle-pw:hover {
+  color: var(--accent, #c9621a);
+}
+
+/* Checkbox and Radio Groups - Professional Spacing */
+.sah-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: transparent;
+  padding: 4px 0;
+  border: none;
+  width: 100%;
+}
+
+.sah-checkbox-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: clamp(8px, 1.5vw, 10px) clamp(16px, 2vw, 22px);
+  border-radius: 6px;
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  background: var(--white, #ffffff);
+  color: var(--muted, #888);
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  font-weight: 600;
+  transition: all 0.15s;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  text-transform: none;
+  letter-spacing: normal;
+  flex: 0 1 auto;
+}
+
+/* Fix checkbox/radio alignment - text and button on same line */
+.sah-checkbox-group label input[type="checkbox"],
+.sah-checkbox-group label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent, #c9621a);
+  flex-shrink: 0;
+  cursor: pointer;
+  margin: 0;
+  vertical-align: middle;
+  position: relative;
+  top: 0;
+}
+
+/* Languages Spoken - Evenly spaced grid */
+.sah-field[name="languages"] .sah-checkbox-group,
+.sah-field[name="secondaryCats"] .sah-checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.sah-field[name="languages"] .sah-checkbox-group label,
+.sah-field[name="secondaryCats"] .sah-checkbox-group label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* Terms Checkbox - Fully Responsive */
+.sah-terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fbfbfb;
+  padding: clamp(16px, 3vw, 22px);
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sah-terms-checkbox input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent, #c9621a);
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sah-terms-checkbox label {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  text-transform: none;
+  font-weight: 500;
+  color: var(--dark, #3a3a3a);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  flex: 1;
+  word-break: break-word;
+}
+
+.sah-terms-link {
+  color: var(--accent, #c9621a);
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+/* Make terms link wrap on mobile */
+@media (max-width: 480px) {
+  .sah-terms-checkbox label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .sah-terms-link {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+/* Other Language Field */
+.sah-other-language-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.sah-other-language-row input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border, rgba(0,0,0,0.08));
+  border-radius: var(--radius, 8px);
+  font-size: 1.1rem;
+  font-family: 'DM Sans', sans-serif;
+  width: 100%;
+}
+
+/* Validation Alert */
+.sah-validation-alert {
+  background: #fee9e9;
+  border-left: 5px solid var(--accent, #c9621a);
+  padding: clamp(16px, 3vw, 18px) clamp(18px, 3vw, 22px);
+  border-radius: var(--radius, 8px);
+  margin-bottom: clamp(24px, 4vw, 32px);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-weight: 600;
+  color: #a84e12;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
+  font-family: 'DM Sans', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sah-validation-alert i {
+  font-size: 1.3rem;
+  color: var(--accent, #c9621a);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Navigation Buttons - Orange Color */
+.sah-form-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: clamp(32px, 5vw, 48px);
+  gap: 16px;
+  width: 100%;
+}
+
+.sah-btn-prev,
+.sah-btn-next,
+.sah-btn-submit {
+  padding: clamp(12px, 2vw, 14px) clamp(24px, 4vw, 32px);
+  border-radius: var(--radius, 8px);
+  font-weight: 700;
+  font-size: clamp(0.9rem, 1.5vw, 0.95rem);
+  transition: all 0.15s;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+/* Orange buttons for Next and Submit */
+.sah-btn-next,
+.sah-btn-submit {
+  background: var(--accent, #c9621a) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
+  margin-left: auto;
+}
+
+.sah-btn-next:hover,
+.sah-btn-submit:hover {
+  background: var(--accent-dark, #a84e12) !important;
+}
+
+.sah-btn-prev {
+  background: #eaeef2;
+  color: var(--dark, #3a3a3a);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  margin-right: auto;
+}
+
+/* Responsive button behavior */
+@media (max-width: 768px) {
+  .sah-btn-prev,
+  .sah-btn-next,
+  .sah-btn-submit {
+    min-width: 120px;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 580px) {
+  .sah-form-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .sah-btn-prev,
+  .sah-btn-next,
+  .sah-btn-submit {
+    flex: 1 1 auto;
+    min-width: 140px;
+    white-space: normal;
+    text-align: center;
+    padding: 12px 16px;
+  }
+  
+  .sah-btn-prev {
+    margin-right: 0;
+  }
+  
+  .sah-btn-next,
+  .sah-btn-submit {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .sah-btn-prev,
+  .sah-btn-next,
+  .sah-btn-submit {
+    min-width: 100%;
+  }
+}
+
+/* Equal spacing for two-column layout on desktop */
+@media (min-width: 769px) {
+  .sah-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 32px;
+  }
+  
+  /* Ensure both columns have equal width */
+  .sah-form-grid > .sah-field:not(.sah-full-width) {
+    width: 100%;
+  }
+}
+
+/* Select dropdown arrow styling */
+.sah-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+  padding-right: 48px;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1100px) {
+  .sah-form-panel {
+    width: 85%;
+  }
+}
+
+@media (max-width: 768px) {
+  .sah-form-panel {
+    width: 90%;
+    padding: 24px;
+  }
+  
+  .sah-field[name="languages"] .sah-checkbox-group,
+  .sah-field[name="secondaryCats"] .sah-checkbox-group {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .sah-form-panel {
+    width: 92%;
+    padding: 20px;
+    margin: 20px auto 30px;
+  }
+  
+  .sah-step-indicator {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0 12px;
+  }
+  
+  .sah-step-progress {
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sah-form-panel {
+    width: 94%;
+    padding: 16px;
+    margin: 15px auto 25px;
+  }
+  
+  .sah-step-indicator {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sah-step-number {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .sah-step-progress {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .sah-field[name="languages"] .sah-checkbox-group,
+  .sah-field[name="secondaryCats"] .sah-checkbox-group {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .sah-field[name="languages"] .sah-checkbox-group label,
+  .sah-field[name="secondaryCats"] .sah-checkbox-group label {
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Fix for extremely small devices */
+@media (max-width: 360px) {
+  .sah-field[name="languages"] .sah-checkbox-group,
+  .sah-field[name="secondaryCats"] .sah-checkbox-group {
+    grid-template-columns: 1fr;
+  }
+  
+  .sah-form-panel {
+    width: 96%;
+    padding: 12px;
+  }
+}
