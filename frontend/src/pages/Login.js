@@ -542,7 +542,7 @@ const Login = () => {
             </button>
             <div className="sah-lhdr-div" />
             <Link to="/" className="sah-lhdr-brand">
-              <img className="sah-lhdr-logo" src="/parentals-logo.png" alt="Parentals" />
+              <img className="sah-lhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
           </div>
           <div className="sah-lhdr-right">

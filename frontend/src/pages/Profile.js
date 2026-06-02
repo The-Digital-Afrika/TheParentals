@@ -821,7 +821,7 @@ const Profile = () => {
               </button>
               <span style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.28)', margin: '0 16px' }} />
               <img
-                src="/parentals-logo.png"
+                src="/parentals-logo-header.png"
                 alt="Parentals"
                 style={{ display: 'block', width: 230, maxWidth: '28vw', height: 124, objectFit: 'contain', objectPosition: 'left center', filter: 'drop-shadow(0 3px 12px rgba(255,138,31,0.26))' }}
               />

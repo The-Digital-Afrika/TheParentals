@@ -36,6 +36,18 @@ const FOOTER_CSS = `
   }
 
   /* Brand column */
+  .sah-footer-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .sah-footer-brand-mark img {
+    display: block;
+    width: 128px;
+    max-width: 42vw;
+    height: auto;
+    filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22));
+  }
   .sah-footer-logo {
     font-family: 'Playfair Display', serif;
     font-size: 1.05rem;
@@ -224,6 +236,9 @@ const Footer = () => {
 
           {/* Brand + newsletter */}
           <div className="sah-footer-brand">
+            <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
+              <img src="/parentals-logo-header.png" alt="Parentals" />
+            </Link>
             <Link to="/" className="sah-footer-logo">SA Homeschooling Directory</Link>
             <p>
               Connecting South African homeschooling families with verified tutors,

@@ -249,7 +249,7 @@ const Header = () => {
               </>
             )}
             <Link to="/" className="sah-hdr-brand">
-              <img className="sah-hdr-logo" src="/parentals-logo.png" alt="Parentals" />
+              <img className="sah-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
           </div>
 

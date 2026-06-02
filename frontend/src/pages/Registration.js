@@ -1514,7 +1514,7 @@ const Registration = () => {
             </button>
             <div className="sah-rhdr-div" />
             <Link to="/" className="sah-rhdr-brand">
-              <img className="sah-rhdr-logo" src="/parentals-logo.png" alt="Parentals" />
+              <img className="sah-rhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
           </div>
           <div className="sah-rhdr-right">

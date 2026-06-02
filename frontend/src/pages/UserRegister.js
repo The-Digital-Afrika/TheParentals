@@ -287,7 +287,7 @@ const UserRegister = () => {
         </button>
         <div className="ur-hdr-div" />
         <Link to="/" className="ur-hdr-brand">
-          <img className="ur-hdr-logo" src="/parentals-logo.png" alt="Parentals" />
+          <img className="ur-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
         </Link>
       </header>
 

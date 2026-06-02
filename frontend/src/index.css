@@ -1,13 +1,947 @@
+:root {
+  /* Logo-led SA Homeschooling Services design system */
+  --sah-navy-950: #06142d;
+  --sah-navy-900: #0a1f44;
+  --sah-navy-800: #102f63;
+  --sah-navy-100: #e8eef8;
+  --sah-ember-700: #b8201d;
+  --sah-ember-600: #df4f17;
+  --sah-ember-500: #f47a1f;
+  --sah-gold-500: #f7bd3d;
+  --sah-gold-200: #ffe7a8;
+  --sah-cream-50: #fffaf1;
+  --sah-cream-100: #f7efe1;
+  --sah-graphite-900: #22211f;
+  --sah-graphite-700: #4f4a43;
+  --sah-graphite-500: #81796d;
+  --sah-success: #12805c;
+  --sah-warning: #c87907;
+  --sah-error: #b42318;
+  --sah-info: #2563a8;
+  --sah-primary: var(--sah-ember-600);
+  --sah-secondary: var(--sah-ember-500);
+  --sah-accent: var(--sah-gold-500);
+  --sah-bg: #fbf7ee;
+  --sah-surface: #ffffff;
+  --sah-surface-warm: #fff6e8;
+  --sah-border: rgba(79, 74, 67, 0.14);
+  --sah-border-strong: rgba(223, 79, 23, 0.26);
+  --sah-focus: rgba(244, 122, 31, 0.24);
+  --sah-gradient: linear-gradient(110deg, #f7bd3d 0%, #f47a1f 28%, #df4f17 48%, #375b83 76%, #0a1f44 100%);
+  --sah-warm-gradient: linear-gradient(135deg, #df4f17 0%, #f47a1f 52%, #f7bd3d 100%);
+  --sah-shadow-sm: 0 2px 8px rgba(6, 20, 45, 0.08);
+  --sah-shadow-md: 0 12px 32px rgba(6, 20, 45, 0.12);
+  --sah-shadow-lg: 0 24px 64px rgba(6, 20, 45, 0.18);
+  --sah-radius: 8px;
+  --sah-radius-lg: 12px;
+
+  --accent: var(--sah-ember-500);
+  --accent-dark: var(--sah-ember-700);
+  --accent-light: var(--sah-gold-200);
+  --accent-gradient: var(--sah-warm-gradient);
+  --dark: var(--sah-graphite-900);
+  --mid: var(--sah-graphite-700);
+  --muted: var(--sah-graphite-500);
+  --light-bg: var(--sah-bg);
+  --white: #ffffff;
+  --border: var(--sah-border);
+  --shadow-sm: var(--sah-shadow-sm);
+  --shadow-md: var(--sah-shadow-md);
+  --shadow-lg: var(--sah-shadow-lg);
+  --radius: var(--sah-radius);
+  --radius-lg: var(--sah-radius-lg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--sah-bg);
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(247, 189, 61, 0.22), transparent 34%),
+    linear-gradient(180deg, #fffaf1 0%, #f8efe1 52%, #f6f8fb 100%);
+  color: var(--sah-graphite-900);
+  font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+::selection {
+  background: rgba(247, 189, 61, 0.45);
+  color: var(--sah-navy-950);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  outline-color: var(--sah-ember-500);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--sah-focus) !important;
+  outline-offset: 2px !important;
+}
+
+input,
+select,
+textarea,
+.cd-input,
+.profile-value,
+.sah-field input,
+.sah-field select,
+.sah-field textarea,
+.sah-lfield input,
+.ur-field input,
+.pv2-enquiry-field input,
+.pv2-enquiry-field select,
+.pv2-enquiry-field textarea,
+.adm-search-input,
+.adm-filter-select,
+.status-select {
+  border-color: var(--sah-border) !important;
+  background: #fffdfa !important;
+  color: var(--sah-graphite-900) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+
+input:hover,
+select:hover,
+textarea:hover,
+.cd-input:hover,
+.profile-value:hover {
+  border-color: rgba(244, 122, 31, 0.42) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.cd-input:focus,
+.profile-value:focus,
+.sah-field input:focus,
+.sah-field select:focus,
+.sah-field textarea:focus,
+.sah-lfield input:focus,
+.ur-field input:focus,
+.pv2-enquiry-field input:focus,
+.pv2-enquiry-field select:focus,
+.pv2-enquiry-field textarea:focus,
+.adm-search-input:focus,
+.adm-filter-select:focus,
+.status-select:focus {
+  border-color: var(--sah-ember-500) !important;
+  box-shadow: 0 0 0 4px var(--sah-focus), inset 0 1px 0 rgba(255,255,255,0.75) !important;
+  background: #ffffff !important;
+}
+
+input.err,
+input.error,
+select.err,
+textarea.err,
+.sah-field input.err,
+.sah-field select.err,
+.sah-field textarea.err,
+.ur-field input.err,
+.sah-lfield input.error,
+.sah-prefix-wrap.err {
+  border-color: var(--sah-error) !important;
+  background: #fff8f5 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(79, 74, 67, 0.52) !important;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--sah-ember-500) !important;
+}
+
+/* Shared app shell */
+.sah-wrap,
+.sah-login-wrap,
+.sah-reg-wrap,
+.ur-wrap,
+.cd-wrap,
+#profilePageV2 {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(247, 189, 61, 0.18), transparent 30%),
+    linear-gradient(180deg, #fffaf1 0%, #f7efe1 58%, #f6f8fb 100%) !important;
+  color: var(--sah-graphite-900) !important;
+}
+
+.sah-container,
+.sah-lhdr-inner,
+.sah-rhdr-inner,
+.sah-hdr-inner,
+.cd-hero-top,
+.cd-tab-bar,
+.cd-main,
+.pv2-inner {
+  max-width: 1280px !important;
+}
+
+/* Logo-inspired navigation */
+.sah-header,
+.sah-hdr,
+.sah-lhdr,
+.sah-rhdr,
+.ur-hdr,
+.pv2-dashboard-header {
+  background:
+    linear-gradient(100deg, rgba(247, 189, 61, 0.96) 0%, rgba(244, 122, 31, 0.95) 34%, rgba(223, 79, 23, 0.92) 53%, rgba(55, 91, 131, 0.9) 78%, rgba(10, 31, 68, 0.94) 100%) !important;
+  box-shadow: 0 12px 32px rgba(118, 70, 25, 0.22) !important;
+  border-bottom: 1px solid rgba(247, 189, 61, 0.24) !important;
+}
+
+.sah-brand-logo,
+.sah-hdr-logo,
+.sah-lhdr-logo,
+.sah-rhdr-logo,
+.ur-hdr-logo {
+  width: 252px !important;
+  max-width: 34vw !important;
+  height: 82px !important;
+  object-fit: contain !important;
+  object-position: left center !important;
+  filter: drop-shadow(0 6px 16px rgba(6, 20, 45, 0.22)) !important;
+}
+
+.sah-header .sah-brand-logo {
+  width: 196px !important;
+  max-width: 26vw !important;
+  height: 64px !important;
+}
+
+.sah-nav-links a,
+.sah-hdr-nav a,
+.sah-hdr-mobile a,
+.sah-hdr-mobile .mob-link,
+.sah-lhdr-back,
+.sah-rhdr-back,
+.ur-hdr-back,
+.sah-hdr-back {
+  border-radius: var(--sah-radius) !important;
+}
+
+.sah-nav-links a:hover,
+.sah-hdr-nav a:hover,
+.sah-hdr-mobile a:hover,
+.sah-hdr-mobile .mob-link:hover,
+.sah-lhdr-back:hover,
+.sah-rhdr-back:hover,
+.ur-hdr-back:hover,
+.sah-hdr-back:hover {
+  background: rgba(255,255,255,0.13) !important;
+  color: #ffffff !important;
+}
+
+/* Buttons */
+.sah-btn-solid-nav,
+.sah-logout-btn,
+.sah-hdr-solid,
+.sah-mob-solid,
+.sah-rhdr-ghost:hover,
+.sah-lhdr-solid,
+.sah-become-btn,
+.sah-hs-btn,
+.sah-plan-cta-link,
+.sah-plan-select-btn,
+.sah-btn-next,
+.sah-btn-submit,
+.sah-nav-next,
+.sah-login-btn,
+.sah-fp-btn,
+.ur-submit,
+.cd-btn-solid,
+.btn-save,
+.add-service-btn:hover:not(:disabled),
+.tag-input-wrapper button,
+.adm-file-dl,
+.adm-doc-list-dl,
+.pv2-gate-btn-primary,
+.pv2-enquiry-send-btn,
+.sah-footer-newsletter button {
+  background: var(--sah-warm-gradient) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 22px rgba(223, 79, 23, 0.22) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease !important;
+}
+
+.sah-btn-solid-nav:hover,
+.sah-logout-btn:hover,
+.sah-hdr-solid:hover,
+.sah-mob-solid:hover,
+.sah-lhdr-solid:hover,
+.sah-become-btn:hover,
+.sah-hs-btn:hover,
+.sah-plan-cta-link:hover,
+.sah-plan-select-btn:hover,
+.sah-nav-next:hover,
+.sah-login-btn:hover:not(:disabled),
+.sah-fp-btn:hover:not(:disabled),
+.ur-submit:hover:not(:disabled),
+.cd-btn-solid:hover:not(:disabled),
+.btn-save:hover:not(:disabled),
+.tag-input-wrapper button:hover,
+.pv2-gate-btn-primary:hover,
+.pv2-enquiry-send-btn:hover,
+.sah-footer-newsletter button:hover {
+  filter: saturate(1.05) brightness(0.98) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 14px 30px rgba(223, 79, 23, 0.28) !important;
+}
+
+.sah-btn-ghost-nav,
+.sah-user-profile-btn,
+.sah-hdr-ghost,
+.sah-mob-ghost,
+.sah-lhdr-back,
+.sah-rhdr-back,
+.ur-hdr-back,
+.cd-btn-ghost,
+.btn-outline,
+.sah-rhdr-ghost,
+.pv2-share-btn,
+.pv2-gate-btn-secondary {
+  border-color: rgba(247, 189, 61, 0.48) !important;
+  background: rgba(255,255,255,0.08) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12) !important;
+}
+
+.cd-btn-ghost:hover,
+.btn-outline:hover,
+.pv2-share-btn:hover,
+.pv2-gate-btn-secondary:hover {
+  background: rgba(255,255,255,0.16) !important;
+}
+
+button:disabled,
+.disabled,
+.sah-login-btn:disabled,
+.ur-submit:disabled,
+.cd-btn-solid:disabled {
+  opacity: 0.58 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* Hero and authentication surfaces */
+.sah-hero-bg::after,
+.sah-reg-hero-bg::after,
+.ur-hero-bg::after,
+.sah-login-left-bg::after {
+  background:
+    linear-gradient(102deg, rgba(88, 42, 14, 0.74) 0%, rgba(24, 23, 21, 0.76) 48%, rgba(10, 31, 68, 0.48) 100%) !important;
+}
+
+.sah-hero-h1,
+.sah-reg-hero-title,
+.ur-hero-inner h1,
+.sah-login-left-title,
+.cd-hero-title,
+.pv2-name,
+.page-headline h1,
+.card-heading,
+.sah-login-heading,
+.sah-step-card-head h2,
+.ur-card-head h2 {
+  letter-spacing: 0 !important;
+}
+
+.sah-hero-search {
+  border: 1px solid rgba(247, 189, 61, 0.34) !important;
+  box-shadow: 0 22px 58px rgba(6, 20, 45, 0.32) !important;
+}
+
+.sah-filter-bar,
+.sah-providers-section,
+.sah-how-section {
+  background: transparent !important;
+}
+
+.sah-fpill,
+.sah-check-group label,
+.sah-day-quickpick-btn,
+.sah-secondary-toggle,
+.badge-option,
+.day-checkbox,
+.cd-day-chip.off,
+.sah-trail-dot,
+.adm-time-tab,
+.adm-role-tab {
+  border-color: var(--sah-border) !important;
+  background: rgba(255,255,255,0.72) !important;
+  color: var(--sah-graphite-700) !important;
+}
+
+.sah-fpill:hover,
+.sah-check-group label:hover,
+.sah-day-quickpick-btn:hover,
+.sah-secondary-toggle:hover,
+.badge-option:hover,
+.day-checkbox:hover,
+.adm-time-tab:hover,
+.adm-role-tab:hover {
+  border-color: rgba(244,122,31,0.5) !important;
+  color: var(--sah-ember-600) !important;
+  background: #fffaf3 !important;
+}
+
+.sah-fpill.active,
+.sah-check-group label:has(input:checked),
+.sah-day-quickpick-btn.active,
+.sah-secondary-toggle.active,
+.cd-day-chip.on,
+.sah-trail-dot.active,
+.adm-time-tab.active,
+.adm-role-tab.active,
+.tab-btn.active,
+.cd-tab-btn.active {
+  background: var(--sah-ember-600) !important;
+  border-color: var(--sah-ember-600) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(223, 79, 23, 0.18) !important;
+}
+
+/* Cards, dashboards and tables */
+.card,
+.stat-box,
+.provider-row,
+.slot-card,
+.review-card,
+.plan-card,
+.sah-provider-card,
+.sah-plan-card,
+.sah-step-card,
+.sah-login-card,
+.ur-card,
+.cd-card,
+.cd-plan-card,
+.cd-svc-card,
+.pv2-card,
+.pv2-svc-card,
+.pv2-left,
+.pv2-enquiry-section,
+.pv2-gate-card,
+.adm-expand-row,
+.adm-listing-row,
+.adm-file-card,
+.adm-pkg-card,
+.adm-rev-box,
+.adm-user-row,
+.sah-modal-box {
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid var(--sah-border) !important;
+  border-radius: var(--sah-radius-lg) !important;
+  box-shadow: var(--sah-shadow-md) !important;
+}
+
+.sah-provider-card:hover,
+.stat-box:hover,
+.provider-row:hover,
+.slot-card:hover,
+.review-card:hover,
+.plan-card:hover,
+.sah-plan-card:hover,
+.cd-plan-card:hover,
+.pv2-svc-card:hover,
+.adm-expand-row:hover,
+.adm-listing-row:hover {
+  border-color: rgba(244,122,31,0.42) !important;
+  box-shadow: var(--sah-shadow-lg) !important;
+  transform: translateY(-2px) !important;
+}
+
+.card-header,
+.sah-login-card-head,
+.sah-fp-head,
+.sah-step-card-head,
+.ur-card-head,
+.cd-card-header-icon,
+.profile-head-card,
+.sah-terms-box-head,
+.adm-float-card-header {
+  background: var(--sah-gradient) !important;
+  color: #ffffff !important;
+}
+
+.cd-card-header,
+.section-label,
+.audit-row,
+.card-footer,
+.contact-block,
+.adm-row-header,
+.adm-detail-footer,
+.adm-file-card-head,
+.sah-plan-card-head,
+.sah-login-card-body,
+.ur-perks,
+.pv2-left,
+.pv2-services-section,
+.pv2-about-section {
+  background: linear-gradient(180deg, #fffdf8 0%, #fff5e6 100%) !important;
+}
+
+.sah-sec-eyebrow,
+.sec-eyebrow,
+.pv2-eyebrow,
+.cd-sec-label,
+.section-heading i,
+.sah-field label i,
+.ur-field label i,
+.sah-lfield label i,
+.sah-card-meta i,
+.qual-list li i,
+.dc-icon,
+.meta-item i,
+.pv2-meta-item i,
+.pv2-contact-row i,
+.adm-detail-section-title,
+.adm-file-section-title {
+  color: var(--sah-ember-500) !important;
+}
+
+.sah-step-num {
+  color: var(--sah-ember-500) !important;
+  text-shadow: 0 8px 20px rgba(223, 79, 23, 0.14) !important;
+}
+
+.stat-box h3,
+.stat-filter-value,
+.plan-price,
+.sah-plan-price,
+.cd-plan-price,
+.sah-card-price,
+.profile-name,
+.pv2-rating-num,
+.rating-big,
+.adm-rev-box-val,
+.adm-pkg-stat-val {
+  color: var(--sah-ember-700) !important;
+}
+
+.sah-card-thumb-fallback,
+.avatar-small,
+.photo-round,
+.tag,
+.tag-item,
+.cd-tag,
+.pv2-tag,
+.pv2-age-pill,
+.sah-cbadge-new,
+.sah-file-upload-zone,
+.profile-preview-badge {
+  background: var(--sah-surface-warm) !important;
+  color: var(--sah-ember-600) !important;
+  border-color: rgba(244,122,31,0.25) !important;
+}
+
+.badge-featured,
+.featured-tag,
+.current-plan-badge,
+.pending-badge,
+.pv2-price-badge,
+.pv2-gate-icon {
+  background: var(--sah-warm-gradient) !important;
+  color: #ffffff !important;
+}
+
+.badge-verified,
+.approved-badge,
+.btn-approve,
+.review-status.approved-badge,
+.public-indicator,
+.sah-login-alert.success,
+.ur-success-banner,
+.info-block {
+  background: #e8f7f0 !important;
+  color: var(--sah-success) !important;
+  border-color: rgba(18, 128, 92, 0.22) !important;
+}
+
+.status-notice,
+.manual-override-note,
+.timer-badge,
+.sah-validation-alert {
+  background: #fff6dd !important;
+  color: var(--sah-warning) !important;
+  border-color: rgba(200, 121, 7, 0.24) !important;
+}
+
+.sah-login-alert.error,
+.ur-err-banner,
+.sah-field-err,
+.sah-terms-err,
+.sah-group-err,
+.sah-fp-error,
+.rejected-badge,
+.btn-reject {
+  background: #fff2ef !important;
+  color: var(--sah-error) !important;
+  border-color: rgba(180, 35, 24, 0.2) !important;
+}
+
+.review-rating,
+.rating-stars,
+.review-stars,
+.pv2-rating-stars,
+.cd-review-stars {
+  color: var(--sah-gold-500) !important;
+}
+
+/* Dashboard-specific polish */
+.cd-hero,
+.pv2-right {
+  background: var(--sah-gradient) !important;
+}
+
+.cd-hero::before {
+  opacity: 0.45 !important;
+}
+
+.cd-tab-bar {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cd-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.cd-tab-btn {
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+
+.cd-tab-btn:not(.active) {
+  background: rgba(255,255,255,0.1) !important;
+  color: rgba(255,255,255,0.78) !important;
+}
+
+.adm-rev-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.adm-rev-table th,
+.adm-rev-table td {
+  border-bottom: 1px solid var(--sah-border) !important;
+  padding: 12px 14px !important;
+}
+
+.adm-rev-table th {
+  background: var(--sah-graphite-900) !important;
+  color: #ffffff !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.7px !important;
+  text-transform: uppercase !important;
+}
+
+.adm-rev-table tr:hover td,
+.adm-user-row:hover {
+  background: #fff8ed !important;
+}
+
+/* Profile page */
+.pv2-right-overlay {
+  background:
+    linear-gradient(100deg, rgba(88,42,14,0.82) 0%, rgba(223,79,23,0.68) 44%, rgba(10,31,68,0.42) 100%) !important;
+}
+
+.pv2-avatar,
+.pv2-avatar-placeholder {
+  border-color: var(--sah-gold-500) !important;
+  box-shadow: 0 12px 34px rgba(247, 189, 61, 0.25) !important;
+}
+
+.pv2-enquiry-section {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,250,241,0.96)) !important;
+}
+
+.pv2-enquiry-send-btn {
+  border-radius: var(--sah-radius) !important;
+}
+
+/* Auth and registration */
+.sah-login-card,
+.ur-card,
+.sah-step-card {
+  overflow: hidden !important;
+}
+
+.sah-step-trail {
+  padding-bottom: 10px !important;
+}
+
+.sah-trail-dot.done {
+  background: rgba(255,255,255,0.18) !important;
+  border-color: rgba(247, 189, 61, 0.42) !important;
+  color: #ffffff !important;
+}
+
+.sah-prefix-wrap,
+.sah-terms-row,
+.sah-file-upload-zone,
+.sah-terms-box,
+.sah-fp-modal {
+  border-color: var(--sah-border) !important;
+  box-shadow: var(--sah-shadow-sm) !important;
+}
+
+/* Footer */
+.sah-footer {
+  background:
+    linear-gradient(110deg, #352617 0%, #773b16 42%, #0a1f44 100%) !important;
+  border-top: 1px solid rgba(247, 189, 61, 0.2) !important;
+}
+
+.sah-footer-col h4,
+.sah-footer-trust-item i {
+  color: var(--sah-gold-500) !important;
+}
+
+.sah-footer-soc:hover {
+  background: var(--sah-warm-gradient) !important;
+}
+
+.sah-footer-brand-mark {
+  display: inline-flex !important;
+  align-items: center !important;
+  margin-bottom: 10px !important;
+}
+
+.sah-footer-brand-mark img {
+  display: block !important;
+  width: 128px !important;
+  max-width: 42vw !important;
+  height: auto !important;
+  filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22)) !important;
+}
+
+/* Motion */
+@keyframes sah-soft-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sah-provider-card,
+.card,
+.cd-card,
+.sah-step-card,
+.sah-login-card,
+.ur-card,
+.pv2-right,
+.pv2-left,
+.pv2-card,
+.pv2-enquiry-section {
+  animation: sah-soft-in 0.32s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Responsive polish */
+@media (max-width: 960px) {
+  .sah-header,
+  .sah-hdr,
+  .sah-lhdr,
+  .sah-rhdr,
+  .ur-hdr {
+    height: 112px !important;
+    --header-h: 112px !important;
+    --hdr-h: 112px !important;
+  }
+
+  .sah-brand-logo,
+  .sah-hdr-logo,
+  .sah-lhdr-logo,
+  .sah-rhdr-logo,
+  .ur-hdr-logo {
+    width: 204px !important;
+    height: 68px !important;
+    max-width: 48vw !important;
+  }
+
+  .sah-header .sah-brand-logo {
+    width: 168px !important;
+    height: 56px !important;
+    max-width: 42vw !important;
+  }
+
+  .sah-hero-search {
+    flex-wrap: wrap !important;
+    border-radius: var(--sah-radius-lg) !important;
+  }
+
+  .sah-hero-search input,
+  .sah-hero-search select,
+  .sah-hs-btn {
+    min-height: 48px !important;
+  }
+
+  .sah-hs-sep {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sah-container,
+  .sah-lhdr-inner,
+  .sah-rhdr-inner,
+  .sah-hdr-inner,
+  .cd-hero-top,
+  .cd-tab-bar,
+  .cd-main,
+  .pv2-inner {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .sah-login-main {
+    min-height: calc(100vh - 112px) !important;
+  }
+
+  .sah-login-card,
+  .ur-card,
+  .sah-step-card,
+  .pv2-gate-card {
+    border-radius: var(--sah-radius-lg) !important;
+  }
+
+  .sah-provider-grid,
+  .sah-hero-plans-grid,
+  .sah-steps-grid,
+  .cd-plan-grid,
+  .cd-row,
+  .cd-row-3,
+  .cd-svc-grid,
+  .pv2-mid-row,
+  .pv2-enquiry-grid,
+  .pv2-enquiry-grid-wide {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pv2-left,
+  .pv2-right-content {
+    flex-direction: column !important;
+  }
+
+  .pv2-right-avatar-col,
+  .pv2-right-info-col,
+  .pv2-right-actions-col {
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  .pv2-right-content {
+    gap: 22px !important;
+    min-height: auto !important;
+    padding: 28px !important;
+  }
+
+  .pv2-right {
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .sah-header,
+  .sah-hdr,
+  .sah-lhdr,
+  .sah-rhdr,
+  .ur-hdr {
+    height: 94px !important;
+    --header-h: 94px !important;
+    --hdr-h: 94px !important;
+  }
+
+  .sah-brand-logo,
+  .sah-hdr-logo,
+  .sah-lhdr-logo,
+  .sah-rhdr-logo,
+  .ur-hdr-logo {
+    width: 164px !important;
+    height: 54px !important;
+    max-width: 46vw !important;
+  }
+
+  .sah-header .sah-brand-logo {
+    width: 142px !important;
+    height: 48px !important;
+    max-width: 42vw !important;
+  }
+
+  .sah-hero-h1,
+  .sah-reg-hero-title,
+  .ur-hero-inner h1,
+  .pv2-name {
+    font-size: clamp(1.75rem, 9vw, 2.35rem) !important;
+  }
+
+  .sah-hero-search,
+  .sah-hero-search input,
+  .sah-hero-search select,
+  .sah-hs-btn,
+  .sah-form-nav-wrap,
+  .sah-nav-prev,
+  .sah-nav-next,
+  .ur-cols,
+  .sah-login-extras {
+    width: 100% !important;
+  }
+
+  .sah-hs-btn,
+  .sah-nav-prev,
+  .sah-nav-next {
+    justify-content: center !important;
+  }
 }

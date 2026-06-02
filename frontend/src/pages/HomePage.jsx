@@ -230,13 +230,15 @@ const CSS = `
   .sah-steps-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
   .sah-step{padding:38px 28px;border-right:1px solid var(--border);}
   .sah-step:last-child{border-right:none;}
-  .sah-step-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:#e0e0e0;display:block;line-height:1;margin-bottom:14px;}
+  .sah-step-num{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--accent);display:block;line-height:1;margin-bottom:14px;text-shadow:0 8px 20px rgba(201,98,26,0.14);}
   .sah-step h3{font-weight:700;font-size:0.97rem;color:var(--dark);margin-bottom:9px;}
   .sah-step p{font-size:0.85rem;color:var(--muted);line-height:1.65;}
 
   /* FOOTER */
   .sah-footer{background:#0e0e0e;color:rgba(255,255,255,0.55);padding:60px 0 32px;}
   .sah-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:44px;}
+  .sah-footer-brand-mark{display:inline-flex;align-items:center;margin-bottom:10px;text-decoration:none;}
+  .sah-footer-brand-mark img{display:block;width:128px;max-width:42vw;height:auto;filter:drop-shadow(0 5px 12px rgba(0,0,0,0.22));}
   .sah-footer-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;color:#fff;display:block;margin-bottom:12px;}
   .sah-footer-brand p{font-size:0.85rem;line-height:1.75;max-width:260px;color:rgba(255,255,255,0.55);}
   .sah-footer-newsletter{margin-top:20px;max-width:280px;}
@@ -850,7 +852,7 @@ export default function HomePage() {
       <header className="sah-header">
         <div className="sah-container sah-nav-inner">
           <Link to="/" className="sah-brand">
-            <img className="sah-brand-logo" src="/parentals-logo.png" alt="Parentals" />
+            <img className="sah-brand-logo" src="/parentals-logo-header.png" alt="Parentals" />
           </Link>
           <nav className="sah-nav-links">
             <a href="#sah-providers">Find Services</a>
@@ -1052,6 +1054,9 @@ export default function HomePage() {
         <div className="sah-container">
           <div className="sah-footer-grid">
             <div className="sah-footer-brand">
+              <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
+                <img src="/parentals-logo-header.png" alt="Parentals" />
+              </Link>
               <span className="sah-footer-logo">SA Homeschooling Directory</span>
               <p>South Africa's dedicated directory connecting homeschooling families with trusted tutors, therapists, curriculum providers and education specialists.</p>
               <div className="sah-footer-newsletter">
