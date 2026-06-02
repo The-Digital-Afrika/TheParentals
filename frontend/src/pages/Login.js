@@ -24,27 +24,29 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #f0dcc8;
-    --dark: #3a3a3a; --mid: #555; --muted: #888;
-    --card-gray: #d6d0c8; --card-white: #ede9e3;
-    --border: rgba(0,0,0,0.10); --header-h: 68px;
+    --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #ffe2a3;
+    --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --dark: #333330; --mid: #55514b; --muted: #837b70;
+    --card-gray: #d9d2c6; --card-white: #f6f2ec;
+    --border: rgba(0,0,0,0.10); --header-h: 140px;
     --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
     --radius: 8px; --radius-lg: 12px;
   }
   .sah-login-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
   .sah-login-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
-  .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: #5a5a5a; box-shadow: 0 2px 12px rgba(0,0,0,0.22); display: flex; align-items: center; flex-shrink: 0; }
+  .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%); box-shadow: 0 2px 12px rgba(0,0,0,0.22); display: flex; align-items: center; flex-shrink: 0; }
   .sah-lhdr-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
   .sah-lhdr-left { display: flex; align-items: center; gap: 0; }
   .sah-lhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
   .sah-lhdr-back:hover { color: #fff; }
   .sah-lhdr-div { width: 1px; height: 28px; background: rgba(255,255,255,0.28); margin: 0 16px; }
-  .sah-lhdr-brand { text-decoration: none; }
+  .sah-lhdr-brand { text-decoration: none; display: flex; align-items: center; }
+  .sah-lhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
   .sah-lhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
   .sah-lhdr-brand-tag { font-size: 0.66rem; color: rgba(255,255,255,0.68); font-weight: 500; letter-spacing: 0.45px; display: block; }
   .sah-lhdr-right { display: flex; align-items: center; gap: 10px; }
-  .sah-lhdr-solid { padding: 7px 18px; border-radius: 6px; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.86rem; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: background 0.15s; }
-  .sah-lhdr-solid:hover { background: var(--accent-dark); }
+  .sah-lhdr-solid { padding: 7px 18px; border-radius: 6px; background: var(--accent-gradient); color: #fff; font-weight: 700; font-size: 0.86rem; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: filter 0.15s; }
+  .sah-lhdr-solid:hover { filter: saturate(1.08) brightness(0.94); }
   .sah-login-main { flex: 1; display: flex; align-items: stretch; overflow: hidden; }
   .sah-login-left { flex: 0 0 48%; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; }
   .sah-login-left-bg { position: absolute; inset: 0; z-index: 0; background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&auto=format&fit=crop&q=80'); background-size: cover; background-position: center 30%; }
@@ -65,7 +67,7 @@ const CSS = `
   .sah-login-alert.info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
   .sah-login-alert.show { display: flex; align-items: center; gap: 8px; }
   .sah-login-card { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); overflow: hidden; }
-  .sah-login-card-head { background: #5a5a5a; padding: 18px 24px 14px; }
+  .sah-login-card-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 18px 24px 14px; }
   .sah-login-card-head h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
   .sah-login-card-head p { font-size: 0.78rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
   .sah-login-card-body { padding: 18px 22px 16px; }
@@ -87,8 +89,8 @@ const CSS = `
   .sah-forgot { background: none; border: none; color: var(--accent); font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 0; text-decoration: underline; }
   .sah-forgot:hover { color: var(--accent-dark); }
   .sah-login-submit-wrap { display: flex; flex-direction: column; gap: 8px; }
-  .sah-login-btn { width: 100%; padding: 12px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; transition: background 0.15s, transform 0.15s; }
-  .sah-login-btn:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
+  .sah-login-btn { width: 100%; padding: 12px; background: var(--accent-gradient); color: #fff; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px; transition: filter 0.15s, transform 0.15s; }
+  .sah-login-btn:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); transform: translateY(-1px); }
   .sah-login-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
   .sah-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -116,7 +118,7 @@ const CSS = `
   }
   @keyframes fp-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   .sah-fp-head {
-    background: #5a5a5a; padding: 22px 26px 18px;
+    background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 22px 26px 18px;
     position: relative;
   }
   .sah-fp-head h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 9px; }
@@ -132,7 +134,7 @@ const CSS = `
   .sah-fp-body { padding: 22px 26px 24px; }
   .sah-fp-steps { display: flex; gap: 6px; margin-bottom: 20px; }
   .sah-fp-step-dot { flex: 1; height: 3px; border-radius: 2px; transition: background 0.3s; }
-  .sah-fp-step-dot.active { background: var(--accent); }
+  .sah-fp-step-dot.active { background: var(--accent-gradient); }
   .sah-fp-step-dot.done   { background: #10b981; }
   .sah-fp-step-dot.inactive { background: rgba(0,0,0,0.10); }
   .sah-fp-step-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-align: center; margin-bottom: 16px; }
@@ -161,13 +163,13 @@ const CSS = `
   .sah-fp-resend button { background: none; border: none; color: var(--accent); font-weight: 600; cursor: pointer; font-family: inherit; font-size: inherit; padding: 0; }
   .sah-fp-resend button:disabled { opacity: 0.5; cursor: not-allowed; }
   .sah-fp-btn {
-    width: 100%; padding: 12px; background: var(--accent); color: #fff;
+    width: 100%; padding: 12px; background: var(--accent-gradient); color: #fff;
     border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
     font-size: 0.95rem; font-weight: 700; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: background 0.15s; margin-top: 4px;
   }
-  .sah-fp-btn:hover:not(:disabled) { background: var(--accent-dark); }
+  .sah-fp-btn:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); }
   .sah-fp-btn:disabled { opacity: 0.65; cursor: not-allowed; }
   .sah-fp-success-icon { text-align: center; font-size: 3rem; color: #10b981; margin-bottom: 16px; }
   .sah-fp-success-text { text-align: center; font-size: 0.88rem; color: var(--mid); line-height: 1.65; }
@@ -178,10 +180,15 @@ const CSS = `
   .sah-fp-info-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; margin-bottom: 14px; font-size: 0.82rem; color: #0369a1; display: flex; align-items: flex-start; gap: 8px; line-height: 1.6; }
   .sah-fp-info-box i { flex-shrink: 0; margin-top: 1px; }
 
-  @media (max-width: 768px) { .sah-login-left { display: none; } .sah-login-right { padding: 24px 20px; } }
+  @media (max-width: 768px) { .sah-login-left { display: none; } .sah-login-right { padding: 24px 20px; } .sah-lhdr-logo { width:150px; height:96px; max-width:42vw; } }
 
   @media(max-width:480px){
   .sah-login-right { padding: 20px 16px; }
+  .sah-lhdr-inner { padding: 0 16px; }
+  .sah-lhdr-back { font-size: 0; gap: 0; }
+  .sah-lhdr-back i { font-size: 0.88rem; }
+  .sah-lhdr-div { margin: 0 10px; }
+  .sah-lhdr-logo { width:132px; height:88px; max-width:40vw; }
   .sah-login-card-body { padding: 14px; }
   .sah-login-heading { font-size: 1.5rem; }
 }
@@ -535,8 +542,7 @@ const Login = () => {
             </button>
             <div className="sah-lhdr-div" />
             <Link to="/" className="sah-lhdr-brand">
-              <span className="sah-lhdr-brand-name">SA Homeschooling</span>
-              <span className="sah-lhdr-brand-tag">Education Services Directory</span>
+              <img className="sah-lhdr-logo" src="/parentals-logo.png" alt="Parentals" />
             </Link>
           </div>
           <div className="sah-lhdr-right">

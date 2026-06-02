@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 /* ── Inject footer CSS once — exact match to HomePage ───────────────────── */
 const FOOTER_CSS = `
   :root {
-    --ft-accent: #c9621a;
-    --ft-accent-dark: #a84e12;
+    --ft-accent: #e66f12;
+    --ft-accent-dark: #bd4610;
+    --ft-accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
   }
 
   .sah-footer {
@@ -71,14 +72,14 @@ const FOOTER_CSS = `
   .sah-footer-newsletter input::placeholder { color: rgba(255,255,255,0.35); }
   .sah-footer-newsletter button {
     padding: 10px 14px;
-    background: var(--ft-accent);
+    background: var(--ft-accent-gradient);
     color: #fff;
     border: none;
     font-weight: 700;
     font-size: 0.8rem;
-    transition: background 0.15s;
+    transition: filter 0.15s;
   }
-  .sah-footer-newsletter button:hover { background: var(--ft-accent-dark); }
+  .sah-footer-newsletter button:hover { filter: saturate(1.08) brightness(0.94); }
   .sah-nl-feedback {
     margin-top: 6px;
     font-size: 0.78rem;
@@ -159,7 +160,7 @@ const FOOTER_CSS = `
     font-size: 0.84rem;
     transition: all 0.15s;
   }
-  .sah-footer-soc:hover { background: var(--ft-accent); color: #fff; }
+  .sah-footer-soc:hover { background: var(--ft-accent-gradient); color: #fff; }
 
   /* Responsive */
   @media (max-width: 1100px) {

@@ -1,15 +1,16 @@
 /* profile.css - Profile page styles with homepage color scheme */
 
 :root {
-  --accent: #c9621a;
-  --accent-dark: #a84e12;
-  --accent-light: #f5e0cc;
-  --red: #c0234a;
-  --red-dark: #96183a;
-  --red-light: #f5d0d8;
-  --dark: #3a3a3a;
-  --mid: #555;
-  --muted: #888;
+  --accent: #e66f12;
+  --accent-dark: #bd4610;
+  --accent-light: #ffe2a3;
+  --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+  --red: #e62925;
+  --red-dark: #b91c1c;
+  --red-light: #ffd7d1;
+  --dark: #333330;
+  --mid: #55514b;
+  --muted: #837b70;
   --grey: #b5b5b5;
   --grey-dark: #7a7a7a;
   --light-bg: #f2f2f2;
@@ -315,7 +316,7 @@
 }
 
 .tag:hover {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: var(--white);
 }
 
@@ -539,7 +540,7 @@
 }
 
 .dc-soc:hover {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   transform: translateY(-2px);
 }
@@ -564,7 +565,7 @@
 }
 
 .avail-pill.on {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent);
 }

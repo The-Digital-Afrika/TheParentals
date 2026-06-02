@@ -16,16 +16,17 @@ const injectHead = () => {
   document.head.appendChild(fa);
 };
 
-const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #f0dcc8; --dark: #3a3a3a; --mid: #555; --muted: #888; --card-gray: #d6d0c8; --card-white: #ede9e3; --border: rgba(0,0,0,0.10); --header-h: 68px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
+const CSS = `:root{ --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #ffe2a3; --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%); --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
 .sah-reg-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
 .sah-reg-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; -webkit-font-smoothing: antialiased; color: var(--dark); }
-.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: #5a5a5a; box-shadow: 0 2px 12px rgba(0,0,0,0.22); }
+.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%); box-shadow: 0 2px 12px rgba(0,0,0,0.22); }
 .sah-rhdr-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
 .sah-rhdr-left { display: flex; align-items: center; }
 .sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
 .sah-rhdr-back:hover { color: #fff; }
 .sah-rhdr-div { width: 1px; height: 28px; background: rgba(255,255,255,0.28); margin: 0 16px; }
-.sah-rhdr-brand { text-decoration: none; }
+.sah-rhdr-brand { text-decoration: none; display: flex; align-items: center; }
+.sah-rhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 .sah-rhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
 .sah-rhdr-brand-tag { font-size: 0.66rem; color: rgba(255,255,255,0.68); font-weight: 500; letter-spacing: 0.45px; display: block; }
 .sah-rhdr-right { display: flex; gap: 10px; align-items: center; }
@@ -41,13 +42,13 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-step-trail::-webkit-scrollbar { display: none; }
 .sah-trail-item { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
 .sah-trail-dot { display: flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 50px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.07); transition: all 0.2s; cursor: default; }
-.sah-trail-dot.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.28); }
+.sah-trail-dot.active { background: var(--accent-gradient); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.28); }
 .sah-trail-dot.done { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.80); border-color: rgba(255,255,255,0.35); }
 .sah-trail-dot .sah-tn { font-size: 0.68rem; opacity: 0.75; margin-right: 2px; }
 .sah-trail-arrow { color: rgba(255,255,255,0.25); font-size: 0.62rem; margin: 0 6px; flex-shrink: 0; }
 .sah-reg-panel { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .sah-step-card { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); margin-top: 28px; overflow: visible; }
-.sah-step-card-head { background: #5a5a5a; padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.sah-step-card-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .sah-step-card-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
 .sah-step-card-head p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
 .sah-step-card-body { padding: 32px 36px 28px; overflow: visible; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
@@ -69,11 +70,11 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-plan-features li.no { color: #888; }
 .sah-ico-yes { color: #16a34a; font-size: 0.7rem; }
 .sah-ico-no { color: #ccc; font-size: 0.7rem; }
-.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
-.sah-plan-select-btn:hover { background: var(--accent-dark); }
+.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent-gradient); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.sah-plan-select-btn:hover { filter: saturate(1.08) brightness(0.94); }
 .sah-plan-select-btn.selected { background: #3a3a3a; }
 .sah-terms-box { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
-.sah-terms-box-head { background: #5a5a5a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
+.sah-terms-box-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
 .sah-terms-box-head-title { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 800; color: #fff; }
 .sah-terms-view-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.55); background: rgba(255,255,255,0.10); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.80rem; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sah-terms-view-btn:hover { background: rgba(255,255,255,0.22); border-color: #fff; }
@@ -168,9 +169,9 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-nav-counter { text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .sah-nav-counter strong { color: var(--accent); font-size: 1rem; }
 .sah-nav-progress { height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-.sah-nav-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(201,98,26,0.45); }
-.sah-nav-next:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
+.sah-nav-progress-fill { height: 100%; background: var(--accent-gradient); border-radius: 2px; transition: width 0.3s; }
+.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent-gradient); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: filter 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(201,98,26,0.45); }
+.sah-nav-next:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); transform: translateY(-1px); }
 .sah-nav-next:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 .sah-nav-submit { background: #3a3a3a; box-shadow: 0 6px 20px -4px rgba(0,0,0,0.3); }
 .sah-nav-submit:hover:not(:disabled) { background: #1e1e1e; }
@@ -191,7 +192,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
   .sah-reg-hero-inner { padding: 28px 16px; }
   .sah-rhdr-inner { padding: 0 16px; }
   .sah-rhdr-right { display: none; }
-  .sah-rhdr-brand-tag { display: none; }
+  .sah-rhdr-logo { width: 150px; height: 96px; max-width: 42vw; }
   .sah-form-nav-wrap { flex-wrap: wrap; padding: 14px 16px; gap: 10px; }
   .sah-nav-counter { order: 3; width: 100%; }
   .sah-terms-box-head { flex-wrap: wrap; gap: 8px; }
@@ -208,7 +209,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 @media (max-width: 480px) {
   .sah-rhdr-inner { padding: 0 12px; }
   .sah-rhdr-back span { display: none; }
-  .sah-rhdr-brand-name { font-size: 0.88rem; }
+  .sah-rhdr-logo { width: 132px; height: 88px; max-width: 40vw; }
   .sah-reg-panel { padding: 0 10px 60px; }
   .sah-step-card-body { padding: 14px 12px; }
   .sah-step-card-head { padding: 14px 14px 10px; }
@@ -1513,8 +1514,7 @@ const Registration = () => {
             </button>
             <div className="sah-rhdr-div" />
             <Link to="/" className="sah-rhdr-brand">
-              <span className="sah-rhdr-brand-name">SA Homeschooling</span>
-              <span className="sah-rhdr-brand-tag">Education Services Directory</span>
+              <img className="sah-rhdr-logo" src="/parentals-logo.png" alt="Parentals" />
             </Link>
           </div>
           <div className="sah-rhdr-right">

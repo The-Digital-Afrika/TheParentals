@@ -93,7 +93,7 @@ function findProvider(id, email) {
 }
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const ORANGE = '#c2510a';
+const ORANGE = '#e66f12';
 
 /* ── Inject all styles ── */
 const injectStyles = () => {
@@ -810,7 +810,7 @@ const Profile = () => {
       {fromDashboard ? (
         <header style={{
           position: 'sticky', top: 0, zIndex: 1000,
-          height: '68px', background: '#5a5a5a',
+          height: '140px', background: 'linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%)',
           boxShadow: '0 2px 12px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', flexShrink: 0,
         }}>
@@ -820,10 +820,11 @@ const Profile = () => {
                 <i className="fas fa-arrow-left" /> Back to Dashboard
               </button>
               <span style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.28)', margin: '0 16px' }} />
-              <div>
-                <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 800, fontSize: '1.02rem', color: '#fff', display: 'block' }}>SA Homeschooling</span>
-                <span style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.68)', fontWeight: 500, letterSpacing: '0.45px', display: 'block' }}>Education Services Directory</span>
-              </div>
+              <img
+                src="/parentals-logo.png"
+                alt="Parentals"
+                style={{ display: 'block', width: 230, maxWidth: '28vw', height: 124, objectFit: 'contain', objectPosition: 'left center', filter: 'drop-shadow(0 3px 12px rgba(255,138,31,0.26))' }}
+              />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 6, border: '1.5px solid rgba(255,255,255,0.55)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>

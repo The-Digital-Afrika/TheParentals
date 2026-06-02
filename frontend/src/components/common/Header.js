@@ -5,12 +5,13 @@ import { useNotification } from '../../contexts/NotificationContext';
 
 const HEADER_CSS = `
   :root {
-    --hdr-bg:       #5a5a5a;
-    --hdr-bg-mob:   #4a4a4a;
-    --hdr-accent:   #f97316;
-    --hdr-accent-dk:#ea580c;
-    --hdr-accent-lt:#fed7aa;
-    --hdr-h:        68px;
+    --hdr-bg:       #3f3f3c;
+    --hdr-bg-mob:   #343431;
+    --hdr-accent:   #e66f12;
+    --hdr-accent-dk:#bd4610;
+    --hdr-accent-lt:#ffe2a3;
+    --hdr-accent-gradient:linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --hdr-h:        140px;
   }
   .sah-hdr, .sah-hdr *, .sah-hdr *::before, .sah-hdr *::after,
   .sah-hdr-mobile, .sah-hdr-mobile *, .sah-hdr-mobile *::before, .sah-hdr-mobile *::after {
@@ -18,7 +19,7 @@ const HEADER_CSS = `
   }
   .sah-hdr {
     position: sticky; top: 0; z-index: 1000;
-    height: var(--hdr-h); background: var(--hdr-bg);
+    height: var(--hdr-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%);
     box-shadow: 0 2px 12px rgba(0,0,0,0.22);
     font-family: 'DM Sans', sans-serif;
     color: #ffffff;
@@ -49,6 +50,11 @@ const HEADER_CSS = `
   .sah-hdr-brand {
     display: flex; align-items: center; gap: 12px;
     text-decoration: none; flex-shrink: 0;
+  }
+  .sah-hdr-logo {
+    display: block; width: 230px; max-width: 28vw; height: 124px;
+    object-fit: contain; object-position: left center;
+    filter: drop-shadow(0 3px 12px rgba(255,138,31,0.26));
   }
   .sah-hdr-brand-text {
     display: flex; flex-direction: column; line-height: 1.15;
@@ -94,13 +100,13 @@ const HEADER_CSS = `
   }
   .sah-hdr-solid {
     padding: 7px 18px; border-radius: 6px;
-    background: var(--hdr-accent); color: #fff;
+    background: var(--hdr-accent-gradient); color: #fff;
     font-weight: 700; font-size: 0.86rem; border: none; cursor: pointer;
     transition: background 0.15s; font-family: 'DM Sans', sans-serif;
     text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
     white-space: nowrap;
   }
-  .sah-hdr-solid:hover { background: var(--hdr-accent-dk); }
+  .sah-hdr-solid:hover { filter: saturate(1.08) brightness(0.94); }
   /* Hamburger */
   .sah-hdr-ham {
     display: none; flex-direction: column; justify-content: center;
@@ -151,10 +157,10 @@ const HEADER_CSS = `
     background: transparent !important; color: #fff !important;
   }
   .sah-mob-solid {
-    background: var(--hdr-accent) !important; color: #fff !important;
+    background: var(--hdr-accent-gradient) !important; color: #fff !important;
     border: none !important;
   }
-  .sah-mob-solid:hover { background: var(--hdr-accent-dk) !important; }
+  .sah-mob-solid:hover { filter: saturate(1.08) brightness(0.94); }
   /* Responsive */
   @media (max-width: 960px) { .sah-hdr-nav { display: none; } }
   @media (max-width: 760px) {
@@ -165,14 +171,12 @@ const HEADER_CSS = `
   @media (max-width: 480px) {
     .sah-hdr-inner { padding: 0 16px; }
     .sah-hdr-back span { display: none; }
-    .sah-hdr-brand-name { font-size: 0.9rem; }
-    .sah-hdr-brand-tag { font-size: 0.62rem; }
+    .sah-hdr-logo { width: 140px; height: 92px; max-width: 42vw; }
   }
 
   @media(max-width:480px){
   .sah-hdr-inner { padding: 0 12px; gap: 8px; }
-  .sah-hdr-brand-name { font-size: 0.82rem; }
-  .sah-hdr-brand-tag { display: none; }
+  .sah-hdr-logo { width: 132px; height: 88px; max-width: 40vw; }
   .sah-hdr-back span { display: none; }
   .sah-hdr-back-div { margin: 0 8px; }
   .sah-hdr-ctas { display: none; }
@@ -245,10 +249,7 @@ const Header = () => {
               </>
             )}
             <Link to="/" className="sah-hdr-brand">
-              <div className="sah-hdr-brand-text">
-                <span className="sah-hdr-brand-name">SA Homeschooling</span>
-                <span className="sah-hdr-brand-tag">Education Services Directory</span>
-              </div>
+              <img className="sah-hdr-logo" src="/parentals-logo.png" alt="Parentals" />
             </Link>
           </div>
 

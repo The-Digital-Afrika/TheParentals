@@ -16,15 +16,16 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --accent:#c9621a; --accent-dark:#a84e12; --accent-light:#f5e0cc;
-    --red:#c0234a; --red-dark:#96183a; --red-light:#f5d0d8;
-    --dark:#3a3a3a; --mid:#555; --muted:#888;
-    --grey:#b5b5b5; --grey-dark:#7a7a7a; --light-bg:#f2f2f2; --white:#fff;
+    --accent:#e66f12; --accent-dark:#bd4610; --accent-light:#ffe2a3;
+    --accent-gradient:linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --red:#e62925; --red-dark:#b91c1c; --red-light:#ffd7d1;
+    --dark:#333330; --mid:#55514b; --muted:#837b70;
+    --grey:#9a958c; --grey-dark:#6a655d; --light-bg:#f6f2ec; --white:#fff;
     --border:rgba(0,0,0,0.08);
     --shadow-sm:0 1px 4px rgba(0,0,0,0.06);
     --shadow-md:0 4px 20px rgba(0,0,0,0.09);
     --shadow-lg:0 12px 48px rgba(0,0,0,0.12);
-    --radius:8px; --radius-lg:12px; --header-h:68px;
+    --radius:8px; --radius-lg:12px; --header-h:140px;
   }
   .sah-wrap *,.sah-wrap *::before,.sah-wrap *::after{box-sizing:border-box;margin:0;padding:0;}
   .sah-wrap{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--dark);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
@@ -34,10 +35,11 @@ const CSS = `
   .sah-container{max-width:1280px;margin:0 auto;padding:0 32px;}
 
   /* HEADER */
-  .sah-header{position:sticky;top:0;z-index:1000;height:var(--header-h);background:#5a5a5a;}
+  .sah-header{position:sticky;top:0;z-index:1000;height:var(--header-h);background:linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%);box-shadow:0 2px 14px rgba(35,31,27,0.26);}
   .sah-nav-inner{height:100%;display:flex;justify-content:space-between;align-items:center;}
   .sah-brand{display:flex;align-items:center;gap:12px;}
-  .sah-brand-divider{width:2px;height:30px;background:rgba(255,255,255,0.5);border-radius:1px;}
+  .sah-brand-logo{display:block;width:230px;max-width:28vw;height:124px;object-fit:contain;object-position:left center;filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26));}
+  .sah-brand-divider{width:2px;height:30px;background:rgba(255,211,106,0.55);border-radius:1px;}
   .sah-brand-text{display:flex;flex-direction:column;line-height:1.15;}
   .sah-brand-name{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:#fff;letter-spacing:0.2px;}
   .sah-brand-tag{font-size:0.66rem;color:rgba(255,255,255,0.75);font-weight:500;letter-spacing:0.5px;}
@@ -48,12 +50,12 @@ const CSS = `
   .sah-btn-ghost-nav{padding:7px 16px;border-radius:5px;border:1.5px solid rgba(255,255,255,0.6);background:transparent;color:#fff;font-weight:600;font-size:0.85rem;transition:all 0.15s;cursor:pointer;}
   .sah-btn-ghost-nav:hover{border-color:#fff;background:rgba(255,255,255,0.2);}
   .sah-btn-solid-nav{
-    padding:7px 18px;border-radius:5px;background:var(--accent);
+    padding:7px 18px;border-radius:5px;background:var(--accent-gradient);
     color:#fff !important;font-weight:700;font-size:0.85rem;border:none;
     transition:background 0.15s;box-shadow:none !important;
     display:inline-block;cursor:pointer;text-decoration:none;
   }
-  .sah-btn-solid-nav:hover{background:var(--accent-dark);}
+  .sah-btn-solid-nav:hover{filter:saturate(1.08) brightness(0.94);}
 
   /* User Profile Button in Header */
   .sah-user-profile-btn {
@@ -72,11 +74,11 @@ const CSS = `
   .sah-logout-btn {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 7px 18px; border-radius: 6px; border: none;
-    background: var(--accent); color: #fff; font-weight: 700;
+    background: var(--accent-gradient); color: #fff; font-weight: 700;
     font-size: 0.85rem; cursor: pointer; font-family: inherit;
     transition: background 0.15s;
   }
-  .sah-logout-btn:hover { background: var(--accent-dark); }
+  .sah-logout-btn:hover { filter:saturate(1.08) brightness(0.94); }
   .sah-logout-btn i { color: rgba(255,255,255,0.9); }
 
   /* HERO */
@@ -84,7 +86,7 @@ const CSS = `
   .sah-hero-bg{position:absolute;inset:0;z-index:0;
     background-image:url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80');
     background-size:cover;background-position:center 30%;}
-  .sah-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(20,20,20,0.90) 0%,rgba(50,50,50,0.80) 45%,rgba(15,15,15,0.62) 100%);}
+  .sah-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(24,23,21,0.92) 0%,rgba(66,54,39,0.82) 48%,rgba(20,19,18,0.66) 100%);}
   .sah-hero-inner{position:relative;z-index:2;padding:60px 0;width:100%;}
   .sah-hero-top{text-align:center;margin-bottom:36px;}
   .sah-hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5.5vw,4.4rem);font-weight:900;line-height:1.07;color:#fff;margin-bottom:22px;letter-spacing:-0.3px;}
@@ -97,8 +99,8 @@ const CSS = `
   .sah-hero-search input::placeholder{color:#bbb;}
   .sah-hs-sep{width:1px;background:var(--border);margin:10px 0;flex-shrink:0;}
   .sah-hero-search select{border:none;outline:none;padding:0 14px;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--muted);cursor:pointer;min-width:140px;flex-shrink:0;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
-  .sah-hs-btn{background:var(--accent);color:#fff;border:none;padding:0 26px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.92rem;white-space:nowrap;transition:background 0.15s;flex-shrink:0;cursor:pointer;}
-  .sah-hs-btn:hover{background:var(--accent-dark);}
+  .sah-hs-btn{background:var(--accent-gradient);color:#fff;border:none;padding:0 26px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.92rem;white-space:nowrap;transition:filter 0.15s;flex-shrink:0;cursor:pointer;}
+  .sah-hs-btn:hover{filter:saturate(1.08) brightness(0.94);}
 
   /* HERO TAGLINE */
   .sah-hero-tagline{text-align:center;margin-top:22px;margin-bottom:36px;}
@@ -118,12 +120,12 @@ const CSS = `
   /* BECOME PROVIDER BUTTON */
   .sah-become-btn{
     display:inline-flex;align-items:center;gap:10px;padding:13px 30px;
-    background:var(--accent);color:#fff !important;border:none;
+    background:var(--accent-gradient);color:#fff !important;border:none;
     border-radius:var(--radius);font-weight:700;font-size:0.97rem;
     transition:background 0.15s,transform 0.15s;cursor:pointer;
     box-shadow:none;text-decoration:none;
   }
-  .sah-become-btn:hover{background:var(--accent-dark);transform:translateY(-2px);}
+  .sah-become-btn:hover{filter:saturate(1.08) brightness(0.94);transform:translateY(-2px);}
   .sah-become-btn.active{background:#3a3a3a;box-shadow:none;}
   .sah-become-btn.active:hover{background:#1e1e1e;transform:none;}
   .sah-become-btn .sah-chev{font-size:0.78rem;transition:transform 0.3s ease;}
@@ -160,8 +162,8 @@ const CSS = `
   .sah-plan-features li.no{color:rgba(255,255,255,0.32);}
   .sah-ico-yes{color:#4ade80;font-size:0.7rem;}
   .sah-ico-no{color:rgba(255,255,255,0.22);font-size:0.7rem;}
-  .sah-plan-cta-link{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;background:var(--accent);color:#fff !important;border:none;border-radius:var(--radius);font-size:0.82rem;font-weight:700;transition:background 0.15s;cursor:pointer;text-decoration:none;}
-  .sah-plan-cta-link:hover{background:var(--accent-dark);}
+  .sah-plan-cta-link{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;background:var(--accent-gradient);color:#fff !important;border:none;border-radius:var(--radius);font-size:0.82rem;font-weight:700;transition:filter 0.15s;cursor:pointer;text-decoration:none;}
+  .sah-plan-cta-link:hover{filter:saturate(1.08) brightness(0.94);}
 
   /* FILTER BAR */
   .sah-filter-bar{background:var(--white);border-bottom:1px solid var(--border);}
@@ -188,7 +190,7 @@ const CSS = `
   .sah-card-thumb{position:relative;height:165px;overflow:hidden;background:var(--accent-light);flex-shrink:0;}
   .sah-card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 0.35s;}
   .sah-provider-card:hover .sah-card-thumb img{transform:scale(1.04);}
-  .sah-card-thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.8rem;color:var(--accent);background:linear-gradient(135deg,#f0e8df,#f5e0cc);}
+  .sah-card-thumb-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.8rem;color:var(--accent);background:linear-gradient(135deg,#fff7df,#ffe3a3);}
   .sah-card-badges{position:absolute;top:9px;left:9px;display:flex;gap:4px;}
   .sah-cbadge{padding:3px 9px;border-radius:3px;font-size:0.67rem;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
   .sah-cbadge-featured{background:var(--red);color:#fff;}
@@ -213,7 +215,7 @@ const CSS = `
   .sah-from-label{font-size:0.65rem;color:var(--muted);line-height:1;}
   .sah-card-price{font-family:'Playfair Display',serif;font-size:1.08rem;font-weight:800;color:var(--accent);}
   .sah-card-cta{padding:6px 13px;background:var(--grey);color:#fff;border:none;border-radius:5px;font-size:0.77rem;font-weight:700;transition:background 0.15s;}
-  .sah-card-cta:hover{background:var(--accent);}
+  .sah-card-cta:hover{background:var(--accent-gradient);}
   .sah-grid-empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);}
   .sah-grid-empty i{font-size:2.2rem;margin-bottom:12px;opacity:0.3;display:block;}
   .sah-grid-empty h3{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--dark);margin-bottom:7px;}
@@ -240,7 +242,7 @@ const CSS = `
   .sah-footer-newsletter{margin-top:20px;max-width:280px;}
   .sah-footer-newsletter-row{display:flex;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);}
   .sah-footer-newsletter input{flex:1;padding:10px 13px;background:rgba(255,255,255,0.06);border:none;color:#fff;font-family:inherit;font-size:0.82rem;outline:none;}
-  .sah-footer-newsletter button{padding:10px 14px;background:var(--accent);color:#fff;border:none;font-weight:700;font-size:0.8rem;cursor:pointer;}
+  .sah-footer-newsletter button{padding:10px 14px;background:var(--accent-gradient);color:#fff;border:none;font-weight:700;font-size:0.8rem;cursor:pointer;}
   .sah-nl-feedback{font-size:0.74rem;margin-top:6px;}
   .sah-nl-feedback.error{color:#f87171;}
   .sah-nl-feedback.success{color:#4ade80;}
@@ -258,14 +260,14 @@ const CSS = `
   .sah-footer-bottom-links a:hover{color:#fff;}
   .sah-footer-socials{display:flex;gap:8px;}
   .sah-footer-soc{width:34px;height:34px;border-radius:5px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.45);font-size:0.84rem;text-decoration:none;transition:all 0.15s;}
-  .sah-footer-soc:hover{background:var(--accent);color:#fff;}
+  .sah-footer-soc:hover{background:var(--accent-gradient);color:#fff;}
 
   /* REGISTER MODAL */
   .sah-modal-overlay{position:fixed;inset:0;z-index:9000;background:rgba(8,0,4,0.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.22s;}
   .sah-modal-overlay.open{opacity:1;pointer-events:all;}
   .sah-modal-box{background:var(--white);width:460px;max-width:93vw;border-radius:var(--radius-lg);box-shadow:0 28px 72px rgba(0,0,0,0.28);overflow:hidden;transform:translateY(14px);transition:transform 0.22s ease;}
   .sah-modal-overlay.open .sah-modal-box{transform:translateY(0);}
-  .sah-modal-head{background:#5a5a5a;padding:26px 28px 20px;position:relative;}
+  .sah-modal-head{background:linear-gradient(90deg,#3b3b38,#5a4631);padding:26px 28px 20px;position:relative;}
   .sah-modal-head h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:800;color:#fff;}
   .sah-modal-head p{font-size:0.86rem;color:rgba(255,255,255,0.65);margin-top:3px;}
   .sah-modal-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:4px;background:rgba(255,255,255,0.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.88rem;transition:background 0.15s;cursor:pointer;}
@@ -300,12 +302,12 @@ const CSS = `
   }
   .sah-login-modal-actions{display:flex;flex-direction:column;gap:9px;}
   .sah-login-modal-primary{
-    width:100%;padding:12px 20px;background:var(--accent);color:#fff;
+    width:100%;padding:12px 20px;background:var(--accent-gradient);color:#fff;
     border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;
     font-weight:700;font-size:0.92rem;cursor:pointer;
     transition:background 0.15s;
   }
-  .sah-login-modal-primary:hover{background:var(--accent-dark);}
+  .sah-login-modal-primary:hover{filter:saturate(1.08) brightness(0.94);}
   .sah-login-modal-secondary{
     width:100%;padding:11px 20px;background:transparent;color:var(--dark);
     border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;
@@ -337,6 +339,7 @@ const CSS = `
   }
   @media(max-width:768px){
     .sah-nav-links{display:none;}
+    .sah-brand-logo{width:170px;height:104px;max-width:38vw;}
     .sah-provider-grid{grid-template-columns:repeat(2,1fr);}
     .sah-steps-grid{grid-template-columns:1fr;}
     .sah-step{border-right:none!important;border-bottom:1px solid var(--border);}
@@ -366,6 +369,7 @@ const CSS = `
 @media(max-width:480px){
   .sah-hero-h1 { font-size: clamp(1.8rem, 7vw, 2.5rem); }
   .sah-container { padding: 0 16px; }
+  .sah-brand-logo { width:140px;height:92px;max-width:42vw; }
   .sah-provider-grid { grid-template-columns: 1fr; }
   .sah-become-btn { width: 100%; justify-content: center; }
 }
@@ -651,7 +655,7 @@ function LoginRequiredModal({ open, onClose, onLogin, onRegister, message }) {
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="sah-modal-box">
-        <div className="sah-modal-head" style={{ background:"#5a5a5a" }}>
+        <div className="sah-modal-head" style={{ background:"linear-gradient(90deg,#3b3b38,#5a4631)" }}>
           <h2>Login Required</h2>
           <p>You need an account to continue</p>
           <button className="sah-modal-close" onClick={onClose}>
@@ -846,11 +850,7 @@ export default function HomePage() {
       <header className="sah-header">
         <div className="sah-container sah-nav-inner">
           <Link to="/" className="sah-brand">
-            <div className="sah-brand-divider" />
-            <div className="sah-brand-text">
-              <span className="sah-brand-name">SA Homeschooling</span>
-              <span className="sah-brand-tag">Education Services</span>
-            </div>
+            <img className="sah-brand-logo" src="/parentals-logo.png" alt="Parentals" />
           </Link>
           <nav className="sah-nav-links">
             <a href="#sah-providers">Find Services</a>

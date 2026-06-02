@@ -1,15 +1,16 @@
 /* dashboard.css - Shared dashboard styles with homepage color scheme */
 
 :root {
-  --accent: #c9621a;
-  --accent-dark: #a84e12;
-  --accent-light: #f5e0cc;
-  --red: #c0234a;
-  --red-dark: #96183a;
-  --red-light: #f5d0d8;
-  --dark: #3a3a3a;
-  --mid: #555;
-  --muted: #888;
+  --accent: #e66f12;
+  --accent-dark: #bd4610;
+  --accent-light: #ffe2a3;
+  --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+  --red: #e62925;
+  --red-dark: #b91c1c;
+  --red-light: #ffd7d1;
+  --dark: #333330;
+  --mid: #55514b;
+  --muted: #837b70;
   --grey: #b5b5b5;
   --grey-dark: #7a7a7a;
   --light-bg: #f2f2f2;
@@ -81,7 +82,7 @@
 }
 
 .profile-preview-badge:hover {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
 }
 
@@ -103,7 +104,7 @@
 }
 
 .pending-badge {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   padding: 3px 10px;
   border-radius: 40px;
@@ -246,12 +247,12 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--accent);
+  background: var(--accent-gradient);
   border-radius: 3px 3px 0 0;
 }
 
 .pending-badge {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   padding: 2px 6px;
   border-radius: 20px;
@@ -357,7 +358,7 @@
 }
 
 .featured-tag {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   padding: 2px 8px;
   border-radius: 40px;
@@ -447,7 +448,7 @@
 
 .badge-option.featured:hover,
 .badge-option.featured.selected {
-  background: var(--accent);
+  background: var(--accent-gradient);
   border-color: var(--accent);
   color: white;
 }
@@ -484,7 +485,7 @@
 }
 
 .demote-btn:hover {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent);
 }
@@ -562,7 +563,7 @@
 }
 
 .slot-list button:hover {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent);
 }
@@ -670,7 +671,7 @@
 }
 
 .btn-reject {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
 }
 
@@ -781,7 +782,7 @@ hr {
 }
 
 .btn-edit:hover:not(:disabled) {
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent);
 }
@@ -913,7 +914,7 @@ select[multiple].profile-value {
 
 .tag-input-wrapper button {
   padding: 0 16px;
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -1036,7 +1037,7 @@ select[multiple].profile-value {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   border-radius: 40px;
   font-size: 0.8rem;
@@ -1131,7 +1132,7 @@ select[multiple].profile-value {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: var(--accent);
+  background: var(--accent-gradient);
   color: white;
   padding: 2px 8px;
   border-radius: 40px;
