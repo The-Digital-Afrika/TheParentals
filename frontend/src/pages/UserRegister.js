@@ -18,8 +18,8 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --acc:#e66f12; --acc-d:#bd4610; --acc-l:#ffe2a3;
-    --acc-gradient:linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --acc:#e94b13; --acc-d:#d9410d; --acc-l:#ffe2a3;
+    --acc-gradient:linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
     --dark:#333330; --mid:#55514b; --muted:#837b70;
     --card:#f6f2ec; --white:#fff;
     --border:rgba(0,0,0,0.10);
@@ -29,7 +29,7 @@ const CSS = `
   .ur-wrap { font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; background:var(--card); -webkit-font-smoothing:antialiased; }
   .ur-wrap * { box-sizing:border-box; margin:0; padding:0; }
 
-  .ur-hdr { height:140px; background:linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%); display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(0,0,0,0.22); }
+  .ur-hdr { height:140px; background:linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%); display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
   .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.85rem; font-weight:600; background:none; border:none; cursor:pointer; font-family:inherit; }
   .ur-hdr-back:hover { color:#fff; }
   .ur-hdr-div { width:1px; height:26px; background:rgba(255,255,255,0.25); }

@@ -4,7 +4,7 @@
   --sah-navy-900: #0a1f44;
   --sah-navy-800: #102f63;
   --sah-navy-100: #e8eef8;
-  --sah-ember-700: #b8201d;
+  --sah-ember-700: #d9410d;
   --sah-ember-600: #df4f17;
   --sah-ember-500: #f47a1f;
   --sah-gold-500: #f7bd3d;
@@ -18,6 +18,8 @@
   --sah-warning: #c87907;
   --sah-error: #b42318;
   --sah-info: #2563a8;
+  --sah-button-orange: #e94b13;
+  --sah-button-orange-hover: #d9410d;
   --sah-primary: var(--sah-ember-600);
   --sah-secondary: var(--sah-ember-500);
   --sah-accent: var(--sah-gold-500);
@@ -28,7 +30,8 @@
   --sah-border-strong: rgba(223, 79, 23, 0.26);
   --sah-focus: rgba(244, 122, 31, 0.24);
   --sah-gradient: linear-gradient(110deg, #f7bd3d 0%, #f47a1f 28%, #df4f17 48%, #375b83 76%, #0a1f44 100%);
-  --sah-warm-gradient: linear-gradient(135deg, #df4f17 0%, #f47a1f 52%, #f7bd3d 100%);
+  --sah-warm-gradient: linear-gradient(135deg, var(--sah-button-orange) 0%, var(--sah-button-orange) 100%);
+  --sah-menu-blue: rgba(74, 107, 141, 0.9);
   --sah-shadow-sm: 0 2px 8px rgba(6, 20, 45, 0.08);
   --sah-shadow-md: 0 12px 32px rgba(6, 20, 45, 0.12);
   --sah-shadow-lg: 0 24px 64px rgba(6, 20, 45, 0.18);
@@ -217,10 +220,55 @@ input[type='radio'] {
 .sah-rhdr,
 .ur-hdr,
 .pv2-dashboard-header {
-  background:
-    linear-gradient(100deg, rgba(247, 189, 61, 0.96) 0%, rgba(244, 122, 31, 0.95) 34%, rgba(223, 79, 23, 0.92) 53%, rgba(55, 91, 131, 0.9) 78%, rgba(10, 31, 68, 0.94) 100%) !important;
-  box-shadow: 0 12px 32px rgba(118, 70, 25, 0.22) !important;
-  border-bottom: 1px solid rgba(247, 189, 61, 0.24) !important;
+  position: sticky !important;
+  height: 96px !important;
+  --header-h: 96px !important;
+  --hdr-h: 96px !important;
+  background: var(--sah-menu-blue) !important;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04) 44%, rgba(8,32,64,0.12)) !important;
+  backdrop-filter: blur(14px) saturate(1.04) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.04) !important;
+  box-shadow: 0 12px 32px rgba(18, 45, 82, 0.18) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+}
+
+.sah-header::before,
+.sah-hdr::before,
+.sah-lhdr::before,
+.sah-rhdr::before,
+.ur-hdr::before,
+.pv2-dashboard-header::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  z-index: 0 !important;
+}
+
+.sah-nav-inner,
+.sah-hdr-inner,
+.sah-lhdr-inner,
+.sah-rhdr-inner,
+.ur-hdr,
+.pv2-dashboard-header > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.sah-brand,
+.sah-hdr-brand,
+.sah-lhdr-brand,
+.sah-rhdr-brand,
+.ur-hdr-brand {
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.66)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.62) !important;
+  border-radius: 7px !important;
+  padding: 6px 14px !important;
+  box-shadow: 0 8px 22px rgba(8, 28, 56, 0.14), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 .sah-brand-logo,
@@ -228,18 +276,18 @@ input[type='radio'] {
 .sah-lhdr-logo,
 .sah-rhdr-logo,
 .ur-hdr-logo {
-  width: 252px !important;
+  width: 210px !important;
   max-width: 34vw !important;
-  height: 82px !important;
+  height: 56px !important;
   object-fit: contain !important;
   object-position: left center !important;
-  filter: drop-shadow(0 6px 16px rgba(6, 20, 45, 0.22)) !important;
+  filter: drop-shadow(0 3px 8px rgba(6, 20, 45, 0.12)) !important;
 }
 
 .sah-header .sah-brand-logo {
-  width: 196px !important;
+  width: 190px !important;
   max-width: 26vw !important;
-  height: 64px !important;
+  height: 52px !important;
 }
 
 .sah-nav-links a,
@@ -291,7 +339,7 @@ input[type='radio'] {
 .pv2-gate-btn-primary,
 .pv2-enquiry-send-btn,
 .sah-footer-newsletter button {
-  background: var(--sah-warm-gradient) !important;
+  background: var(--sah-button-orange) !important;
   color: #ffffff !important;
   border-color: transparent !important;
   box-shadow: 0 10px 22px rgba(223, 79, 23, 0.22) !important;
@@ -317,7 +365,8 @@ input[type='radio'] {
 .pv2-gate-btn-primary:hover,
 .pv2-enquiry-send-btn:hover,
 .sah-footer-newsletter button:hover {
-  filter: saturate(1.05) brightness(0.98) !important;
+  background: var(--sah-button-orange-hover) !important;
+  filter: saturate(1.02) brightness(0.98) !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 14px 30px rgba(223, 79, 23, 0.28) !important;
 }
@@ -429,8 +478,8 @@ button:disabled,
 .adm-role-tab.active,
 .tab-btn.active,
 .cd-tab-btn.active {
-  background: var(--sah-ember-600) !important;
-  border-color: var(--sah-ember-600) !important;
+  background: var(--sah-button-orange) !important;
+  border-color: var(--sah-button-orange) !important;
   color: #ffffff !important;
   box-shadow: 0 8px 20px rgba(223, 79, 23, 0.18) !important;
 }
@@ -793,9 +842,9 @@ button:disabled,
   .sah-lhdr,
   .sah-rhdr,
   .ur-hdr {
-    height: 112px !important;
-    --header-h: 112px !important;
-    --hdr-h: 112px !important;
+    height: 86px !important;
+    --header-h: 86px !important;
+    --hdr-h: 86px !important;
   }
 
   .sah-brand-logo,
@@ -803,14 +852,14 @@ button:disabled,
   .sah-lhdr-logo,
   .sah-rhdr-logo,
   .ur-hdr-logo {
-    width: 204px !important;
-    height: 68px !important;
+    width: 176px !important;
+    height: 48px !important;
     max-width: 48vw !important;
   }
 
   .sah-header .sah-brand-logo {
-    width: 168px !important;
-    height: 56px !important;
+    width: 156px !important;
+    height: 44px !important;
     max-width: 42vw !important;
   }
 
@@ -844,7 +893,7 @@ button:disabled,
   }
 
   .sah-login-main {
-    min-height: calc(100vh - 112px) !important;
+    min-height: calc(100vh - 86px) !important;
   }
 
   .sah-login-card,
@@ -899,9 +948,9 @@ button:disabled,
   .sah-lhdr,
   .sah-rhdr,
   .ur-hdr {
-    height: 94px !important;
-    --header-h: 94px !important;
-    --hdr-h: 94px !important;
+    height: 78px !important;
+    --header-h: 78px !important;
+    --hdr-h: 78px !important;
   }
 
   .sah-brand-logo,
@@ -909,14 +958,14 @@ button:disabled,
   .sah-lhdr-logo,
   .sah-rhdr-logo,
   .ur-hdr-logo {
-    width: 164px !important;
-    height: 54px !important;
+    width: 146px !important;
+    height: 42px !important;
     max-width: 46vw !important;
   }
 
   .sah-header .sah-brand-logo {
-    width: 142px !important;
-    height: 48px !important;
+    width: 132px !important;
+    height: 38px !important;
     max-width: 42vw !important;
   }
 

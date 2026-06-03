@@ -7,11 +7,12 @@ const HEADER_CSS = `
   :root {
     --hdr-bg:       #3f3f3c;
     --hdr-bg-mob:   #343431;
-    --hdr-accent:   #e66f12;
-    --hdr-accent-dk:#bd4610;
+    --hdr-accent:   #e94b13;
+    --hdr-accent-dk:#d9410d;
     --hdr-accent-lt:#ffe2a3;
-    --hdr-accent-gradient:linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
-    --hdr-h:        140px;
+    --hdr-accent-gradient:linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
+    --hdr-blue-glass:rgba(74,107,141,0.9);
+    --hdr-h:        96px;
   }
   .sah-hdr, .sah-hdr *, .sah-hdr *::before, .sah-hdr *::after,
   .sah-hdr-mobile, .sah-hdr-mobile *, .sah-hdr-mobile *::before, .sah-hdr-mobile *::after {
@@ -19,15 +20,23 @@ const HEADER_CSS = `
   }
   .sah-hdr {
     position: sticky; top: 0; z-index: 1000;
-    height: var(--hdr-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+    height: var(--hdr-h); background: var(--hdr-blue-glass);
+    background-image: linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04) 44%,rgba(8,32,64,0.12));
+    box-shadow: 0 12px 32px rgba(18,45,82,0.18);
+    backdrop-filter: blur(14px) saturate(1.04);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04);
     font-family: 'DM Sans', sans-serif;
     color: #ffffff;
+    overflow: hidden;
+  }
+  .sah-hdr::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(255,255,255,0.06); pointer-events: none; z-index: 0;
   }
   .sah-hdr-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 32px;
     height: 100%; display: flex; align-items: center; justify-content: space-between;
-    gap: 16px;
+    gap: 16px; position: relative; z-index: 1;
   }
   /* Left - Back button + brand together */
   .sah-hdr-left {
@@ -50,9 +59,16 @@ const HEADER_CSS = `
   .sah-hdr-brand {
     display: flex; align-items: center; gap: 12px;
     text-decoration: none; flex-shrink: 0;
+    background: linear-gradient(180deg,rgba(255,255,255,0.86),rgba(255,255,255,0.66));
+    border: 1px solid rgba(255,255,255,0.62);
+    border-radius: 7px;
+    padding: 6px 14px;
+    box-shadow: 0 8px 22px rgba(8,28,56,0.14), inset 0 1px 0 rgba(255,255,255,0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
   .sah-hdr-logo {
-    display: block; width: 230px; max-width: 28vw; height: 124px;
+    display: block; width: 210px; max-width: 28vw; height: 56px;
     object-fit: contain; object-position: left center;
     filter: drop-shadow(0 3px 12px rgba(255,138,31,0.26));
   }
@@ -124,7 +140,10 @@ const HEADER_CSS = `
   /* Mobile drawer */
   .sah-hdr-mobile {
     position: fixed; top: var(--hdr-h); left: 0; right: 0; z-index: 999;
-    background: var(--hdr-bg-mob); max-height: 0; overflow: hidden;
+    background: var(--hdr-blue-glass); max-height: 0; overflow: hidden;
+    background-image: linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04) 44%,rgba(8,32,64,0.12));
+    backdrop-filter: blur(14px) saturate(1.04);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04);
     transition: max-height 0.28s ease, box-shadow 0.28s;
     display: flex; flex-direction: column;
   }

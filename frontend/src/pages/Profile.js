@@ -93,7 +93,7 @@ function findProvider(id, email) {
 }
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const ORANGE = '#e66f12';
+const ORANGE = '#e94b13';
 
 /* ── Inject all styles ── */
 const injectStyles = () => {
@@ -810,7 +810,7 @@ const Profile = () => {
       {fromDashboard ? (
         <header style={{
           position: 'sticky', top: 0, zIndex: 1000,
-          height: '140px', background: 'linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%)',
+          height: '140px', background: 'linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%)',
           boxShadow: '0 2px 12px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', flexShrink: 0,
         }}>

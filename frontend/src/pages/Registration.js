@@ -16,10 +16,10 @@ const injectHead = () => {
   document.head.appendChild(fa);
 };
 
-const CSS = `:root{ --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #ffe2a3; --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%); --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
+const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #ffe2a3; --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%); --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
 .sah-reg-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
 .sah-reg-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; -webkit-font-smoothing: antialiased; color: var(--dark); }
-.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%); box-shadow: 0 2px 12px rgba(0,0,0,0.22); }
+.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%); box-shadow: 0 2px 12px rgba(18,45,82,0.28); }
 .sah-rhdr-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
 .sah-rhdr-left { display: flex; align-items: center; }
 .sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
@@ -72,7 +72,7 @@ const CSS = `:root{ --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #
 .sah-ico-no { color: #ccc; font-size: 0.7rem; }
 .sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent-gradient); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
 .sah-plan-select-btn:hover { filter: saturate(1.08) brightness(0.94); }
-.sah-plan-select-btn.selected { background: #3a3a3a; }
+.sah-plan-select-btn.selected { background: var(--accent); }
 .sah-terms-box { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
 .sah-terms-box-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
 .sah-terms-box-head-title { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 800; color: #fff; }
@@ -173,8 +173,8 @@ const CSS = `:root{ --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #
 .sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent-gradient); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: filter 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(201,98,26,0.45); }
 .sah-nav-next:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); transform: translateY(-1px); }
 .sah-nav-next:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
-.sah-nav-submit { background: #3a3a3a; box-shadow: 0 6px 20px -4px rgba(0,0,0,0.3); }
-.sah-nav-submit:hover:not(:disabled) { background: #1e1e1e; }
+.sah-nav-submit { background: var(--accent); box-shadow: 0 6px 20px -4px rgba(233,75,19,0.42); }
+.sah-nav-submit:hover:not(:disabled) { background: var(--accent-dark); }
 .sah-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: sah-spin 0.7s linear infinite; }
 @keyframes sah-spin { to { transform: rotate(360deg); } }
 @media (max-width: 900px) {

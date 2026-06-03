@@ -1,10 +1,10 @@
 /* profile.css - Profile page styles with homepage color scheme */
 
 :root {
-  --accent: #e66f12;
-  --accent-dark: #bd4610;
+  --accent: #e94b13;
+  --accent-dark: #d9410d;
   --accent-light: #ffe2a3;
-  --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+  --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
   --red: #e62925;
   --red-dark: #b91c1c;
   --red-light: #ffd7d1;
@@ -208,22 +208,22 @@
 }
 
 .btn-primary {
-  background: var(--white);
-  color: var(--accent);
+  background: var(--accent);
+  color: white;
 }
 
 .btn-primary:hover {
-  background: var(--accent-light);
+  background: var(--accent-dark);
   transform: translateY(-2px);
 }
 
 .btn-whatsapp {
-  background: #25D366;
+  background: var(--accent);
   color: white;
 }
 
 .btn-whatsapp:hover {
-  background: #128C7E;
+  background: var(--accent-dark);
   transform: translateY(-2px);
 }
 

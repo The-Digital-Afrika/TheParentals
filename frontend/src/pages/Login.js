@@ -24,8 +24,8 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --accent: #e66f12; --accent-dark: #bd4610; --accent-light: #ffe2a3;
-    --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #ffe2a3;
+    --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
     --dark: #333330; --mid: #55514b; --muted: #837b70;
     --card-gray: #d9d2c6; --card-white: #f6f2ec;
     --border: rgba(0,0,0,0.10); --header-h: 140px;
@@ -34,7 +34,7 @@ const CSS = `
   }
   .sah-login-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
   .sah-login-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
-  .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%); box-shadow: 0 2px 12px rgba(0,0,0,0.22); display: flex; align-items: center; flex-shrink: 0; }
+  .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%); box-shadow: 0 2px 12px rgba(18,45,82,0.28); display: flex; align-items: center; flex-shrink: 0; }
   .sah-lhdr-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
   .sah-lhdr-left { display: flex; align-items: center; gap: 0; }
   .sah-lhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }

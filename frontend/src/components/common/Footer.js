@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 /* ── Inject footer CSS once — exact match to HomePage ───────────────────── */
 const FOOTER_CSS = `
   :root {
-    --ft-accent: #e66f12;
-    --ft-accent-dark: #bd4610;
-    --ft-accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --ft-accent: #e94b13;
+    --ft-accent-dark: #d9410d;
+    --ft-accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
   }
 
   .sah-footer {
@@ -43,7 +43,7 @@ const FOOTER_CSS = `
   }
   .sah-footer-brand-mark img {
     display: block;
-    width: 128px;
+    width: 190px;
     max-width: 42vw;
     height: auto;
     filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22));
@@ -237,7 +237,7 @@ const Footer = () => {
           {/* Brand + newsletter */}
           <div className="sah-footer-brand">
             <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
-              <img src="/parentals-logo-header.png" alt="Parentals" />
+              <img src="/parentals-footer-logo.png" alt="Parentals" />
             </Link>
             <Link to="/" className="sah-footer-logo">SA Homeschooling Directory</Link>
             <p>

@@ -16,8 +16,8 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --accent:#e66f12; --accent-dark:#bd4610; --accent-light:#ffe2a3;
-    --accent-gradient:linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+    --accent:#e94b13; --accent-dark:#d9410d; --accent-light:#ffe2a3;
+    --accent-gradient:linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
     --red:#e62925; --red-dark:#b91c1c; --red-light:#ffd7d1;
     --dark:#333330; --mid:#55514b; --muted:#837b70;
     --grey:#9a958c; --grey-dark:#6a655d; --light-bg:#f6f2ec; --white:#fff;
@@ -25,7 +25,7 @@ const CSS = `
     --shadow-sm:0 1px 4px rgba(0,0,0,0.06);
     --shadow-md:0 4px 20px rgba(0,0,0,0.09);
     --shadow-lg:0 12px 48px rgba(0,0,0,0.12);
-    --radius:8px; --radius-lg:12px; --header-h:140px;
+    --radius:8px; --radius-lg:12px; --header-h:96px;
   }
   .sah-wrap *,.sah-wrap *::before,.sah-wrap *::after{box-sizing:border-box;margin:0;padding:0;}
   .sah-wrap{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--dark);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
@@ -35,10 +35,11 @@ const CSS = `
   .sah-container{max-width:1280px;margin:0 auto;padding:0 32px;}
 
   /* HEADER */
-  .sah-header{position:sticky;top:0;z-index:1000;height:var(--header-h);background:linear-gradient(90deg,#3b3b38 0%,#4b463d 58%,#5a4631 100%);box-shadow:0 2px 14px rgba(35,31,27,0.26);}
-  .sah-nav-inner{height:100%;display:flex;justify-content:space-between;align-items:center;}
-  .sah-brand{display:flex;align-items:center;gap:12px;}
-  .sah-brand-logo{display:block;width:230px;max-width:28vw;height:124px;object-fit:contain;object-position:left center;filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26));}
+  .sah-header{position:sticky;top:0;z-index:1000;height:var(--header-h);background:rgba(74,107,141,0.9);background-image:linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04) 44%,rgba(8,32,64,0.12));box-shadow:0 12px 32px rgba(18,45,82,0.18);backdrop-filter:blur(14px) saturate(1.04);-webkit-backdrop-filter:blur(14px) saturate(1.04);overflow:hidden;}
+  .sah-header::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.06);pointer-events:none;z-index:0;}
+  .sah-nav-inner{height:100%;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;}
+  .sah-brand{display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(255,255,255,0.86),rgba(255,255,255,0.66));border:1px solid rgba(255,255,255,0.62);border-radius:7px;padding:6px 14px;box-shadow:0 8px 22px rgba(8,28,56,0.14),inset 0 1px 0 rgba(255,255,255,0.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}
+  .sah-brand-logo{display:block;width:190px;max-width:28vw;height:52px;object-fit:contain;object-position:left center;filter:drop-shadow(0 3px 8px rgba(6,20,45,0.12));}
   .sah-brand-divider{width:2px;height:30px;background:rgba(255,211,106,0.55);border-radius:1px;}
   .sah-brand-text{display:flex;flex-direction:column;line-height:1.15;}
   .sah-brand-name{font-family:'Playfair Display',serif;font-weight:800;font-size:1rem;color:#fff;letter-spacing:0.2px;}
@@ -82,13 +83,13 @@ const CSS = `
   .sah-logout-btn i { color: rgba(255,255,255,0.9); }
 
   /* HERO */
-  .sah-hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;background:#1e1e1e;}
+  .sah-hero{position:relative;min-height:68vh;display:flex;align-items:center;overflow:hidden;background:#1e1e1e;}
   .sah-hero-bg{position:absolute;inset:0;z-index:0;
     background-image:url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80');
     background-size:cover;background-position:center 30%;}
   .sah-hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,rgba(24,23,21,0.92) 0%,rgba(66,54,39,0.82) 48%,rgba(20,19,18,0.66) 100%);}
-  .sah-hero-inner{position:relative;z-index:2;padding:60px 0;width:100%;}
-  .sah-hero-top{text-align:center;margin-bottom:36px;}
+  .sah-hero-inner{position:relative;z-index:2;padding:44px 0;width:100%;}
+  .sah-hero-top{text-align:center;margin-bottom:24px;}
   .sah-hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5.5vw,4.4rem);font-weight:900;line-height:1.07;color:#fff;margin-bottom:22px;letter-spacing:-0.3px;}
   .sah-hero-h1 em{font-style:italic;color:rgba(255,255,255,0.9);}
 
@@ -126,8 +127,8 @@ const CSS = `
     box-shadow:none;text-decoration:none;
   }
   .sah-become-btn:hover{filter:saturate(1.08) brightness(0.94);transform:translateY(-2px);}
-  .sah-become-btn.active{background:#3a3a3a;box-shadow:none;}
-  .sah-become-btn.active:hover{background:#1e1e1e;transform:none;}
+  .sah-become-btn.active{background:var(--accent);box-shadow:none;}
+  .sah-become-btn.active:hover{background:var(--accent-dark);transform:none;}
   .sah-become-btn .sah-chev{font-size:0.78rem;transition:transform 0.3s ease;}
   .sah-become-btn.active .sah-chev{transform:rotate(180deg);}
 
@@ -172,7 +173,7 @@ const CSS = `
   .sah-filter-label{font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);white-space:nowrap;margin-right:6px;flex-shrink:0;}
   .sah-fpill{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--muted);font-size:1rem;font-weight:600;transition:all 0.15s;cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1.3;}
   .sah-fpill:hover{border-color:var(--accent);color:var(--accent);}
-  .sah-fpill.active{background:var(--grey);color:#fff;border-color:var(--grey);}
+  .sah-fpill.active{background:var(--accent);color:#fff;border-color:var(--accent);}
   .sah-fpill i{font-size:0.95rem;}
 
   /* PROVIDERS */
@@ -214,8 +215,8 @@ const CSS = `
   .sah-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px solid var(--border);}
   .sah-from-label{font-size:0.65rem;color:var(--muted);line-height:1;}
   .sah-card-price{font-family:'Playfair Display',serif;font-size:1.08rem;font-weight:800;color:var(--accent);}
-  .sah-card-cta{padding:6px 13px;background:var(--grey);color:#fff;border:none;border-radius:5px;font-size:0.77rem;font-weight:700;transition:background 0.15s;}
-  .sah-card-cta:hover{background:var(--accent-gradient);}
+  .sah-card-cta{padding:6px 13px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:0.77rem;font-weight:700;transition:background 0.15s;}
+  .sah-card-cta:hover{background:var(--accent-dark);}
   .sah-grid-empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--muted);}
   .sah-grid-empty i{font-size:2.2rem;margin-bottom:12px;opacity:0.3;display:block;}
   .sah-grid-empty h3{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--dark);margin-bottom:7px;}
@@ -238,7 +239,7 @@ const CSS = `
   .sah-footer{background:#0e0e0e;color:rgba(255,255,255,0.55);padding:60px 0 32px;}
   .sah-footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:44px;}
   .sah-footer-brand-mark{display:inline-flex;align-items:center;margin-bottom:10px;text-decoration:none;}
-  .sah-footer-brand-mark img{display:block;width:128px;max-width:42vw;height:auto;filter:drop-shadow(0 5px 12px rgba(0,0,0,0.22));}
+  .sah-footer-brand-mark img{display:block;width:190px;max-width:42vw;height:auto;filter:drop-shadow(0 5px 12px rgba(0,0,0,0.22));}
   .sah-footer-logo{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;color:#fff;display:block;margin-bottom:12px;}
   .sah-footer-brand p{font-size:0.85rem;line-height:1.75;max-width:260px;color:rgba(255,255,255,0.55);}
   .sah-footer-newsletter{margin-top:20px;max-width:280px;}
@@ -1055,7 +1056,7 @@ export default function HomePage() {
           <div className="sah-footer-grid">
             <div className="sah-footer-brand">
               <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
-                <img src="/parentals-logo-header.png" alt="Parentals" />
+                <img src="/parentals-footer-logo.png" alt="Parentals" />
               </Link>
               <span className="sah-footer-logo">SA Homeschooling Directory</span>
               <p>South Africa's dedicated directory connecting homeschooling families with trusted tutors, therapists, curriculum providers and education specialists.</p>

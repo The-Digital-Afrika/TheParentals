@@ -1,10 +1,10 @@
 /* dashboard.css - Shared dashboard styles with homepage color scheme */
 
 :root {
-  --accent: #e66f12;
-  --accent-dark: #bd4610;
+  --accent: #e94b13;
+  --accent-dark: #d9410d;
   --accent-light: #ffe2a3;
-  --accent-gradient: linear-gradient(135deg,#d99a16 0%,#d95f12 44%,#b8201d 100%);
+  --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
   --red: #e62925;
   --red-dark: #b91c1c;
   --red-light: #ffd7d1;
@@ -470,13 +470,13 @@
 
 .promote-btn {
   border-radius: 4px 0 0 4px;
-  color: #4caf50;
+  color: var(--accent);
 }
 
 .promote-btn:hover {
-  background: #4caf50;
+  background: var(--accent);
   color: white;
-  border-color: #4caf50;
+  border-color: var(--accent);
 }
 
 .demote-btn {
@@ -662,12 +662,12 @@
 }
 
 .btn-approve {
-  background: #4caf50;
+  background: var(--accent);
   color: white;
 }
 
 .btn-approve:hover:not(:disabled) {
-  background: #388e3c;
+  background: var(--accent-dark);
 }
 
 .btn-reject {
