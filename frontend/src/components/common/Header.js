@@ -7,11 +7,11 @@ const HEADER_CSS = `
   :root {
     --hdr-bg:       #3f3f3c;
     --hdr-bg-mob:   #343431;
-    --hdr-accent:   #e94b13;
-    --hdr-accent-dk:#d9410d;
-    --hdr-accent-lt:#ffe2a3;
-    --hdr-accent-gradient:linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
-    --hdr-blue-glass:rgba(74,107,141,0.9);
+    --hdr-accent:   #8fb8d8;
+    --hdr-accent-dk:#557691;
+    --hdr-accent-lt:#d9efff;
+    --hdr-accent-solid:#ff8c42;
+    --hdr-blue-glass:rgba(111,141,166,0.78);
     --hdr-h:        96px;
   }
   .sah-hdr, .sah-hdr *, .sah-hdr *::before, .sah-hdr *::after,
@@ -21,17 +21,17 @@ const HEADER_CSS = `
   .sah-hdr {
     position: sticky; top: 0; z-index: 1000;
     height: var(--hdr-h); background: var(--hdr-blue-glass);
-    background-image: linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04) 44%,rgba(8,32,64,0.12));
-    box-shadow: 0 12px 32px rgba(18,45,82,0.18);
-    backdrop-filter: blur(14px) saturate(1.04);
-    -webkit-backdrop-filter: blur(14px) saturate(1.04);
+    background-image: none;
+    box-shadow: 0 12px 34px rgba(24,35,48,0.18);
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
     font-family: 'DM Sans', sans-serif;
     color: #ffffff;
     overflow: hidden;
   }
   .sah-hdr::before {
     content: ''; position: absolute; inset: 0;
-    background: rgba(255,255,255,0.06); pointer-events: none; z-index: 0;
+    background: transparent; pointer-events: none; z-index: 0;
   }
   .sah-hdr-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 32px;
@@ -59,18 +59,18 @@ const HEADER_CSS = `
   .sah-hdr-brand {
     display: flex; align-items: center; gap: 12px;
     text-decoration: none; flex-shrink: 0;
-    background: linear-gradient(180deg,rgba(255,255,255,0.86),rgba(255,255,255,0.66));
-    border: 1px solid rgba(255,255,255,0.62);
-    border-radius: 7px;
-    padding: 6px 14px;
-    box-shadow: 0 8px 22px rgba(8,28,56,0.14), inset 0 1px 0 rgba(255,255,255,0.72);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .sah-hdr-logo {
     display: block; width: 210px; max-width: 28vw; height: 56px;
     object-fit: contain; object-position: left center;
-    filter: drop-shadow(0 3px 12px rgba(255,138,31,0.26));
+    filter: drop-shadow(0 4px 10px rgba(24,35,48,0.22));
   }
   .sah-hdr-brand-text {
     display: flex; flex-direction: column; line-height: 1.15;
@@ -116,7 +116,7 @@ const HEADER_CSS = `
   }
   .sah-hdr-solid {
     padding: 7px 18px; border-radius: 6px;
-    background: var(--hdr-accent-gradient); color: #fff;
+    background: #ff8c42; color: #fff;
     font-weight: 700; font-size: 0.86rem; border: none; cursor: pointer;
     transition: background 0.15s; font-family: 'DM Sans', sans-serif;
     text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
@@ -140,10 +140,10 @@ const HEADER_CSS = `
   /* Mobile drawer */
   .sah-hdr-mobile {
     position: fixed; top: var(--hdr-h); left: 0; right: 0; z-index: 999;
-    background: var(--hdr-blue-glass); max-height: 0; overflow: hidden;
-    background-image: linear-gradient(90deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04) 44%,rgba(8,32,64,0.12));
-    backdrop-filter: blur(14px) saturate(1.04);
-    -webkit-backdrop-filter: blur(14px) saturate(1.04);
+    background: rgba(111,141,166,0.92); max-height: 0; overflow: hidden;
+    background-image: none;
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
     transition: max-height 0.28s ease, box-shadow 0.28s;
     display: flex; flex-direction: column;
   }
@@ -176,7 +176,7 @@ const HEADER_CSS = `
     background: transparent !important; color: #fff !important;
   }
   .sah-mob-solid {
-    background: var(--hdr-accent-gradient) !important; color: #fff !important;
+    background: #ff8c42 !important; color: #fff !important;
     border: none !important;
   }
   .sah-mob-solid:hover { filter: saturate(1.08) brightness(0.94); }

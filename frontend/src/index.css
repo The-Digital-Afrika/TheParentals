@@ -1,51 +1,39 @@
 :root {
-  /* Logo-led SA Homeschooling Services design system */
-  --sah-navy-950: #06142d;
-  --sah-navy-900: #0a1f44;
-  --sah-navy-800: #102f63;
-  --sah-navy-100: #e8eef8;
-  --sah-ember-700: #d9410d;
-  --sah-ember-600: #df4f17;
-  --sah-ember-500: #f47a1f;
-  --sah-gold-500: #f7bd3d;
-  --sah-gold-200: #ffe7a8;
-  --sah-cream-50: #fffaf1;
-  --sah-cream-100: #f7efe1;
-  --sah-graphite-900: #22211f;
-  --sah-graphite-700: #4f4a43;
-  --sah-graphite-500: #81796d;
+  --sah-baby-blue: #8fb8d8;
+  --sah-baby-blue-700: #557691;
+  --sah-baby-blue-600: #6f8da6;
+  --sah-baby-blue-100: #eaf6ff;
+  --sah-baby-blue-50: #f5fbff;
+  --sah-orange: #ff8c42;
+  --sah-orange-700: #d76518;
+  --sah-orange-100: #fff0e6;
+  --sah-grey-25: #fafafa;
+  --sah-grey-50: #f7f8fa;
+  --sah-grey-100: #f1f3f5;
+  --sah-grey-200: #e4e8ec;
+  --sah-ink: #182330;
+  --sah-text: #354151;
+  --sah-muted: #6b7684;
   --sah-success: #12805c;
-  --sah-warning: #c87907;
+  --sah-warning: #b76514;
   --sah-error: #b42318;
-  --sah-info: #2563a8;
-  --sah-button-orange: #e94b13;
-  --sah-button-orange-hover: #d9410d;
-  --sah-primary: var(--sah-ember-600);
-  --sah-secondary: var(--sah-ember-500);
-  --sah-accent: var(--sah-gold-500);
-  --sah-bg: #fbf7ee;
-  --sah-surface: #ffffff;
-  --sah-surface-warm: #fff6e8;
-  --sah-border: rgba(79, 74, 67, 0.14);
-  --sah-border-strong: rgba(223, 79, 23, 0.26);
-  --sah-focus: rgba(244, 122, 31, 0.24);
-  --sah-gradient: linear-gradient(110deg, #f7bd3d 0%, #f47a1f 28%, #df4f17 48%, #375b83 76%, #0a1f44 100%);
-  --sah-warm-gradient: linear-gradient(135deg, var(--sah-button-orange) 0%, var(--sah-button-orange) 100%);
-  --sah-menu-blue: rgba(74, 107, 141, 0.9);
-  --sah-shadow-sm: 0 2px 8px rgba(6, 20, 45, 0.08);
-  --sah-shadow-md: 0 12px 32px rgba(6, 20, 45, 0.12);
-  --sah-shadow-lg: 0 24px 64px rgba(6, 20, 45, 0.18);
+  --sah-focus: rgba(143, 184, 216, 0.42);
+  --sah-border: #dde6ee;
+  --sah-border-strong: #c6d8e7;
+  --sah-shadow-sm: 0 2px 8px rgba(24, 35, 48, 0.06);
+  --sah-shadow-md: 0 12px 30px rgba(24, 35, 48, 0.10);
+  --sah-shadow-lg: 0 22px 56px rgba(24, 35, 48, 0.14);
   --sah-radius: 8px;
   --sah-radius-lg: 12px;
 
-  --accent: var(--sah-ember-500);
-  --accent-dark: var(--sah-ember-700);
-  --accent-light: var(--sah-gold-200);
-  --accent-gradient: var(--sah-warm-gradient);
-  --dark: var(--sah-graphite-900);
-  --mid: var(--sah-graphite-700);
-  --muted: var(--sah-graphite-500);
-  --light-bg: var(--sah-bg);
+  --accent: var(--sah-baby-blue-600);
+  --accent-dark: var(--sah-baby-blue-700);
+  --accent-light: var(--sah-baby-blue-100);
+  --accent-solid: var(--sah-baby-blue-600);
+  --dark: var(--sah-ink);
+  --mid: var(--sah-text);
+  --muted: var(--sah-muted);
+  --light-bg: var(--sah-grey-50);
   --white: #ffffff;
   --border: var(--sah-border);
   --shadow-sm: var(--sah-shadow-sm);
@@ -61,17 +49,15 @@
 
 html {
   min-height: 100%;
-  background: var(--sah-bg);
+  background: var(--sah-grey-50);
   scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-height: 100%;
-  background:
-    radial-gradient(circle at 12% -10%, rgba(247, 189, 61, 0.22), transparent 34%),
-    linear-gradient(180deg, #fffaf1 0%, #f8efe1 52%, #f6f8fb 100%);
-  color: var(--sah-graphite-900);
+  background: var(--sah-grey-50) !important;
+  color: var(--sah-ink);
   font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -85,8 +71,8 @@ code {
 }
 
 ::selection {
-  background: rgba(247, 189, 61, 0.45);
-  color: var(--sah-navy-950);
+  background: var(--sah-baby-blue-100);
+  color: var(--sah-ink);
 }
 
 button,
@@ -101,7 +87,7 @@ button,
 input,
 select,
 textarea {
-  outline-color: var(--sah-ember-500);
+  outline-color: var(--sah-baby-blue-600);
 }
 
 button:focus-visible,
@@ -129,10 +115,10 @@ textarea,
 .adm-search-input,
 .adm-filter-select,
 .status-select {
-  border-color: var(--sah-border) !important;
-  background: #fffdfa !important;
-  color: var(--sah-graphite-900) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--sah-border) !important;
+  color: var(--sah-ink) !important;
+  box-shadow: none !important;
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
 }
 
@@ -141,7 +127,7 @@ select:hover,
 textarea:hover,
 .cd-input:hover,
 .profile-value:hover {
-  border-color: rgba(244, 122, 31, 0.42) !important;
+  border-color: var(--sah-border-strong) !important;
 }
 
 input:focus,
@@ -160,9 +146,9 @@ textarea:focus,
 .adm-search-input:focus,
 .adm-filter-select:focus,
 .status-select:focus {
-  border-color: var(--sah-ember-500) !important;
-  box-shadow: 0 0 0 4px var(--sah-focus), inset 0 1px 0 rgba(255,255,255,0.75) !important;
   background: #ffffff !important;
+  border-color: var(--sah-baby-blue-600) !important;
+  box-shadow: 0 0 0 4px var(--sah-focus) !important;
 }
 
 input.err,
@@ -175,31 +161,30 @@ textarea.err,
 .ur-field input.err,
 .sah-lfield input.error,
 .sah-prefix-wrap.err {
+  background: #fff7f5 !important;
   border-color: var(--sah-error) !important;
-  background: #fff8f5 !important;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(79, 74, 67, 0.52) !important;
+  color: #8994a3 !important;
 }
 
 input[type='checkbox'],
 input[type='radio'] {
-  accent-color: var(--sah-ember-500) !important;
+  accent-color: var(--sah-baby-blue-600) !important;
 }
 
-/* Shared app shell */
 .sah-wrap,
 .sah-login-wrap,
 .sah-reg-wrap,
 .ur-wrap,
 .cd-wrap,
-#profilePageV2 {
-  background:
-    radial-gradient(circle at 8% 0%, rgba(247, 189, 61, 0.18), transparent 30%),
-    linear-gradient(180deg, #fffaf1 0%, #f7efe1 58%, #f6f8fb 100%) !important;
-  color: var(--sah-graphite-900) !important;
+#profilePageV2,
+.dash-wrapper,
+.page-wrap {
+  background: var(--sah-grey-50) !important;
+  color: var(--sah-ink) !important;
 }
 
 .sah-container,
@@ -213,7 +198,6 @@ input[type='radio'] {
   max-width: 1280px !important;
 }
 
-/* Logo-inspired navigation */
 .sah-header,
 .sah-hdr,
 .sah-lhdr,
@@ -221,16 +205,15 @@ input[type='radio'] {
 .ur-hdr,
 .pv2-dashboard-header {
   position: sticky !important;
-  height: 96px !important;
-  --header-h: 96px !important;
-  --hdr-h: 96px !important;
-  background: var(--sah-menu-blue) !important;
-  background-image:
-    linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04) 44%, rgba(8,32,64,0.12)) !important;
-  backdrop-filter: blur(14px) saturate(1.04) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.04) !important;
-  box-shadow: 0 12px 32px rgba(18, 45, 82, 0.18) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
+  height: 92px !important;
+  --header-h: 92px !important;
+  --hdr-h: 92px !important;
+  background: rgba(111, 141, 166, 0.78) !important;
+  background-image: none !important;
+  backdrop-filter: blur(18px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.12) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 12px 34px rgba(24, 35, 48, 0.18) !important;
 }
 
 .sah-header::before,
@@ -239,22 +222,14 @@ input[type='radio'] {
 .sah-rhdr::before,
 .ur-hdr::before,
 .pv2-dashboard-header::before {
-  content: "" !important;
-  position: absolute !important;
-  inset: 0 !important;
-  pointer-events: none !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  z-index: 0 !important;
+  display: none !important;
 }
 
-.sah-nav-inner,
-.sah-hdr-inner,
-.sah-lhdr-inner,
-.sah-rhdr-inner,
-.ur-hdr,
-.pv2-dashboard-header > * {
-  position: relative !important;
-  z-index: 1 !important;
+.sah-hdr-mobile {
+  background: rgba(111, 141, 166, 0.9) !important;
+  background-image: none !important;
+  backdrop-filter: blur(18px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.12) !important;
 }
 
 .sah-brand,
@@ -262,13 +237,13 @@ input[type='radio'] {
 .sah-lhdr-brand,
 .sah-rhdr-brand,
 .ur-hdr-brand {
-  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.66)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.62) !important;
-  border-radius: 7px !important;
-  padding: 6px 14px !important;
-  box-shadow: 0 8px 22px rgba(8, 28, 56, 0.14), inset 0 1px 0 rgba(255,255,255,0.72) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .sah-brand-logo,
@@ -276,18 +251,12 @@ input[type='radio'] {
 .sah-lhdr-logo,
 .sah-rhdr-logo,
 .ur-hdr-logo {
-  width: 210px !important;
+  width: 204px !important;
   max-width: 34vw !important;
-  height: 56px !important;
+  height: 54px !important;
   object-fit: contain !important;
   object-position: left center !important;
-  filter: drop-shadow(0 3px 8px rgba(6, 20, 45, 0.12)) !important;
-}
-
-.sah-header .sah-brand-logo {
-  width: 190px !important;
-  max-width: 26vw !important;
-  height: 52px !important;
+  filter: drop-shadow(0 4px 10px rgba(24, 35, 48, 0.22)) !important;
 }
 
 .sah-nav-links a,
@@ -309,11 +278,10 @@ input[type='radio'] {
 .sah-rhdr-back:hover,
 .ur-hdr-back:hover,
 .sah-hdr-back:hover {
-  background: rgba(255,255,255,0.13) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
 }
 
-/* Buttons */
 .sah-btn-solid-nav,
 .sah-logout-btn,
 .sah-hdr-solid,
@@ -332,18 +300,24 @@ input[type='radio'] {
 .ur-submit,
 .cd-btn-solid,
 .btn-save,
-.add-service-btn:hover:not(:disabled),
 .tag-input-wrapper button,
 .adm-file-dl,
 .adm-doc-list-dl,
 .pv2-gate-btn-primary,
 .pv2-enquiry-send-btn,
-.sah-footer-newsletter button {
-  background: var(--sah-button-orange) !important;
+.sah-footer-newsletter button,
+.cd-plan-action-btn.upgrade,
+.cd-plan-action-btn.downgrade,
+.adm-demote-btn,
+.modal-file-dl,
+.adm-float-doc-dl,
+.sah-card-cta {
+  background: var(--sah-orange) !important;
+  background-image: none !important;
   color: #ffffff !important;
   border-color: transparent !important;
-  box-shadow: 0 10px 22px rgba(223, 79, 23, 0.22) !important;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease !important;
+  box-shadow: 0 10px 22px rgba(255, 140, 66, 0.24) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
 }
 
 .sah-btn-solid-nav:hover,
@@ -364,11 +338,12 @@ input[type='radio'] {
 .tag-input-wrapper button:hover,
 .pv2-gate-btn-primary:hover,
 .pv2-enquiry-send-btn:hover,
-.sah-footer-newsletter button:hover {
-  background: var(--sah-button-orange-hover) !important;
-  filter: saturate(1.02) brightness(0.98) !important;
+.sah-footer-newsletter button:hover,
+.sah-card-cta:hover {
+  background: var(--sah-orange-700) !important;
+  filter: none !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 14px 30px rgba(223, 79, 23, 0.28) !important;
+  box-shadow: 0 14px 30px rgba(255, 140, 66, 0.30) !important;
 }
 
 .sah-btn-ghost-nav,
@@ -383,17 +358,32 @@ input[type='radio'] {
 .sah-rhdr-ghost,
 .pv2-share-btn,
 .pv2-gate-btn-secondary {
-  border-color: rgba(247, 189, 61, 0.48) !important;
-  background: rgba(255,255,255,0.08) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.62) !important;
   color: #ffffff !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12) !important;
+  box-shadow: none !important;
+}
+
+.cd-btn-ghost,
+.btn-outline,
+.pv2-share-btn,
+.pv2-gate-btn-secondary,
+.btn-edit,
+.add-service-btn {
+  background: #ffffff !important;
+  border-color: var(--sah-border) !important;
+  color: var(--sah-baby-blue-700) !important;
 }
 
 .cd-btn-ghost:hover,
 .btn-outline:hover,
 .pv2-share-btn:hover,
-.pv2-gate-btn-secondary:hover {
-  background: rgba(255,255,255,0.16) !important;
+.pv2-gate-btn-secondary:hover,
+.btn-edit:hover:not(:disabled),
+.add-service-btn:hover:not(:disabled) {
+  background: var(--sah-baby-blue-50) !important;
+  border-color: var(--sah-baby-blue-600) !important;
+  color: var(--sah-baby-blue-700) !important;
 }
 
 button:disabled,
@@ -401,18 +391,23 @@ button:disabled,
 .sah-login-btn:disabled,
 .ur-submit:disabled,
 .cd-btn-solid:disabled {
-  opacity: 0.58 !important;
   cursor: not-allowed !important;
+  opacity: 0.58 !important;
   transform: none !important;
 }
 
-/* Hero and authentication surfaces */
 .sah-hero-bg::after,
 .sah-reg-hero-bg::after,
 .ur-hero-bg::after,
-.sah-login-left-bg::after {
-  background:
-    linear-gradient(102deg, rgba(88, 42, 14, 0.74) 0%, rgba(24, 23, 21, 0.76) 48%, rgba(10, 31, 68, 0.48) 100%) !important;
+.sah-login-left-bg::after,
+.pv2-right-overlay {
+  background: rgba(24, 35, 48, 0.68) !important;
+  background-image: none !important;
+}
+
+.sah-hero,
+.sah-registration-hero {
+  background: var(--sah-baby-blue-600) !important;
 }
 
 .sah-hero-h1,
@@ -430,14 +425,16 @@ button:disabled,
 }
 
 .sah-hero-search {
-  border: 1px solid rgba(247, 189, 61, 0.34) !important;
-  box-shadow: 0 22px 58px rgba(6, 20, 45, 0.32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 20px 48px rgba(24, 35, 48, 0.24) !important;
 }
 
 .sah-filter-bar,
 .sah-providers-section,
-.sah-how-section {
-  background: transparent !important;
+.sah-how-section,
+.tab-pane,
+.reviews-section {
+  background: var(--sah-grey-50) !important;
 }
 
 .sah-fpill,
@@ -449,10 +446,14 @@ button:disabled,
 .cd-day-chip.off,
 .sah-trail-dot,
 .adm-time-tab,
-.adm-role-tab {
+.adm-role-tab,
+.tab-btn,
+.cd-tab-btn,
+.grade-pill,
+.avail-pill {
+  background: #ffffff !important;
   border-color: var(--sah-border) !important;
-  background: rgba(255,255,255,0.72) !important;
-  color: var(--sah-graphite-700) !important;
+  color: var(--sah-text) !important;
 }
 
 .sah-fpill:hover,
@@ -462,10 +463,11 @@ button:disabled,
 .badge-option:hover,
 .day-checkbox:hover,
 .adm-time-tab:hover,
-.adm-role-tab:hover {
-  border-color: rgba(244,122,31,0.5) !important;
-  color: var(--sah-ember-600) !important;
-  background: #fffaf3 !important;
+.adm-role-tab:hover,
+.tab-btn:hover {
+  background: var(--sah-baby-blue-50) !important;
+  border-color: var(--sah-baby-blue-600) !important;
+  color: var(--sah-baby-blue-700) !important;
 }
 
 .sah-fpill.active,
@@ -477,14 +479,21 @@ button:disabled,
 .adm-time-tab.active,
 .adm-role-tab.active,
 .tab-btn.active,
-.cd-tab-btn.active {
-  background: var(--sah-button-orange) !important;
-  border-color: var(--sah-button-orange) !important;
+.cd-tab-btn.active,
+.avail-pill.on {
+  background: var(--sah-baby-blue-600) !important;
+  border-color: var(--sah-baby-blue-600) !important;
   color: #ffffff !important;
-  box-shadow: 0 8px 20px rgba(223, 79, 23, 0.18) !important;
+  box-shadow: 0 8px 20px rgba(111, 141, 166, 0.22) !important;
 }
 
-/* Cards, dashboards and tables */
+.tab-btn.active::after,
+.sah-step-progress-fill,
+.sah-nav-progress-fill {
+  background: var(--sah-orange) !important;
+  background-image: none !important;
+}
+
 .card,
 .stat-box,
 .provider-row,
@@ -510,8 +519,11 @@ button:disabled,
 .adm-pkg-card,
 .adm-rev-box,
 .adm-user-row,
-.sah-modal-box {
-  background: rgba(255,255,255,0.92) !important;
+.sah-modal-box,
+.sah-form-panel,
+.profile-head-card {
+  background: #ffffff !important;
+  background-image: none !important;
   border: 1px solid var(--sah-border) !important;
   border-radius: var(--sah-radius-lg) !important;
   box-shadow: var(--sah-shadow-md) !important;
@@ -528,7 +540,7 @@ button:disabled,
 .pv2-svc-card:hover,
 .adm-expand-row:hover,
 .adm-listing-row:hover {
-  border-color: rgba(244,122,31,0.42) !important;
+  border-color: var(--sah-baby-blue-600) !important;
   box-shadow: var(--sah-shadow-lg) !important;
   transform: translateY(-2px) !important;
 }
@@ -541,8 +553,10 @@ button:disabled,
 .cd-card-header-icon,
 .profile-head-card,
 .sah-terms-box-head,
-.adm-float-card-header {
-  background: var(--sah-gradient) !important;
+.adm-float-card-header,
+.sah-modal-head {
+  background: var(--sah-baby-blue-600) !important;
+  background-image: none !important;
   color: #ffffff !important;
 }
 
@@ -559,8 +573,12 @@ button:disabled,
 .ur-perks,
 .pv2-left,
 .pv2-services-section,
-.pv2-about-section {
-  background: linear-gradient(180deg, #fffdf8 0%, #fff5e6 100%) !important;
+.pv2-about-section,
+.plan-row,
+.map-ph,
+.cd-review {
+  background: var(--sah-grey-25) !important;
+  background-image: none !important;
 }
 
 .sah-sec-eyebrow,
@@ -578,15 +596,13 @@ button:disabled,
 .pv2-meta-item i,
 .pv2-contact-row i,
 .adm-detail-section-title,
-.adm-file-section-title {
-  color: var(--sah-ember-500) !important;
+.adm-file-section-title,
+.modal-section-title,
+.sah-link-btn {
+  color: var(--sah-baby-blue-700) !important;
 }
 
-.sah-step-num {
-  color: var(--sah-ember-500) !important;
-  text-shadow: 0 8px 20px rgba(223, 79, 23, 0.14) !important;
-}
-
+.sah-step-num,
 .stat-box h3,
 .stat-filter-value,
 .plan-price,
@@ -597,8 +613,17 @@ button:disabled,
 .pv2-rating-num,
 .rating-big,
 .adm-rev-box-val,
-.adm-pkg-stat-val {
-  color: var(--sah-ember-700) !important;
+.adm-pkg-stat-val,
+.adm-time-stat-val {
+  color: var(--sah-baby-blue-700) !important;
+  text-shadow: none !important;
+}
+
+.profile-head-card .profile-name,
+.profile-head-card .profile-info,
+.profile-head-card .rating-big,
+.profile-head-card .rating-sub {
+  color: #ffffff !important;
 }
 
 .sah-card-thumb-fallback,
@@ -611,10 +636,17 @@ button:disabled,
 .pv2-age-pill,
 .sah-cbadge-new,
 .sah-file-upload-zone,
+.profile-preview-badge,
+.dc-icon,
+.adm-detail-tag,
+.adm-float-tag,
+.cd-contact-icon,
+.cd-photo-placeholder,
 .profile-preview-badge {
-  background: var(--sah-surface-warm) !important;
-  color: var(--sah-ember-600) !important;
-  border-color: rgba(244,122,31,0.25) !important;
+  background: var(--sah-baby-blue-100) !important;
+  background-image: none !important;
+  color: var(--sah-baby-blue-700) !important;
+  border-color: var(--sah-border-strong) !important;
 }
 
 .badge-featured,
@@ -622,8 +654,12 @@ button:disabled,
 .current-plan-badge,
 .pending-badge,
 .pv2-price-badge,
-.pv2-gate-icon {
-  background: var(--sah-warm-gradient) !important;
+.pv2-gate-icon,
+.sah-cbadge-featured,
+.plan-badge,
+.cd-plan-current-badge {
+  background: var(--sah-orange) !important;
+  background-image: none !important;
   color: #ffffff !important;
 }
 
@@ -643,10 +679,12 @@ button:disabled,
 .status-notice,
 .manual-override-note,
 .timer-badge,
-.sah-validation-alert {
-  background: #fff6dd !important;
+.sah-validation-alert,
+.service-limit-note.free-limit,
+.cd-info-note {
+  background: var(--sah-orange-100) !important;
   color: var(--sah-warning) !important;
-  border-color: rgba(200, 121, 7, 0.24) !important;
+  border-color: rgba(255, 140, 66, 0.28) !important;
 }
 
 .sah-login-alert.error,
@@ -666,18 +704,19 @@ button:disabled,
 .rating-stars,
 .review-stars,
 .pv2-rating-stars,
-.cd-review-stars {
-  color: var(--sah-gold-500) !important;
+.cd-review-stars,
+.sah-stars {
+  color: var(--sah-orange) !important;
 }
 
-/* Dashboard-specific polish */
 .cd-hero,
 .pv2-right {
-  background: var(--sah-gradient) !important;
+  background: var(--sah-baby-blue-600) !important;
+  background-image: none !important;
 }
 
 .cd-hero::before {
-  opacity: 0.45 !important;
+  display: none !important;
 }
 
 .cd-tab-bar {
@@ -689,13 +728,10 @@ button:disabled,
   display: none;
 }
 
-.cd-tab-btn {
-  border: 1px solid rgba(255,255,255,0.16) !important;
-}
-
 .cd-tab-btn:not(.active) {
-  background: rgba(255,255,255,0.1) !important;
-  color: rgba(255,255,255,0.78) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
 }
 
 .adm-rev-table {
@@ -710,7 +746,7 @@ button:disabled,
 }
 
 .adm-rev-table th {
-  background: var(--sah-graphite-900) !important;
+  background: var(--sah-baby-blue-700) !important;
   color: #ffffff !important;
   font-size: 0.74rem !important;
   letter-spacing: 0.7px !important;
@@ -719,35 +755,18 @@ button:disabled,
 
 .adm-rev-table tr:hover td,
 .adm-user-row:hover {
-  background: #fff8ed !important;
-}
-
-/* Profile page */
-.pv2-right-overlay {
-  background:
-    linear-gradient(100deg, rgba(88,42,14,0.82) 0%, rgba(223,79,23,0.68) 44%, rgba(10,31,68,0.42) 100%) !important;
+  background: var(--sah-baby-blue-50) !important;
 }
 
 .pv2-avatar,
-.pv2-avatar-placeholder {
-  border-color: var(--sah-gold-500) !important;
-  box-shadow: 0 12px 34px rgba(247, 189, 61, 0.25) !important;
-}
-
-.pv2-enquiry-section {
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,250,241,0.96)) !important;
-}
-
-.pv2-enquiry-send-btn {
-  border-radius: var(--sah-radius) !important;
-}
-
-/* Auth and registration */
-.sah-login-card,
-.ur-card,
-.sah-step-card {
-  overflow: hidden !important;
+.pv2-avatar-placeholder,
+.avatar-lg,
+.adm-photo-big,
+.adm-float-photo,
+.modal-photo,
+.cd-photo-img {
+  border-color: var(--sah-orange) !important;
+  box-shadow: 0 12px 34px rgba(24, 35, 48, 0.14) !important;
 }
 
 .sah-step-trail {
@@ -755,51 +774,93 @@ button:disabled,
 }
 
 .sah-trail-dot.done {
-  background: rgba(255,255,255,0.18) !important;
-  border-color: rgba(247, 189, 61, 0.42) !important;
-  color: #ffffff !important;
+  background: var(--sah-baby-blue-100) !important;
+  border-color: var(--sah-border-strong) !important;
+  color: var(--sah-baby-blue-700) !important;
 }
 
 .sah-prefix-wrap,
 .sah-terms-row,
 .sah-file-upload-zone,
 .sah-terms-box,
-.sah-fp-modal {
+.sah-fp-modal,
+.sah-terms-checkbox {
   border-color: var(--sah-border) !important;
   box-shadow: var(--sah-shadow-sm) !important;
 }
 
-/* Footer */
 .sah-footer {
-  background:
-    linear-gradient(110deg, #352617 0%, #773b16 42%, #0a1f44 100%) !important;
-  border-top: 1px solid rgba(247, 189, 61, 0.2) !important;
+  background: rgba(111, 141, 166, 0.9) !important;
+  background-image: none !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  padding: 28px 0 14px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 -14px 40px rgba(24, 35, 48, 0.14) !important;
+  backdrop-filter: blur(18px) saturate(1.12) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.12) !important;
 }
 
 .sah-footer-col h4,
 .sah-footer-trust-item i {
-  color: var(--sah-gold-500) !important;
+  color: #ffffff !important;
+}
+
+.sah-footer-grid {
+  gap: 22px !important;
+  margin-bottom: 16px !important;
+}
+
+.sah-footer-col {
+  padding-top: 28px !important;
+}
+
+.sah-footer-brand p,
+.sah-footer-col ul li a,
+.sah-footer-trust-item,
+.sah-footer-bottom p,
+.sah-footer-bottom-links a {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.sah-footer-logo {
+  margin-bottom: 7px !important;
+  color: #ffffff !important;
+}
+
+.sah-footer-newsletter {
+  margin-top: 10px !important;
+}
+
+.sah-footer-trust {
+  padding: 9px 0 !important;
+  margin-bottom: 8px !important;
+  border-top-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.sah-footer-bottom {
+  padding-top: 10px !important;
+  border-top-color: rgba(255, 255, 255, 0.22) !important;
 }
 
 .sah-footer-soc:hover {
-  background: var(--sah-warm-gradient) !important;
+  background: var(--sah-orange) !important;
+  background-image: none !important;
 }
 
 .sah-footer-brand-mark {
   display: inline-flex !important;
   align-items: center !important;
-  margin-bottom: 10px !important;
+  margin-bottom: 4px !important;
 }
 
 .sah-footer-brand-mark img {
   display: block !important;
-  width: 128px !important;
+  width: 116px !important;
   max-width: 42vw !important;
   height: auto !important;
-  filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22)) !important;
+  filter: drop-shadow(0 4px 10px rgba(24, 35, 48, 0.18)) !important;
 }
 
-/* Motion */
 @keyframes sah-soft-in {
   from {
     opacity: 0;
@@ -835,16 +896,15 @@ button:disabled,
   }
 }
 
-/* Responsive polish */
 @media (max-width: 960px) {
   .sah-header,
   .sah-hdr,
   .sah-lhdr,
   .sah-rhdr,
   .ur-hdr {
-    height: 86px !important;
-    --header-h: 86px !important;
-    --hdr-h: 86px !important;
+    height: 84px !important;
+    --header-h: 84px !important;
+    --hdr-h: 84px !important;
   }
 
   .sah-brand-logo,
@@ -855,12 +915,6 @@ button:disabled,
     width: 176px !important;
     height: 48px !important;
     max-width: 48vw !important;
-  }
-
-  .sah-header .sah-brand-logo {
-    width: 156px !important;
-    height: 44px !important;
-    max-width: 42vw !important;
   }
 
   .sah-hero-search {
@@ -893,14 +947,7 @@ button:disabled,
   }
 
   .sah-login-main {
-    min-height: calc(100vh - 86px) !important;
-  }
-
-  .sah-login-card,
-  .ur-card,
-  .sah-step-card,
-  .pv2-gate-card {
-    border-radius: var(--sah-radius-lg) !important;
+    min-height: calc(100vh - 84px) !important;
   }
 
   .sah-provider-grid,
@@ -936,10 +983,6 @@ button:disabled,
     min-height: auto !important;
     padding: 28px !important;
   }
-
-  .pv2-right {
-    min-height: auto !important;
-  }
 }
 
 @media (max-width: 520px) {
@@ -948,9 +991,9 @@ button:disabled,
   .sah-lhdr,
   .sah-rhdr,
   .ur-hdr {
-    height: 78px !important;
-    --header-h: 78px !important;
-    --hdr-h: 78px !important;
+    height: 76px !important;
+    --header-h: 76px !important;
+    --hdr-h: 76px !important;
   }
 
   .sah-brand-logo,
@@ -958,15 +1001,9 @@ button:disabled,
   .sah-lhdr-logo,
   .sah-rhdr-logo,
   .ur-hdr-logo {
-    width: 146px !important;
-    height: 42px !important;
+    width: 142px !important;
+    height: 40px !important;
     max-width: 46vw !important;
-  }
-
-  .sah-header .sah-brand-logo {
-    width: 132px !important;
-    height: 38px !important;
-    max-width: 42vw !important;
   }
 
   .sah-hero-h1,

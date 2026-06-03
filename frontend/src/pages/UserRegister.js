@@ -18,8 +18,8 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --acc:#e94b13; --acc-d:#d9410d; --acc-l:#ffe2a3;
-    --acc-gradient:linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
+    --acc:#6f8da6; --acc-d:#557691; --acc-l:#d9efff;
+    --acc-solid:#ff8c42;
     --dark:#333330; --mid:#55514b; --muted:#837b70;
     --card:#f6f2ec; --white:#fff;
     --border:rgba(0,0,0,0.10);
@@ -29,7 +29,7 @@ const CSS = `
   .ur-wrap { font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; background:var(--card); -webkit-font-smoothing:antialiased; }
   .ur-wrap * { box-sizing:border-box; margin:0; padding:0; }
 
-  .ur-hdr { height:140px; background:linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%); display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
+  .ur-hdr { height:140px; background:#6f8da6; display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
   .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.85rem; font-weight:600; background:none; border:none; cursor:pointer; font-family:inherit; }
   .ur-hdr-back:hover { color:#fff; }
   .ur-hdr-div { width:1px; height:26px; background:rgba(255,255,255,0.25); }
@@ -38,7 +38,7 @@ const CSS = `
 
   .ur-hero { position:relative; overflow:hidden; min-height:180px; display:flex; align-items:center; }
   .ur-hero-bg { position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1400&auto=format&fit=crop&q=80'); background-size:cover; background-position:center; }
-  .ur-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(100deg,rgba(10,10,10,0.88) 0%,rgba(30,30,30,0.80) 100%); }
+  .ur-hero-bg::after { content:''; position:absolute; inset:0; background:rgba(24,35,48,0.68); }
   .ur-hero-inner { position:relative; z-index:2; padding:40px 32px; width:100%; max-width:700px; margin:0 auto; text-align:center; }
   .ur-hero-inner h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; }
   .ur-hero-inner h1 em { font-style:italic; color:var(--acc-l); }
@@ -47,7 +47,7 @@ const CSS = `
   .ur-body { flex:1; display:flex; align-items:flex-start; justify-content:center; padding:36px 24px 64px; }
 
   .ur-card { background:var(--white); border-radius:var(--r-lg); box-shadow:var(--shadow); width:100%; max-width:840px; overflow:hidden; }
-  .ur-card-head { background:linear-gradient(90deg,#3b3b38,#5a4631); padding:24px 36px 18px; }
+  .ur-card-head { background:#6f8da6; padding:24px 36px 18px; }
   .ur-card-head h2 { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; color:#fff; }
   .ur-card-head p { font-size:0.82rem; color:rgba(255,255,255,0.65); margin-top:3px; }
   .ur-card-body { padding:28px 36px 36px; }
@@ -59,7 +59,7 @@ const CSS = `
   .ur-field label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--mid); display:flex; align-items:center; gap:5px; }
   .ur-field label i { color:var(--acc); font-size:0.65rem; }
   .ur-field input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.92rem; color:var(--dark); outline:none; background:var(--card); transition:border-color 0.15s,box-shadow 0.15s; width:100%; }
-  .ur-field input:focus { border-color:var(--acc); box-shadow:0 0 0 3px rgba(201,98,26,0.14); }
+  .ur-field input:focus { border-color:var(--acc); box-shadow:0 0 0 3px rgba(85,118,145,0.14); }
   .ur-field input.err { border-color:#dc2626; background:#fff8f8; }
   .ur-field-err { color:#dc2626; font-size:0.74rem; font-weight:600; padding:4px 9px; background:#fff0f0; border-radius:5px; border-left:3px solid #dc2626; display:flex; align-items:center; gap:5px; }
   .ur-field-hint { font-size:0.73rem; color:var(--muted); display:flex; align-items:center; gap:4px; margin-top:2px; }
@@ -70,14 +70,14 @@ const CSS = `
   .ur-pw-eye { position:absolute; right:11px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.88rem; padding:3px; }
   .ur-pw-eye:hover { color:var(--acc); }
 
-  .ur-perks { display:flex; flex-direction:column; gap:10px; background:rgba(201,98,26,0.06); border:1px solid rgba(201,98,26,0.18); border-radius:var(--r); padding:16px 18px; margin-bottom:18px; }
+  .ur-perks { display:flex; flex-direction:column; gap:10px; background:rgba(85,118,145,0.06); border:1px solid rgba(85,118,145,0.18); border-radius:var(--r); padding:16px 18px; margin-bottom:18px; }
   .ur-perks-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:800; color:var(--dark); margin-bottom:2px; }
   .ur-perk { display:flex; align-items:center; gap:9px; font-size:0.84rem; color:var(--mid); }
   .ur-perk i { color:var(--acc); font-size:0.76rem; width:14px; text-align:center; flex-shrink:0; }
 
   .ur-privacy { background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.07); border-radius:var(--r); padding:12px 15px; font-size:0.79rem; color:var(--muted); line-height:1.65; }
 
-  .ur-submit { width:100%; padding:13px; background:var(--acc-gradient); color:#fff; border:none; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:filter 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
+  .ur-submit { width:100%; padding:13px; background:var(--acc-solid); color:#fff; border:none; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:filter 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
   .ur-submit:hover:not(:disabled) { filter:saturate(1.08) brightness(0.94); }
   .ur-submit:disabled { opacity:0.65; cursor:not-allowed; }
 
@@ -469,3 +469,4 @@ const UserRegister = () => {
 };
 
 export default UserRegister;
+

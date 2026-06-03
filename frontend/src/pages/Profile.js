@@ -93,7 +93,7 @@ function findProvider(id, email) {
 }
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const ORANGE = '#e94b13';
+const ORANGE = '#6f8da6';
 
 /* ── Inject all styles ── */
 const injectStyles = () => {
@@ -114,7 +114,7 @@ const injectStyles = () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #f4f1ec 0%, #ede9e3 100%);
+      background: #f7f8fa;
       padding: 32px 16px;
     }
     .pv2-gate-card {
@@ -129,7 +129,7 @@ const injectStyles = () => {
     }
     .pv2-gate-icon {
       width: 80px; height: 80px;
-      background: linear-gradient(135deg, ${ORANGE}, #e07a35);
+      background: #ff8c42;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 24px;
@@ -332,7 +332,7 @@ const injectStyles = () => {
     .pv2-right-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(105deg, rgba(5,5,5,0.97) 0%, rgba(10,10,10,0.82) 50%, rgba(5,5,5,0.75) 100%);
+      background: rgba(24,35,48,0.68);
       z-index: 0;
     }
     .pv2-right-content {
@@ -400,8 +400,8 @@ const injectStyles = () => {
     }
     .pv2-badge-featured {
       display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(201,98,26,0.28); color: #f0c89a;
-      border: 1px solid rgba(201,98,26,0.5);
+      background: rgba(85,118,145,0.28); color: #b7d5ea;
+      border: 1px solid rgba(85,118,145,0.5);
       font-size: 0.78rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
       white-space: nowrap;
     }
@@ -494,11 +494,11 @@ const injectStyles = () => {
     .pv2-contact-row a { color: #fbbf7a; text-decoration: none; font-weight: 600; }
     .pv2-contact-row a:hover { text-decoration: underline; color: #fff; }
     .pv2-upgrade-note {
-      background: rgba(201,98,26,0.2); border: 1px solid rgba(201,98,26,0.45);
+      background: rgba(85,118,145,0.2); border: 1px solid rgba(85,118,145,0.45);
       border-radius: 8px; padding: 12px 16px; margin-top: 4px;
       font-size: 0.8rem; color: rgba(255,255,255,0.8); text-align: center;
     }
-    .pv2-upgrade-note strong { color: #f0c89a; }
+    .pv2-upgrade-note strong { color: #b7d5ea; }
 
     /* ── MIDDLE ROW ── */
     .pv2-mid-row {
@@ -810,7 +810,7 @@ const Profile = () => {
       {fromDashboard ? (
         <header style={{
           position: 'sticky', top: 0, zIndex: 1000,
-          height: '140px', background: 'linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%)',
+          height: '140px', background: '#6f8da6',
           boxShadow: '0 2px 12px rgba(0,0,0,0.22)',
           display: 'flex', alignItems: 'center', flexShrink: 0,
         }}>
@@ -1127,3 +1127,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

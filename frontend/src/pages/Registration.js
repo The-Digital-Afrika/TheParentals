@@ -16,10 +16,10 @@ const injectHead = () => {
   document.head.appendChild(fa);
 };
 
-const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #ffe2a3; --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%); --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
+const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #d9efff; --accent-solid: #ff8c42; --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
 .sah-reg-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
 .sah-reg-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; -webkit-font-smoothing: antialiased; color: var(--dark); }
-.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: linear-gradient(90deg,#7c7280 0%,#4f7298 34%,#2b4d78 66%,#15335f 100%); box-shadow: 0 2px 12px rgba(18,45,82,0.28); }
+.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: #6f8da6; box-shadow: 0 2px 12px rgba(18,45,82,0.28); }
 .sah-rhdr-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
 .sah-rhdr-left { display: flex; align-items: center; }
 .sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
@@ -34,7 +34,7 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-rhdr-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.10); }
 .sah-reg-hero { position: relative; overflow: hidden; min-height: 220px; display: flex; align-items: center; }
 .sah-reg-hero-bg { position: absolute; inset: 0; z-index: 0; background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80'); background-size: cover; background-position: center 35%; }
-.sah-reg-hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(10,10,10,0.88) 0%, rgba(30,30,30,0.82) 50%, rgba(10,10,10,0.78) 100%); }
+.sah-reg-hero-bg::after { content: ''; position: absolute; inset: 0; background: rgba(24,35,48,0.68); }
 .sah-reg-hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1400px; margin: 0 auto; padding: 48px 32px; }
 .sah-reg-hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: #fff; margin-bottom: 28px; line-height: 1.1; }
 .sah-reg-hero-title em { font-style: italic; color: var(--accent-light); }
@@ -42,20 +42,20 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-step-trail::-webkit-scrollbar { display: none; }
 .sah-trail-item { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
 .sah-trail-dot { display: flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 50px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.07); transition: all 0.2s; cursor: default; }
-.sah-trail-dot.active { background: var(--accent-gradient); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.28); }
+.sah-trail-dot.active { background: var(--accent-solid); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.28); }
 .sah-trail-dot.done { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.80); border-color: rgba(255,255,255,0.35); }
 .sah-trail-dot .sah-tn { font-size: 0.68rem; opacity: 0.75; margin-right: 2px; }
 .sah-trail-arrow { color: rgba(255,255,255,0.25); font-size: 0.62rem; margin: 0 6px; flex-shrink: 0; }
 .sah-reg-panel { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .sah-step-card { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); margin-top: 28px; overflow: visible; }
-.sah-step-card-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.sah-step-card-head { background: #6f8da6; padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .sah-step-card-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
 .sah-step-card-head p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
 .sah-step-card-body { padding: 32px 36px 28px; overflow: visible; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
 .sah-plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
 .sah-plan-card { border: 2px solid rgba(0,0,0,0.10); border-radius: var(--radius-lg); background: var(--card-white); cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
 .sah-plan-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.sah-plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.18), var(--shadow-md); }
+.sah-plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.18), var(--shadow-md); }
 .sah-plan-card-head { padding: 18px 20px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; background: var(--card-white); }
 .sah-plan-card.selected .sah-plan-card-head { background: #f5f0ea; border-bottom: 2px solid var(--accent); }
 .sah-plan-card-name { font-weight: 800; font-size: 1rem; color: #1a1a1a; }
@@ -70,11 +70,11 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-plan-features li.no { color: #888; }
 .sah-ico-yes { color: #16a34a; font-size: 0.7rem; }
 .sah-ico-no { color: #ccc; font-size: 0.7rem; }
-.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent-gradient); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent-solid); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
 .sah-plan-select-btn:hover { filter: saturate(1.08) brightness(0.94); }
 .sah-plan-select-btn.selected { background: var(--accent); }
 .sah-terms-box { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
-.sah-terms-box-head { background: linear-gradient(90deg,#3b3b38,#5a4631); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
+.sah-terms-box-head { background: #6f8da6; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
 .sah-terms-box-head-title { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 800; color: #fff; }
 .sah-terms-view-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.55); background: rgba(255,255,255,0.10); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.80rem; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sah-terms-view-btn:hover { background: rgba(255,255,255,0.22); border-color: #fff; }
@@ -87,7 +87,7 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-terms-body ul { padding-left: 18px; margin-bottom: 10px; }
 .sah-terms-body ul li { font-size: 0.85rem; color: var(--mid); line-height: 1.7; margin-bottom: 4px; }
 .sah-terms-row { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 12px; font-size: 0.88rem; font-weight: 500; color: var(--mid); cursor: pointer; }
-.sah-terms-row.checked { border-color: var(--accent); background: rgba(201,98,26,0.05); }
+.sah-terms-row.checked { border-color: var(--accent); background: rgba(85,118,145,0.05); }
 .sah-terms-row.err-border { border-color: #dc2626; background: #fff8f8; }
 .sah-terms-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 .sah-terms-row a { color: var(--accent); font-weight: 700; text-decoration: none; }
@@ -100,7 +100,7 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-req { color: var(--accent); font-size: 1rem; font-style: normal; }
 .sah-field input, .sah-field select, .sah-field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); background: var(--card-white); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--dark); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; appearance: none; }
 .sah-field textarea { resize: vertical; min-height: 90px; }
-.sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.14); }
+.sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
 .sah-field input.err, .sah-field select.err, .sah-field textarea.err { border-color: #dc2626; background: #fff8f8; }
 .sah-field input[type="file"] { padding: 8px 12px; font-size: 0.83rem; cursor: pointer; background: var(--card-white); }
 .sah-field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
@@ -110,7 +110,7 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-terms-err { color: #dc2626; font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 8px; padding: 6px 10px; background: #fff0f0; border-radius: 5px; border-left: 3px solid #dc2626; }
 .sah-group-err { color: #dc2626; font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 10px; background: #fff0f0; border-radius: 5px; border-left: 3px solid #dc2626; animation: sah-err-in 0.18s ease; }
 .sah-prefix-wrap { display: flex; align-items: stretch; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); overflow: hidden; background: var(--card-white); transition: border-color 0.15s, box-shadow 0.15s; }
-.sah-prefix-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.14); }
+.sah-prefix-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
 .sah-prefix-wrap.err { border-color: #dc2626; background: #fff8f8; }
 .sah-prefix { background: rgba(0,0,0,0.06); border-right: 1.5px solid rgba(0,0,0,0.10); padding: 11px 12px; font-size: 0.92rem; font-weight: 700; color: var(--mid); white-space: nowrap; display: flex; align-items: center; }
 .sah-prefix-wrap input { border: none !important; box-shadow: none !important; border-radius: 0 !important; flex: 1; }
@@ -129,14 +129,14 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-check-group label:hover:not(.disabled-opt) { border-color: var(--accent); color: var(--accent); }
 .sah-check-group label.disabled-opt { opacity: 0.4; cursor: not-allowed; }
 .sah-check-group input[type="checkbox"], .sah-check-group input[type="radio"] { width: auto; padding: 0; border: none; background: none; box-shadow: none; accent-color: var(--accent); transform: scale(1.1); }
-.sah-check-group label:has(input:checked) { border-color: var(--accent); background: rgba(201,98,26,0.08); color: var(--accent); }
+.sah-check-group label:has(input:checked) { border-color: var(--accent); background: rgba(85,118,145,0.08); color: var(--accent); }
 .sah-day-quickpick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .sah-day-quickpick-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card-white); font-size: 0.82rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all 0.14s; font-family: 'DM Sans', sans-serif; }
 .sah-day-quickpick-btn:hover { border-color: var(--accent); color: var(--accent); }
-.sah-day-quickpick-btn.active { border-color: var(--accent); background: rgba(201,98,26,0.10); color: var(--accent); }
+.sah-day-quickpick-btn.active { border-color: var(--accent); background: rgba(85,118,145,0.10); color: var(--accent); }
 .sah-secondary-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card-white); font-size: 0.84rem; font-weight: 600; color: var(--mid); cursor: pointer; transition: all 0.14s; user-select: none; }
 .sah-secondary-toggle:hover { border-color: var(--accent); color: var(--accent); }
-.sah-secondary-toggle.active { border-color: var(--accent); background: rgba(201,98,26,0.08); color: var(--accent); }
+.sah-secondary-toggle.active { border-color: var(--accent); background: rgba(85,118,145,0.08); color: var(--accent); }
 .sah-secondary-toggle input[type="checkbox"] { width: auto; padding: 0; border: none; background: none; box-shadow: none; accent-color: var(--accent); transform: scale(1.1); }
 .sah-secondary-cats-box { margin-top: 10px; padding: 14px 16px; background: var(--card-white); border: 1.5px solid var(--accent); border-radius: var(--radius); }
 .sah-file-upload-zone { border: 2px dashed rgba(0,0,0,0.15); border-radius: var(--radius); padding: 16px; background: rgba(255,255,255,0.6); cursor: pointer; transition: border-color 0.15s; }
@@ -160,7 +160,7 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-add-others-btn:hover { border-color: var(--accent); color: var(--accent); }
 .sah-add-others-dropdown { position: absolute; top: calc(100% + 6px); left: 0; z-index: 500; background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md); min-width: 200px; overflow: hidden; }
 .sah-add-others-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; color: var(--mid); cursor: pointer; transition: background 0.12s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
-.sah-add-others-option:hover { background: rgba(201,98,26,0.07); color: var(--accent); }
+.sah-add-others-option:hover { background: rgba(85,118,145,0.07); color: var(--accent); }
 .sah-add-others-option i { color: var(--accent); width: 16px; text-align: center; }
 .sah-added-socials { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 .sah-form-nav-wrap { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 20px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -169,8 +169,8 @@ const CSS = `:root{ --accent: #e94b13; --accent-dark: #d9410d; --accent-light: #
 .sah-nav-counter { text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .sah-nav-counter strong { color: var(--accent); font-size: 1rem; }
 .sah-nav-progress { height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-.sah-nav-progress-fill { height: 100%; background: var(--accent-gradient); border-radius: 2px; transition: width 0.3s; }
-.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent-gradient); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: filter 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(201,98,26,0.45); }
+.sah-nav-progress-fill { height: 100%; background: var(--accent-solid); border-radius: 2px; transition: width 0.3s; }
+.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent-solid); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: filter 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(85,118,145,0.45); }
 .sah-nav-next:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); transform: translateY(-1px); }
 .sah-nav-next:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 .sah-nav-submit { background: var(--accent); box-shadow: 0 6px 20px -4px rgba(233,75,19,0.42); }
@@ -1593,3 +1593,4 @@ const Registration = () => {
 };
 
 export default Registration;
+

@@ -189,14 +189,14 @@ const TABS = [
 const DASH_CSS = `
   .cd-wrap { font-family:'DM Sans','Segoe UI',sans-serif; background:#f4f1ec; min-height:100vh; -webkit-font-smoothing:antialiased; }
   .cd-wrap * { box-sizing:border-box; }
-  .cd-hero { background:linear-gradient(135deg,#3a3a3a 0%,#5a5a5a 55%,#e94b13 100%); padding:32px 0 0; position:relative; overflow:hidden; }
+  .cd-hero { background:#6f8da6; padding:32px 0 0; position:relative; overflow:hidden; }
   .cd-hero::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23fff' fill-opacity='.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
   .cd-hero-top { max-width:1280px; margin:0 auto; padding:0 32px 28px; position:relative; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
   .cd-hero-left { flex:1; min-width:0; }
   .cd-hero-eyebrow { font-size:0.67rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:7px; display:flex; align-items:center; gap:8px; }
   .cd-hero-eyebrow span { width:20px; height:1px; background:rgba(255,255,255,0.3); display:inline-block; }
   .cd-hero-title { font-size:clamp(1.4rem,2.5vw,1.9rem); font-weight:800; color:#fff; margin:0 0 10px; line-height:1.15; font-family:'Playfair Display',Georgia,serif; }
-  .cd-hero-title em { font-style:italic; color:#f0c89a; }
+  .cd-hero-title em { font-style:italic; color:#b7d5ea; }
   .cd-hero-meta { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
   .cd-status-pill { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; border-radius:50px; font-size:0.75rem; font-weight:700; }
   .cd-status-pill.pending  { background:rgba(245,158,11,.2); color:#fbbf24; border:1px solid rgba(245,158,11,.35); }
@@ -205,82 +205,82 @@ const DASH_CSS = `
   .cd-hero-right { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .cd-btn-ghost { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:7px; border:1.5px solid rgba(255,255,255,.38); background:rgba(255,255,255,.07); color:#fff; font-size:0.81rem; font-weight:600; cursor:pointer; font-family:inherit; transition:all .17s; text-decoration:none; white-space:nowrap; }
   .cd-btn-ghost:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.75); }
-  .cd-btn-solid { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:7px; border:none; background:#e94b13; color:#fff; font-size:0.81rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .17s; white-space:nowrap; }
-  .cd-btn-solid:hover { background:#d9410d; transform:translateY(-1px); }
+  .cd-btn-solid { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:7px; border:none; background:#6f8da6; color:#fff; font-size:0.81rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .17s; white-space:nowrap; }
+  .cd-btn-solid:hover { background:#557691; transform:translateY(-1px); }
   .cd-btn-solid:disabled { opacity:.6; cursor:not-allowed; transform:none; }
-  .cd-btn-solid.cancel { background:#e94b13; }
-  .cd-btn-solid.cancel:hover { background:#d9410d; }
+  .cd-btn-solid.cancel { background:#6f8da6; }
+  .cd-btn-solid.cancel:hover { background:#557691; }
   .cd-tab-bar { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; gap:2px; position:relative; z-index:10; }
   .cd-tab-btn { padding:10px 18px; background:rgba(255,255,255,.1); border:none; border-bottom:none; color:rgba(255,255,255,.6); font-size:0.8rem; font-weight:600; cursor:pointer; font-family:inherit; border-radius:8px 8px 0 0; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
   .cd-tab-btn:hover { background:rgba(255,255,255,.2); color:#fff; }
-  .cd-tab-btn.active { background:#f4f1ec; color:#e94b13; font-weight:700; }
+  .cd-tab-btn.active { background:#f4f1ec; color:#6f8da6; font-weight:700; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
   .cd-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; align-items:start; }
   .cd-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04); margin-bottom:16px; border:1px solid rgba(0,0,0,.05); }
   .cd-card-header { display:flex; align-items:center; gap:11px; padding:14px 20px; border-bottom:1px solid #f0ece5; background:#faf9f7; }
-  .cd-card-header-icon { width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,#e94b13,#e94b13); display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; flex-shrink:0; }
+  .cd-card-header-icon { width:34px; height:34px; border-radius:8px; background:#6f8da6; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; flex-shrink:0; }
   .cd-card-title    { font-size:0.88rem; font-weight:700; color:#1a1a1a; margin:0; }
   .cd-card-subtitle { font-size:0.71rem; color:#888; margin:1px 0 0; }
   .cd-card-body     { padding:20px; }
   .cd-card-body.tight { padding:14px 20px; }
   .cd-edit-toggle { margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; border:1.5px solid; transition:all .15s; font-family:inherit; }
   .cd-edit-toggle.inactive { border-color:#d1d5db; background:transparent; color:#6b7280; }
-  .cd-edit-toggle.inactive:hover { border-color:#e94b13; color:#e94b13; }
-  .cd-edit-toggle.active { border-color:#e94b13; background:#fef3e8; color:#e94b13; }
+  .cd-edit-toggle.inactive:hover { border-color:#6f8da6; color:#6f8da6; }
+  .cd-edit-toggle.active { border-color:#6f8da6; background:#edf7ff; color:#6f8da6; }
   .cd-field { margin-bottom:14px; }
   .cd-field:last-child { margin-bottom:0; }
   .cd-label { display:block; font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#888; margin-bottom:5px; }
-  .cd-label .req { color:#e94b13; }
+  .cd-label .req { color:#6f8da6; }
   .cd-value { font-size:0.87rem; color:#1a1a1a; padding:7px 0; border-bottom:1px solid #f0ece5; min-height:32px; display:flex; align-items:center; }
   .cd-value.empty { color:#bbb; font-style:italic; }
   .cd-input { width:100%; padding:9px 12px; border:1.5px solid #e5e0d8; border-radius:7px; background:#faf9f7; font-family:inherit; font-size:0.87rem; color:#1a1a1a; outline:none; transition:border-color .15s,box-shadow .15s; -webkit-appearance:none; appearance:none; }
-  .cd-input:focus { border-color:#e94b13; box-shadow:0 0 0 3px rgba(201,98,26,.11); }
+  .cd-input:focus { border-color:#6f8da6; box-shadow:0 0 0 3px rgba(85,118,145,.11); }
   .cd-textarea { resize:vertical; min-height:82px; }
   .cd-select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; padding-right:30px; cursor:pointer; }
   .cd-row   { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .cd-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
   .cd-svc-card { background:#faf9f7; border:1px solid #e5e0d8; border-radius:9px; padding:14px 16px; margin-bottom:10px; }
-  .cd-svc-card.editing { border-color:#e94b13; background:#fff; }
+  .cd-svc-card.editing { border-color:#6f8da6; background:#fff; }
   .cd-svc-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:start; }
   .cd-svc-grid .cd-field { margin-bottom:0; }
-  .cd-sec-label { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#e94b13; display:flex; align-items:center; gap:7px; padding-bottom:8px; border-bottom:1px solid #f0ece5; margin:16px 0 12px; }
+  .cd-sec-label { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#6f8da6; display:flex; align-items:center; gap:7px; padding-bottom:8px; border-bottom:1px solid #f0ece5; margin:16px 0 12px; }
   .cd-days { display:flex; flex-wrap:wrap; gap:7px; }
   .cd-day-chip { padding:5px 12px; border-radius:20px; font-size:0.77rem; font-weight:600; transition:all .13s; border:none; }
-  .cd-day-chip.on  { background:#e94b13; color:#fff; }
+  .cd-day-chip.on  { background:#6f8da6; color:#fff; }
   .cd-day-chip.off { background:#f0ece5; color:#bbb; border:1px solid #e5e0d8; }
   .cd-day-chip.clickable { cursor:pointer; }
-  .cd-day-chip.clickable.off:hover { border-color:#e94b13; color:#e94b13; }
+  .cd-day-chip.clickable.off:hover { border-color:#6f8da6; color:#6f8da6; }
   .cd-tags { display:flex; flex-wrap:wrap; gap:7px; }
-  .cd-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 11px; border-radius:20px; background:#fef3e8; color:#e94b13; border:1px solid #f0c89a; font-size:0.75rem; font-weight:600; }
-  .cd-tag button { background:none; border:none; cursor:pointer; color:#e94b13; font-size:0.68rem; padding:0; line-height:1; }
+  .cd-tag { display:inline-flex; align-items:center; gap:4px; padding:3px 11px; border-radius:20px; background:#edf7ff; color:#6f8da6; border:1px solid #b7d5ea; font-size:0.75rem; font-weight:600; }
+  .cd-tag button { background:none; border:none; cursor:pointer; color:#6f8da6; font-size:0.68rem; padding:0; line-height:1; }
   .cd-plan-badge { display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:9px; font-size:0.82rem; font-weight:700; border:2px solid; }
   .cd-plan-badge.free     { background:#f9f9f9; color:#666;    border-color:#e5e5e5; }
   .cd-plan-badge.pro      { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
   .cd-plan-badge.featured { background:#fffbeb; color:#d97706; border-color:#fde68a; }
   .cd-plan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .cd-plan-card { border:2px solid #e5e0d8; border-radius:11px; padding:17px; background:#fff; position:relative; transition:border-color .18s; }
-  .cd-plan-card.is-current { border-color:#e94b13; background:#fffaf6; }
-  .cd-plan-current-badge { position:absolute; top:-1px; right:14px; background:#e94b13; color:#fff; font-size:0.63rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase; padding:3px 9px; border-radius:0 0 7px 7px; }
+  .cd-plan-card.is-current { border-color:#6f8da6; background:#f8fcff; }
+  .cd-plan-current-badge { position:absolute; top:-1px; right:14px; background:#6f8da6; color:#fff; font-size:0.63rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase; padding:3px 9px; border-radius:0 0 7px 7px; }
   .cd-plan-card-name  { font-size:0.92rem; font-weight:800; color:#1a1a1a; margin-bottom:2px; }
   .cd-plan-card-desc  { font-size:0.72rem; color:#888; margin-bottom:9px; }
-  .cd-plan-price      { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; color:#e94b13; line-height:1; margin-bottom:11px; }
+  .cd-plan-price      { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; color:#6f8da6; line-height:1; margin-bottom:11px; }
   .cd-plan-price small { font-size:0.59rem; color:#888; font-weight:400; font-family:'DM Sans',sans-serif; display:block; margin-top:2px; }
   .cd-plan-features   { list-style:none; padding:0; margin:0 0 4px; display:flex; flex-direction:column; gap:5px; }
   .cd-plan-features li { display:flex; align-items:center; gap:6px; font-size:0.77rem; color:#555; }
   .cd-plan-features li i { color:#10b981; font-size:0.63rem; }
   .cd-plan-action-btn { width:100%; margin-top:12px; padding:9px; border-radius:7px; font-size:0.8rem; font-weight:700; cursor:pointer; border:none; font-family:inherit; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px; }
-  .cd-plan-action-btn.current   { background:#fef3e8; color:#e94b13; border:2px solid #e94b13; cursor:default; pointer-events:none; }
-  .cd-plan-action-btn.upgrade   { background:#e94b13; color:#fff; }
-  .cd-plan-action-btn.upgrade:hover { background:#d9410d; }
-  .cd-plan-action-btn.downgrade { background:#e94b13; color:#fff; border:1.5px solid #e94b13; }
-  .cd-plan-action-btn.downgrade:hover { background:#d9410d; border-color:#d9410d; }
-  .cd-review { padding:12px 14px; background:#faf9f7; border-radius:9px; border-left:3px solid #e94b13; margin-bottom:9px; }
+  .cd-plan-action-btn.current   { background:#edf7ff; color:#6f8da6; border:2px solid #6f8da6; cursor:default; pointer-events:none; }
+  .cd-plan-action-btn.upgrade   { background:#6f8da6; color:#fff; }
+  .cd-plan-action-btn.upgrade:hover { background:#557691; }
+  .cd-plan-action-btn.downgrade { background:#6f8da6; color:#fff; border:1.5px solid #6f8da6; }
+  .cd-plan-action-btn.downgrade:hover { background:#557691; border-color:#557691; }
+  .cd-review { padding:12px 14px; background:#faf9f7; border-radius:9px; border-left:3px solid #6f8da6; margin-bottom:9px; }
   .cd-review-stars  { color:#f59e0b; font-size:0.82rem; margin-bottom:3px; }
   .cd-review-text   { font-size:0.84rem; color:#555; font-style:italic; }
   .cd-review-author { font-size:0.72rem; color:#888; margin-top:3px; font-weight:600; }
   .cd-contact-item { display:flex; align-items:center; gap:11px; padding:10px 0; border-bottom:1px solid #f0ece5; }
   .cd-contact-item:last-child { border-bottom:none; }
-  .cd-contact-icon { width:31px; height:31px; border-radius:7px; background:#fef3e8; display:flex; align-items:center; justify-content:center; color:#e94b13; font-size:0.8rem; flex-shrink:0; }
+  .cd-contact-icon { width:31px; height:31px; border-radius:7px; background:#edf7ff; display:flex; align-items:center; justify-content:center; color:#6f8da6; font-size:0.8rem; flex-shrink:0; }
   .cd-contact-label { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#aaa; }
   .cd-contact-val   { font-size:0.85rem; color:#1a1a1a; font-weight:500; }
   .cd-toggle-row { display:flex; align-items:center; justify-content:space-between; }
@@ -288,7 +288,7 @@ const DASH_CSS = `
   .cd-switch input { opacity:0; width:0; height:0; }
   .cd-slider { position:absolute; cursor:pointer; inset:0; background:#d1d5db; border-radius:22px; transition:.2s; }
   .cd-slider::before { content:''; position:absolute; height:16px; width:16px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.18); }
-  .cd-switch input:checked + .cd-slider { background:#e94b13; }
+  .cd-switch input:checked + .cd-slider { background:#6f8da6; }
   .cd-switch input:checked + .cd-slider::before { transform:translateX(18px); }
   .cd-footer-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#faf9f7; border-top:1px solid #f0ece5; gap:10px; flex-wrap:wrap; }
   .cd-last-edit { font-size:0.72rem; color:#aaa; display:flex; align-items:center; gap:5px; }
@@ -297,10 +297,10 @@ const DASH_CSS = `
   .cd-info-note i { color:#f59e0b; margin-top:1px; flex-shrink:0; }
   .cd-info-note.last { margin-bottom:0; }
   .cd-photo-wrap { position:relative; display:inline-block; flex-shrink:0; }
-  .cd-photo-img  { width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid #e94b13; display:block; }
-  .cd-photo-placeholder { width:76px; height:76px; border-radius:50%; background:#fef3e8; border:3px solid #e94b13; display:flex; align-items:center; justify-content:center; color:#e94b13; font-size:1.5rem; }
-  .cd-photo-btn { position:absolute; bottom:0; right:0; background:#e94b13; color:#fff; border:2px solid #fff; border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.67rem; transition:background .15s; }
-  .cd-photo-btn:hover { background:#d9410d; }
+  .cd-photo-img  { width:76px; height:76px; border-radius:50%; object-fit:cover; border:3px solid #6f8da6; display:block; }
+  .cd-photo-placeholder { width:76px; height:76px; border-radius:50%; background:#edf7ff; border:3px solid #6f8da6; display:flex; align-items:center; justify-content:center; color:#6f8da6; font-size:1.5rem; }
+  .cd-photo-btn { position:absolute; bottom:0; right:0; background:#6f8da6; color:#fff; border:2px solid #fff; border-radius:50%; width:25px; height:25px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.67rem; transition:background .15s; }
+  .cd-photo-btn:hover { background:#557691; }
   .cd-photo-input { display:none; }
   .cd-sidebar-card { background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.06); margin-bottom:14px; border:1px solid rgba(0,0,0,.05); overflow:hidden; }
   .cd-sidebar-header { padding:12px 16px; background:#5a5a5a; }
@@ -311,12 +311,12 @@ const DASH_CSS = `
   /* ── uploaded document card ── */
   .cd-doc-card { display:flex; align-items:center; gap:10px; padding:10px 13px; background:#faf9f7; border:1.5px solid #e5e0d8; border-radius:8px; margin-bottom:8px; }
   .cd-doc-icon { width:32px; height:32px; border-radius:7px; background:#fff3e8; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .cd-doc-icon i { color:#e94b13; font-size:0.82rem; }
+  .cd-doc-icon i { color:#6f8da6; font-size:0.82rem; }
   .cd-doc-info { flex:1; min-width:0; }
   .cd-doc-name { font-size:0.78rem; font-weight:700; color:#1a1a1a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cd-doc-sub  { font-size:0.68rem; color:#aaa; margin-top:1px; }
-  .cd-doc-dl { padding:5px 11px; border-radius:5px; background:#e94b13; color:#fff; font-size:0.7rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; transition:background .15s; flex-shrink:0; display:inline-flex; align-items:center; gap:5px; }
-  .cd-doc-dl:hover { background:#d9410d; }
+  .cd-doc-dl { padding:5px 11px; border-radius:5px; background:#6f8da6; color:#fff; font-size:0.7rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; transition:background .15s; flex-shrink:0; display:inline-flex; align-items:center; gap:5px; }
+  .cd-doc-dl:hover { background:#557691; }
   /* ── qual upload notice ── */
   .cd-qual-notice { display:flex; align-items:flex-start; gap:8px; padding:10px 13px; background:#f0f9ff; border-radius:7px; border:1px solid #bae6fd; font-size:0.77rem; color:#0369a1; margin-top:8px; }
   .cd-qual-notice i { color:#0284c7; margin-top:1px; flex-shrink:0; }
@@ -737,10 +737,10 @@ const ClientDashboard = () => {
           <div style={{ marginTop: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
               <span style={{ fontSize: '0.69rem', color: '#888', fontWeight: 700 }}>COMPLETE</span>
-              <span style={{ fontSize: '0.69rem', color: '#e94b13', fontWeight: 800 }}>{compPct}%</span>
+              <span style={{ fontSize: '0.69rem', color: '#6f8da6', fontWeight: 800 }}>{compPct}%</span>
             </div>
             <div style={{ height: 5, background: '#f0ece5', borderRadius: 3, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${compPct}%`, background: 'linear-gradient(90deg,#e94b13,#e94b13)', borderRadius: 3, transition: 'width .5s' }} />
+              <div style={{ height: '100%', width: `${compPct}%`, background: '#ff8c42', borderRadius: 3, transition: 'width .5s' }} />
             </div>
           </div>
         </div>
@@ -784,7 +784,7 @@ const ClientDashboard = () => {
                 Documents you uploaded during registration. Go to <strong>Profile → Qualifications</strong> to view and download.
               </p>
               <button
-                style={{ width: '100%', padding: '8px 12px', background: '#e94b13', color: '#fff', border: 'none', borderRadius: 7, fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
+                style={{ width: '100%', padding: '8px 12px', background: '#6f8da6', color: '#fff', border: 'none', borderRadius: 7, fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}
                 onClick={() => setActiveTab('profile')}
               >
                 <i className="fas fa-folder-open"></i> View Documents
@@ -823,7 +823,7 @@ const ClientDashboard = () => {
               <div>
                 <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1a1a1a' }}>{profileData.name || 'Your Name'}</div>
                 <div style={{ fontSize: '0.76rem', color: '#888', margin: '2px 0 6px' }}>{profileData.email}</div>
-                <button onClick={() => photoInputRef.current?.click()} style={{ background: 'none', border: 'none', color: '#e94b13', fontSize: '0.73rem', fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+                <button onClick={() => photoInputRef.current?.click()} style={{ background: 'none', border: 'none', color: '#6f8da6', fontSize: '0.73rem', fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
                   <i className="fas fa-camera"></i> Change photo / logo
                 </button>
               </div>
@@ -900,8 +900,8 @@ const ClientDashboard = () => {
               {editing ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                   {['English','Afrikaans','isiZulu','isiXhosa','Sepedi','Setswana','Sesotho','Xitsonga','SiSwati','Tshivenda','isiNdebele','Other'].map(lang => (
-                    <label key={lang} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:'0.8rem', cursor:'pointer', padding:'5px 11px', border:'1.5px solid', borderColor:(profileData.languages||[]).includes(lang)?'#e94b13':'#e5e0d8', borderRadius:6, background:(profileData.languages||[]).includes(lang)?'rgba(201,98,26,0.08)':'#faf9f7', color:(profileData.languages||[]).includes(lang)?'#e94b13':'#555', fontWeight:600 }}>
-                      <input type="checkbox" style={{ accentColor:'#e94b13' }}
+                    <label key={lang} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:'0.8rem', cursor:'pointer', padding:'5px 11px', border:'1.5px solid', borderColor:(profileData.languages||[]).includes(lang)?'#6f8da6':'#e5e0d8', borderRadius:6, background:(profileData.languages||[]).includes(lang)?'rgba(85,118,145,0.08)':'#faf9f7', color:(profileData.languages||[]).includes(lang)?'#6f8da6':'#555', fontWeight:600 }}>
+                      <input type="checkbox" style={{ accentColor:'#6f8da6' }}
                         checked={(profileData.languages||[]).includes(lang)}
                         onChange={e => {
                           const cur = profileData.languages || [];
@@ -972,7 +972,7 @@ const ClientDashboard = () => {
                   <span>Upload PDF documents only. These will be reviewed by the admin as-is and will not affect your text fields above.</span>
                 </div>
                 <div className="cd-field">
-                  <label className="cd-label"><i className="fas fa-certificate" style={{ marginRight: 5, color: '#e94b13' }}></i>Qualification / Certificate PDF</label>
+                  <label className="cd-label"><i className="fas fa-certificate" style={{ marginRight: 5, color: '#6f8da6' }}></i>Qualification / Certificate PDF</label>
                   <input
                     ref={qualFileInputRef}
                     type="file"
@@ -989,7 +989,7 @@ const ClientDashboard = () => {
                   )}
                 </div>
                 <div className="cd-field" style={{ marginTop: 10 }}>
-                  <label className="cd-label"><i className="fas fa-shield-alt" style={{ marginRight: 5, color: '#e94b13' }}></i>Police Clearance PDF</label>
+                  <label className="cd-label"><i className="fas fa-shield-alt" style={{ marginRight: 5, color: '#6f8da6' }}></i>Police Clearance PDF</label>
                   <input
                     ref={clearanceFileInputRef}
                     type="file"
@@ -1029,7 +1029,7 @@ const ClientDashboard = () => {
                   {hasCertDocs && (
                     <div style={{ marginBottom: hasClearDocs ? 14 : 0 }}>
                       <div className="cd-docs-section-title">
-                        <i className="fas fa-certificate" style={{ color: '#e94b13' }}></i>
+                        <i className="fas fa-certificate" style={{ color: '#6f8da6' }}></i>
                         Qualification / Certificate PDFs
                       </div>
                       {certCards}
@@ -1090,7 +1090,7 @@ const ClientDashboard = () => {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                           {['5–7', '8–10', '11–13', '14–18'].map(ag => (
                             <label key={ag} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: '0.79rem', cursor: 'pointer', userSelect: 'none' }}>
-                              <input type="checkbox" style={{ accentColor: '#e94b13' }}
+                              <input type="checkbox" style={{ accentColor: '#6f8da6' }}
                                 checked={(svc.ageGroups || []).includes(ag)}
                                 onChange={e => updService(idx, { ...svc, ageGroups: e.target.checked ? [...(svc.ageGroups || []), ag] : (svc.ageGroups || []).filter(a => a !== ag) })} />
                               {ag}
@@ -1154,7 +1154,7 @@ const ClientDashboard = () => {
             {editing && isPaidPlan && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
                 <button onClick={addService} disabled={svcCount >= maxServices}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 15px', borderRadius: 7, border: '1.5px dashed #e94b13', background: '#fef3e8', color: '#e94b13', fontWeight: 700, fontSize: '0.8rem', fontFamily: 'inherit', cursor: svcCount >= maxServices ? 'not-allowed' : 'pointer', opacity: svcCount >= maxServices ? 0.5 : 1 }}>
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 15px', borderRadius: 7, border: '1.5px dashed #6f8da6', background: '#edf7ff', color: '#6f8da6', fontWeight: 700, fontSize: '0.8rem', fontFamily: 'inherit', cursor: svcCount >= maxServices ? 'not-allowed' : 'pointer', opacity: svcCount >= maxServices ? 0.5 : 1 }}>
                   <i className="fas fa-plus-circle"></i> Add Service
                 </button>
                 <span style={{ fontSize: '0.74rem', color: '#888' }}>{svcCount}/{maxServices} used</span>
@@ -1164,7 +1164,7 @@ const ClientDashboard = () => {
               <div className="cd-info-note last" style={{ marginTop: 8 }}>
                 <i className="fas fa-lock"></i>
                 <span>Want more services?{' '}
-                  <span style={{ fontWeight: 700, color: '#e94b13', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setActiveTab('plan')}>
+                  <span style={{ fontWeight: 700, color: '#6f8da6', cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setActiveTab('plan')}>
                     Upgrade your plan →
                   </span>
                 </span>
@@ -1435,7 +1435,7 @@ const ClientDashboard = () => {
               <>
                 {profileData.reviews.count > 0 && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12, padding: '9px 13px', background: '#faf9f7', borderRadius: 9 }}>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#e94b13', lineHeight: 1 }}>{profileData.reviews.average}</div>
+                    <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#6f8da6', lineHeight: 1 }}>{profileData.reviews.average}</div>
                     <div>
                       <div style={{ color: '#f59e0b' }}>{'★'.repeat(Math.round(profileData.reviews.average))}{'☆'.repeat(5 - Math.round(profileData.reviews.average))}</div>
                       <div style={{ fontSize: '0.72rem', color: '#888' }}>Based on {profileData.reviews.count} reviews</div>
@@ -1532,3 +1532,4 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
+

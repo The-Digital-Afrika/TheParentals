@@ -1,10 +1,10 @@
 /* dashboard.css - Shared dashboard styles with homepage color scheme */
 
 :root {
-  --accent: #e94b13;
-  --accent-dark: #d9410d;
-  --accent-light: #ffe2a3;
-  --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
+  --accent: #6f8da6;
+  --accent-dark: #557691;
+  --accent-light: #d9efff;
+  --accent-solid: #ff8c42;
   --red: #e62925;
   --red-dark: #b91c1c;
   --red-light: #ffd7d1;
@@ -82,7 +82,7 @@
 }
 
 .profile-preview-badge:hover {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .pending-badge {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   padding: 3px 10px;
   border-radius: 40px;
@@ -128,7 +128,7 @@
   align-items: center;
   gap: 12px;
   padding: 20px 24px;
-  background: linear-gradient(145deg, var(--accent) 0%, var(--accent-dark) 100%);
+  background: var(--accent);
   color: white;
 }
 
@@ -247,12 +247,12 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   border-radius: 3px 3px 0 0;
 }
 
 .pending-badge {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   padding: 2px 6px;
   border-radius: 20px;
@@ -358,7 +358,7 @@
 }
 
 .featured-tag {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   padding: 2px 8px;
   border-radius: 40px;
@@ -448,7 +448,7 @@
 
 .badge-option.featured:hover,
 .badge-option.featured.selected {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   border-color: var(--accent);
   color: white;
 }
@@ -485,7 +485,7 @@
 }
 
 .demote-btn:hover {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border-color: var(--accent);
 }
@@ -563,7 +563,7 @@
 }
 
 .slot-list button:hover {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border-color: var(--accent);
 }
@@ -671,7 +671,7 @@
 }
 
 .btn-reject {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
 }
 
@@ -782,7 +782,7 @@ hr {
 }
 
 .btn-edit:hover:not(:disabled) {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border-color: var(--accent);
 }
@@ -858,7 +858,7 @@ hr {
 .profile-value:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201,98,26,0.1);
+  box-shadow: 0 0 0 3px rgba(85,118,145,0.1);
 }
 
 textarea.profile-value {
@@ -914,7 +914,7 @@ select[multiple].profile-value {
 
 .tag-input-wrapper button {
   padding: 0 16px;
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -1037,7 +1037,7 @@ select[multiple].profile-value {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border-radius: 40px;
   font-size: 0.8rem;
@@ -1079,7 +1079,7 @@ select[multiple].profile-value {
 
 .plan-card.selected {
   border: 2px solid var(--accent);
-  background: linear-gradient(to bottom, var(--white), var(--accent-light));
+  background: var(--accent-light);
 }
 
 .plan-card h4 {
@@ -1132,7 +1132,7 @@ select[multiple].profile-value {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   padding: 2px 8px;
   border-radius: 40px;
@@ -1333,3 +1333,4 @@ select[multiple].profile-value {
     align-items: flex-start;
   }
 }
+

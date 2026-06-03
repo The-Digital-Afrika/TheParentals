@@ -1,10 +1,10 @@
 /* profile.css - Profile page styles with homepage color scheme */
 
 :root {
-  --accent: #e94b13;
-  --accent-dark: #d9410d;
-  --accent-light: #ffe2a3;
-  --accent-gradient: linear-gradient(135deg,#e94b13 0%,#e94b13 100%);
+  --accent: #6f8da6;
+  --accent-dark: #557691;
+  --accent-light: #d9efff;
+  --accent-solid: #ff8c42;
   --red: #e62925;
   --red-dark: #b91c1c;
   --red-light: #ffd7d1;
@@ -63,7 +63,7 @@
 
 /* Profile Head Card */
 .profile-head-card {
-  background: linear-gradient(145deg, var(--accent) 0%, var(--accent-dark) 100%);
+  background: var(--accent);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
@@ -316,7 +316,7 @@
 }
 
 .tag:hover {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: var(--white);
 }
 
@@ -456,7 +456,7 @@
 .field textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(201,98,26,0.1);
+  box-shadow: 0 0 0 3px rgba(85,118,145,0.1);
 }
 
 .field textarea {
@@ -540,7 +540,7 @@
 }
 
 .dc-soc:hover {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   transform: translateY(-2px);
 }
@@ -565,7 +565,7 @@
 }
 
 .avail-pill.on {
-  background: var(--accent-gradient);
+  background: var(--accent-solid);
   color: white;
   border-color: var(--accent);
 }
@@ -687,3 +687,4 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
