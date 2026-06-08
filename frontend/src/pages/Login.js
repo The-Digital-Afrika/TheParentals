@@ -36,10 +36,9 @@ const CSS = `
   .sah-login-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
   .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: #6f8da6; box-shadow: 0 2px 12px rgba(18,45,82,0.28); display: flex; align-items: center; flex-shrink: 0; }
   .sah-lhdr-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
-  .sah-lhdr-left { display: flex; align-items: center; gap: 0; }
-  .sah-lhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
+  .sah-lhdr-left { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+  .sah-lhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 0; text-decoration: none; white-space: nowrap; }
   .sah-lhdr-back:hover { color: #fff; }
-  .sah-lhdr-div { width: 1px; height: 28px; background: rgba(255,255,255,0.28); margin: 0 16px; }
   .sah-lhdr-brand { text-decoration: none; display: flex; align-items: center; }
   .sah-lhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
   .sah-lhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
@@ -185,9 +184,8 @@ const CSS = `
   @media(max-width:480px){
   .sah-login-right { padding: 20px 16px; }
   .sah-lhdr-inner { padding: 0 16px; }
-  .sah-lhdr-back { font-size: 0; gap: 0; }
-  .sah-lhdr-back i { font-size: 0.88rem; }
-  .sah-lhdr-div { margin: 0 10px; }
+  .sah-lhdr-back { font-size: 0.72rem; gap: 6px; }
+  .sah-lhdr-back i { font-size: 0.68rem; }
   .sah-lhdr-logo { width:132px; height:88px; max-width:40vw; }
   .sah-login-card-body { padding: 14px; }
   .sah-login-heading { font-size: 1.5rem; }
@@ -537,13 +535,12 @@ const Login = () => {
       <header className="sah-lhdr">
         <div className="sah-lhdr-inner">
           <div className="sah-lhdr-left">
-            <button className="sah-lhdr-back" onClick={() => navigate('/')}>
-              <i className="fas fa-arrow-left" /> Back to Directory
-            </button>
-            <div className="sah-lhdr-div" />
             <Link to="/" className="sah-lhdr-brand">
               <img className="sah-lhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
+            <button className="sah-lhdr-back" onClick={() => navigate('/')}>
+              <i className="fas fa-arrow-left" /> Back to Directory
+            </button>
           </div>
           <div className="sah-lhdr-right">
             <Link to="/register" className="sah-lhdr-solid">Register</Link>

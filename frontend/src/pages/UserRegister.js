@@ -29,10 +29,9 @@ const CSS = `
   .ur-wrap { font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; background:var(--card); -webkit-font-smoothing:antialiased; }
   .ur-wrap * { box-sizing:border-box; margin:0; padding:0; }
 
-  .ur-hdr { height:140px; background:#6f8da6; display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
-  .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.85rem; font-weight:600; background:none; border:none; cursor:pointer; font-family:inherit; }
+  .ur-hdr { height:140px; background:#6f8da6; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:0 32px; gap:2px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
+  .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.76rem; font-weight:700; background:none; border:none; cursor:pointer; font-family:inherit; }
   .ur-hdr-back:hover { color:#fff; }
-  .ur-hdr-div { width:1px; height:26px; background:rgba(255,255,255,0.25); }
   .ur-hdr-brand { color:#fff; text-decoration:none; display:flex; align-items:center; }
   .ur-hdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 
@@ -282,13 +281,12 @@ const UserRegister = () => {
     <div className="ur-wrap">
 
       <header className="ur-hdr">
-        <button className="ur-hdr-back" onClick={() => navigate('/')}>
-          <i className="fas fa-arrow-left" /> Back to Directory
-        </button>
-        <div className="ur-hdr-div" />
         <Link to="/" className="ur-hdr-brand">
           <img className="ur-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
         </Link>
+        <button className="ur-hdr-back" onClick={() => navigate('/')}>
+          <i className="fas fa-arrow-left" /> Back to Directory
+        </button>
       </header>
 
       <div className="ur-hero">

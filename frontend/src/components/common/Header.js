@@ -40,21 +40,18 @@ const HEADER_CSS = `
   }
   /* Left - Back button + brand together */
   .sah-hdr-left {
-    display: flex; align-items: center; flex-shrink: 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    flex-shrink: 0; min-width: 0; gap: 2px;
   }
   .sah-hdr-back {
     display: inline-flex; align-items: center; gap: 8px;
     background: none; border: none; color: rgba(255,255,255,0.90);
-    font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; padding: 6px 0; transition: color 0.15s;
+    font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; padding: 0; transition: color 0.15s;
     text-decoration: none; white-space: nowrap;
   }
-  .sah-hdr-back i { font-size: 0.78rem; }
+  .sah-hdr-back i { font-size: 0.68rem; }
   .sah-hdr-back:hover { color: #fff; }
-  .sah-hdr-back-div {
-    width: 1px; height: 28px;
-    background: rgba(255,255,255,0.28); margin: 0 16px; flex-shrink: 0;
-  }
   /* Brand — lives in left section next to back button */
   .sah-hdr-brand {
     display: flex; align-items: center; gap: 12px;
@@ -189,15 +186,12 @@ const HEADER_CSS = `
   }
   @media (max-width: 480px) {
     .sah-hdr-inner { padding: 0 16px; }
-    .sah-hdr-back span { display: none; }
     .sah-hdr-logo { width: 140px; height: 92px; max-width: 42vw; }
   }
 
   @media(max-width:480px){
   .sah-hdr-inner { padding: 0 12px; gap: 8px; }
   .sah-hdr-logo { width: 132px; height: 88px; max-width: 40vw; }
-  .sah-hdr-back span { display: none; }
-  .sah-hdr-back-div { margin: 0 8px; }
   .sah-hdr-ctas { display: none; }
   .sah-hdr-ham { display: flex; }
 }
@@ -224,7 +218,7 @@ function injectCSS() {
   }
 }
 
-const Header = () => {
+const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack = true } = {}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
   const { showNotification } = useNotification();
@@ -248,7 +242,8 @@ const Header = () => {
   const isLoggedIn = !!user || !!currentUser;
   const isAdmin = currentUser?.role === 'admin';
   const isHomepage = location.pathname === '/';
-  const showBackButton = !isHomepage;
+  const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
+  const showBackButton = showBack && !isHomepage && !isAdminDashboard;
   const closeMob = () => setMobileOpen(false);
 
   return (
@@ -258,18 +253,15 @@ const Header = () => {
 
           {/* LEFT: Back button + Brand side by side */}
           <div className="sah-hdr-left">
-            {showBackButton && (
-              <>
-                <button className="sah-hdr-back" onClick={() => navigate('/')}>
-                  <i className="fas fa-arrow-left" />
-                  <span>Back to Directory</span>
-                </button>
-                <div className="sah-hdr-back-div" />
-              </>
-            )}
             <Link to="/" className="sah-hdr-brand">
               <img className="sah-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
+            {showBackButton && (
+              <button className="sah-hdr-back" onClick={() => navigate('/')}>
+                <i className="fas fa-arrow-left" />
+                <span>{backLabel}</span>
+              </button>
+            )}
           </div>
 
           {/* RIGHT: Nav + CTAs + Hamburger */}

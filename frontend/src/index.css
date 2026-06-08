@@ -758,6 +758,31 @@ button:disabled,
   background: var(--sah-baby-blue-50) !important;
 }
 
+.admin-tabs .tab-btn,
+.cd-tab-bar .cd-tab-btn,
+.cd-tab-bar .cd-tab-btn:not(.active) {
+  background: var(--sah-orange) !important;
+  border-color: var(--sah-orange) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(255, 140, 66, 0.18) !important;
+}
+
+.admin-tabs .tab-btn:hover,
+.cd-tab-bar .cd-tab-btn:hover,
+.cd-tab-bar .cd-tab-btn:not(.active):hover {
+  background: #f47b2b !important;
+  border-color: #f47b2b !important;
+  color: #ffffff !important;
+}
+
+.admin-tabs .tab-btn.active,
+.cd-tab-bar .cd-tab-btn.active {
+  background: #e96f1f !important;
+  border-color: #e96f1f !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(255, 140, 66, 0.24) !important;
+}
+
 .pv2-avatar,
 .pv2-avatar-placeholder,
 .avatar-lg,

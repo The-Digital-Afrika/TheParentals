@@ -211,9 +211,9 @@ const DASH_CSS = `
   .cd-btn-solid.cancel { background:#6f8da6; }
   .cd-btn-solid.cancel:hover { background:#557691; }
   .cd-tab-bar { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; gap:2px; position:relative; z-index:10; }
-  .cd-tab-btn { padding:10px 18px; background:rgba(255,255,255,.1); border:none; border-bottom:none; color:rgba(255,255,255,.6); font-size:0.8rem; font-weight:600; cursor:pointer; font-family:inherit; border-radius:8px 8px 0 0; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
-  .cd-tab-btn:hover { background:rgba(255,255,255,.2); color:#fff; }
-  .cd-tab-btn.active { background:#f4f1ec; color:#6f8da6; font-weight:700; }
+  .cd-tab-btn { padding:10px 18px; background:#ff8c42; border:none; border-bottom:none; color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; border-radius:8px 8px 0 0; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; box-shadow:0 8px 18px rgba(255,140,66,.18); }
+  .cd-tab-btn:hover { background:#f47b2b; color:#fff; }
+  .cd-tab-btn.active { background:#e96f1f; color:#fff; font-weight:800; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
   .cd-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; align-items:start; }
   .cd-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04); margin-bottom:16px; border:1px solid rgba(0,0,0,.05); }
@@ -747,7 +747,7 @@ const ClientDashboard = () => {
       </div>
       {profileData.status === 'pending' && (
         <div className="cd-sidebar-card">
-          <div className="cd-sidebar-header" style={{ background: '#92400e' }}>
+          <div className="cd-sidebar-header">
             <div className="cd-sidebar-title"><i className="fas fa-clock" style={{ marginRight: 6 }}></i>Pending Review</div>
           </div>
           <div className="cd-sidebar-body">

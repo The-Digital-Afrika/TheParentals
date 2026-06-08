@@ -21,10 +21,9 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-reg-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; -webkit-font-smoothing: antialiased; color: var(--dark); }
 .sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: #6f8da6; box-shadow: 0 2px 12px rgba(18,45,82,0.28); }
 .sah-rhdr-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
-.sah-rhdr-left { display: flex; align-items: center; }
-.sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
+.sah-rhdr-left { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+.sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 0; text-decoration: none; white-space: nowrap; }
 .sah-rhdr-back:hover { color: #fff; }
-.sah-rhdr-div { width: 1px; height: 28px; background: rgba(255,255,255,0.28); margin: 0 16px; }
 .sah-rhdr-brand { text-decoration: none; display: flex; align-items: center; }
 .sah-rhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 .sah-rhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
@@ -208,7 +207,7 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 }
 @media (max-width: 480px) {
   .sah-rhdr-inner { padding: 0 12px; }
-  .sah-rhdr-back span { display: none; }
+  .sah-rhdr-back { font-size: 0.72rem; gap: 6px; }
   .sah-rhdr-logo { width: 132px; height: 88px; max-width: 40vw; }
   .sah-reg-panel { padding: 0 10px 60px; }
   .sah-step-card-body { padding: 14px 12px; }
@@ -1509,13 +1508,12 @@ const Registration = () => {
       <header className="sah-rhdr">
         <div className="sah-rhdr-inner">
           <div className="sah-rhdr-left">
-            <button className="sah-rhdr-back" onClick={() => navigate('/')}>
-              <i className="fas fa-arrow-left" /> Back to Directory
-            </button>
-            <div className="sah-rhdr-div" />
             <Link to="/" className="sah-rhdr-brand">
               <img className="sah-rhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
+            <button className="sah-rhdr-back" onClick={() => navigate('/')}>
+              <i className="fas fa-arrow-left" /> Back to Directory
+            </button>
           </div>
           <div className="sah-rhdr-right">
             <Link to="/login" className="sah-rhdr-ghost">Already registered? Log in</Link>
