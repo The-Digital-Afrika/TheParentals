@@ -31,15 +31,19 @@ async function main() {
   });
 
   await prisma.providerProfile.create({
-    data: {
-      userId: user.id,
-      fullName: 'Khan Academy SA',
-      accountType: 'Organisation / Company',
-      // Add all other fields from your mock data...
-      status: 'PENDING',
-    },
-  });
+  data: {
+    userId: user.id,
+    fullName: 'Khan Academy SA',
+    accountType: 'Organisation / Company',
 
+    languages: ['English'],
+    secondaryCategories: [],
+    ageGroups: ['All Ages'],
+    availabilityDays: ['Monday', 'Tuesday'],
+
+    status: 'PENDING',
+  },
+});
   // Add reviews, featured slots similarly...
 }
 
