@@ -9,6 +9,7 @@ import Modal from '../components/common/Modal';
 import ReviewCard from '../components/admin/ReviewCard';
 import { reviewsMock } from '../utils/constants';
 import { escapeHtml } from '../utils/helpers';
+import { api } from '../services/api';
 import '../assets/css/dashboard.css';
 
 /* ── localStorage helpers ────────────────────────────────── */
@@ -46,6 +47,41 @@ function saveFeaturedSlots(slots) {
   catch {}
 }
 const MAX_FEATURED_SLOTS = 4;
+
+function normalizeProviderForAdmin(p) {
+  const status = String(p.status || 'pending').toLowerCase();
+  const tier = p.tier || p.plan || p.listingPlan || 'free';
+  return {
+    ...p,
+    id: p.userId || p.id,
+    profileId: p.profileId || p.id,
+    userId: p.userId || p.id,
+    name: p.name || p.fullName || p.user?.name || '',
+    email: p.email || p.user?.email || p.inquiryEmail || '',
+    contactEmail: p.contactEmail || p.inquiryEmail || p.user?.email || '',
+    status,
+    plan: tier,
+    tier,
+    listingPlan: tier,
+    registered: p.registered || p.createdAt || p.user?.createdAt || '',
+    lastLogin: p.lastLogin || p.user?.lastLogin || '',
+    category: p.category || p.primaryCategory || '',
+    location: p.location || [p.city, p.province].filter(Boolean).join(', '),
+    image: p.image || p.profilePhoto || null,
+    photo: p.photo || p.profilePhoto || null,
+    publicToggle: Boolean(p.publicToggle ?? p.publicDisplay),
+  };
+}
+
+function normalizeUserForAdmin(u) {
+  return {
+    ...u,
+    role: u.role || 'USER',
+    registered: u.registered || u.createdAt || '',
+    status: u.status ? String(u.status).toLowerCase() : u.status,
+    plan: u.plan || u.listingPlan,
+  };
+}
 
 /* ── Package pricing config — must match Registration.js exactly ── */
 const PACKAGE_CONFIG = {
@@ -1138,27 +1174,84 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const loadedProviders = getStoredProviders();
-    setProviders(loadedProviders);
-    setFeaturedSlots(getFeaturedSlots());
-    const storedUsers = getStoredUsers();
-    const providerUsers = loadedProviders.map(p => ({
-      id: p.id, email: p.email || p.contactEmail || '', name: p.name || '',
-      role: 'PROVIDER', registered: p.registered || '', lastLogin: p.lastLogin || p.registered || '',
-      status: p.status || 'pending', plan: p.plan || p.listingPlan || p.tier || 'free',
-    }));
-    const seen = new Set();
-    const merged = [
-      ...storedUsers.map(u => ({ ...u, role: u.role || 'USER', accountType: u.accountType || 'parent' })),
-      ...providerUsers,
-    ].filter(u => {
-      const k = (u.email || u.id || '').toLowerCase();
-      if (!k || seen.has(k)) return false;
-      seen.add(k); return true;
-    });
-    setRegisteredUsers(merged);
-    setAuthLogs(getAuthLogs());
-  }, []);
+    const token = user?.token || localStorage.getItem('sah_token');
+
+    const loadLocal = () => {
+      const loadedProviders = getStoredProviders().map(normalizeProviderForAdmin);
+      setProviders(loadedProviders);
+      setFeaturedSlots(getFeaturedSlots());
+      const storedUsers = getStoredUsers();
+      const providerUsers = loadedProviders.map(p => ({
+        id: p.id, email: p.email || p.contactEmail || '', name: p.name || '',
+        role: 'PROVIDER', registered: p.registered || '', lastLogin: p.lastLogin || p.registered || '',
+        status: p.status || 'pending', plan: p.plan || p.listingPlan || p.tier || 'free',
+      }));
+      const seen = new Set();
+      const merged = [
+        ...storedUsers.map(u => ({ ...u, role: u.role || 'USER', accountType: u.accountType || 'parent' })),
+        ...providerUsers,
+      ].filter(u => {
+        const k = (u.email || u.id || '').toLowerCase();
+        if (!k || seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+      setRegisteredUsers(merged.map(normalizeUserForAdmin));
+      setAuthLogs(getAuthLogs());
+    };
+
+    const loadApi = async () => {
+      try {
+        const [providerRows, userRows, reviewRows, slotRows] = await Promise.all([
+          api.getProviders(),
+          token ? api.getUsers(token) : Promise.resolve(null),
+          token ? api.getReviews(token).catch(() => null) : Promise.resolve(null),
+          token ? api.getFeaturedSlots(token).catch(() => null) : Promise.resolve(null),
+        ]);
+
+        const apiProviders = (Array.isArray(providerRows) ? providerRows : providerRows?.data || []).map(normalizeProviderForAdmin);
+        setProviders(apiProviders);
+        saveStoredProviders(apiProviders);
+
+        if (userRows?.data) setRegisteredUsers(userRows.data.map(normalizeUserForAdmin));
+        else {
+          const providerUsers = apiProviders.map(p => ({
+            id: p.id,
+            email: p.email || p.contactEmail || '',
+            name: p.name || '',
+            role: 'PROVIDER',
+            registered: p.registered || '',
+            lastLogin: p.lastLogin || '',
+            status: p.status,
+            plan: p.plan,
+          }));
+          setRegisteredUsers(providerUsers);
+        }
+
+        const apiReviews = reviewRows?.data || reviewRows;
+        if (Array.isArray(apiReviews)) setReviews(apiReviews);
+
+        const apiSlots = slotRows?.data || slotRows;
+        if (Array.isArray(apiSlots)) {
+          setFeaturedSlots(apiSlots.map((s, idx) => ({
+            id: s.id || idx + 1,
+            provider: s.provider?.fullName || s.providerName || null,
+            providerId: s.providerId || null,
+            addedDaysAgo: 0,
+            daysRemaining: s.expiresAt ? Math.max(0, Math.ceil((new Date(s.expiresAt) - new Date()) / (1000 * 60 * 60 * 24))) : 0,
+          })));
+        } else {
+          setFeaturedSlots(getFeaturedSlots());
+        }
+
+        setAuthLogs(getAuthLogs());
+      } catch (error) {
+        console.warn('Admin API load failed, using localStorage fallback:', error.message);
+        loadLocal();
+      }
+    };
+
+    loadApi();
+  }, [user]);
 
   const pendingProviders  = providers.filter(p => p.status === 'pending');
   const approvedProviders = providers.filter(p => p.status === 'approved');
@@ -1194,13 +1287,51 @@ const AdminDashboard = () => {
     totalAccounts:   registeredUsers.length,
   };
 
-  const handleApprove = (id) => {
+  const handleApprove = async (id) => {
+    const p = providers.find(x => x.id === id || x.userId === id);
+    const token = user?.token || localStorage.getItem('sah_token');
+    try {
+      if (token && !String(token).startsWith('local_')) {
+        const result = await api.updateProviderStatus(p?.userId || id, 'APPROVED', token);
+        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'approved' });
+        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
+        setProviders(updated); saveStoredProviders(updated);
+      } else {
+        const updated = providers.map(item => item.id === id ? { ...item, status: 'approved', publicToggle: true } : item);
+        setProviders(updated); saveStoredProviders(updated);
+      }
+      showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
+    } catch (error) {
+      showNotification(error.message || 'Could not approve provider.', 'error');
+    }
+  };
+
+  const handleApproveLocalOnly = (id) => {
     const updated = providers.map(p => p.id === id ? { ...p, status: 'approved' } : p);
     setProviders(updated); saveStoredProviders(updated);
     const p = providers.find(x => x.id === id);
     showNotification(`✅ ${p?.name || 'Provider'} approved and is now live.`, 'success');
   };
-  const handleReject = (id) => {
+  const handleReject = async (id) => {
+    const p = providers.find(x => x.id === id || x.userId === id);
+    const token = user?.token || localStorage.getItem('sah_token');
+    try {
+      if (token && !String(token).startsWith('local_')) {
+        const result = await api.updateProviderStatus(p?.userId || id, 'REJECTED', token);
+        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'rejected' });
+        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
+        setProviders(updated); saveStoredProviders(updated);
+      } else {
+        const updated = providers.map(item => item.id === id ? { ...item, status: 'rejected', publicToggle: false } : item);
+        setProviders(updated); saveStoredProviders(updated);
+      }
+      showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
+    } catch (error) {
+      showNotification(error.message || 'Could not reject provider.', 'error');
+    }
+  };
+
+  const handleRejectLocalOnly = (id) => {
     const updated = providers.map(p => p.id === id ? { ...p, status: 'rejected' } : p);
     setProviders(updated); saveStoredProviders(updated);
     const p = providers.find(x => x.id === id);

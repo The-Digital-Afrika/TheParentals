@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
+import { api } from '../services/api';
 import '../assets/css/profile.css';
 
 const SEED_PROVIDERS = [
@@ -90,6 +91,41 @@ function findProvider(id, email) {
     }
     return null;
   } catch { return null; }
+}
+
+function normalizeApiProfile(found) {
+  if (!found) return null;
+  return {
+    ...found,
+    id: found.userId || found.id,
+    userId: found.userId || found.id,
+    name: found.name || found.fullName || '',
+    bio: found.bio || '',
+    primaryCategory: found.primaryCategory || found.category || '',
+    city: found.city || '',
+    province: found.province || '',
+    location: found.location || [found.city, found.province].filter(Boolean).join(', '),
+    phone: found.phone || '',
+    whatsapp: found.whatsapp || '',
+    contactEmail: found.contactEmail || found.inquiryEmail || found.email || '',
+    website: found.website || found.social || '',
+    facebook: found.facebook || '',
+    social: found.social || found.website || '',
+    startingPrice: typeof found.startingPrice === 'string' ? found.startingPrice : (found.priceFrom || ''),
+    priceFrom: found.priceFrom || found.startingPrice || 'Contact',
+    deliveryMode: found.deliveryMode || found.delivery || '',
+    delivery: found.delivery || found.deliveryMode || '',
+    degrees: found.degrees || '',
+    certifications: found.certifications || '',
+    memberships: found.memberships || '',
+    clearance: found.clearance || '',
+    image: found.image || found.profilePhoto || null,
+    photo: found.photo || found.profilePhoto || null,
+    tier: found.tier || found.plan || found.listingPlan || 'free',
+    listingPlan: found.listingPlan || found.plan || found.tier || 'free',
+    tags: found.tags || (found.subjects ? String(found.subjects).split(',').map(s => s.trim()).filter(Boolean) : []),
+    reviews: found.reviews || { average: found.rating || 0, count: found.reviewCount || 0, items: [] },
+  };
 }
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -738,16 +774,37 @@ const Profile = () => {
     injectStyles();
     const id = searchParams.get('id');
     const email = searchParams.get('email');
-    let found = findProvider(id, email);
-    if (!found) {
-      try {
-        const cu = JSON.parse(localStorage.getItem('sah_current_user') || 'null');
-        if (cu?.id) found = findProvider(cu.id, null);
-      } catch {}
-    }
-    if (!found) found = SEED_PROVIDERS.find(p => p.id === 'khan');
-    setProfile(found);
-    setLoading(false);
+    let cancelled = false;
+
+    const loadProfile = async () => {
+      setLoading(true);
+      let found = null;
+
+      if (id) {
+        try {
+          found = normalizeApiProfile(await api.getProviderById(id));
+        } catch (error) {
+          console.warn('Profile API load failed, using local data:', error.message);
+        }
+      }
+
+      if (!found) found = findProvider(id, email);
+      if (!found) {
+        try {
+          const cu = JSON.parse(localStorage.getItem('sah_current_user') || 'null');
+          if (cu?.id) found = findProvider(cu.id, null);
+        } catch {}
+      }
+      if (!found) found = SEED_PROVIDERS.find(p => p.id === 'khan');
+
+      if (!cancelled) {
+        setProfile(found);
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+    return () => { cancelled = true; };
   }, [searchParams]);
 
   const shareProfile = () => {

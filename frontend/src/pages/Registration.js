@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../services/api';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -222,8 +223,8 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
   .sah-file-upload-zone { padding: 12px; }
 }`; 
 // ── Config ────────────────────────────────────────────────────────────────────
-const API_URL = 'http://localhost:5000/api';
-const MAX_TOTAL_UPLOAD_MB = 100;
+const API_URL = `${API_BASE_URL}/api`;
+const MAX_TOTAL_UPLOAD_MB = 10;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
 const STEPS = [
@@ -355,7 +356,7 @@ const FieldErr = ({ msg }) => msg
 
 // ── saveToLocalStorage — all values passed explicitly, no closure bugs ────────
 // ── KEY FIX: certFilesAll and clearanceFilesAll now carry full base64 data ───
-function saveToLocalStorage({ userId, email, fullName, tier, password, newProvider }) {
+function saveToLocalStorage({ userId, email, fullName, tier, password, newProvider, token }) {
   try {
     // sah_users
     const users = JSON.parse(localStorage.getItem('sah_users') || '[]');
@@ -392,7 +393,7 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
     const sessionUser = { role: 'client', email: email.toLowerCase(), id: userId, name: fullName, plan: tier };
     localStorage.setItem('sah_current_user', JSON.stringify(sessionUser));
     localStorage.setItem('sah_user', JSON.stringify(sessionUser));
-    localStorage.setItem('sah_token', 'local_' + userId);
+    localStorage.setItem('sah_token', token || ('local_' + userId));
 
     return sessionUser;
   } catch (e) {
@@ -839,10 +840,11 @@ const Registration = () => {
           tier,
           password: data.password,
           newProvider: { ...newProvider, id: dbUserId },
+          token: userData?.token,
         });
 
         if (sessionUser) {
-          login(sessionUser);
+          login({ ...sessionUser, token: userData?.token });
         }
 
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');

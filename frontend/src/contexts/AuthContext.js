@@ -1,8 +1,8 @@
 // frontend/src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../services/api';
 
 const AuthContext = createContext();
-const API_URL = 'https://sahomeschooling-services-4.onrender.com';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -33,42 +33,36 @@ export const AuthProvider = ({ children }) => {
   // ── REGISTER ─────────────────────────────────────────────────────────────
   const register = async (userData) => {
     try {
-      const res = await fetch(`${API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email:       (userData?.email || '').toLowerCase(),
-          password:    userData?.password || '',
-          role:        'PROVIDER',
-          name:        userData?.fullName || userData?.businessName || '',
-          accountType: userData?.accountType || 'Individual Provider',
-        }),
+      const role = (userData?.role || 'PROVIDER').toUpperCase();
+      const data = await api.register({
+        email:       (userData?.email || '').toLowerCase(),
+        password:    userData?.password || '',
+        role,
+        name:        userData?.fullName || userData?.businessName || userData?.username || '',
+        accountType: userData?.accountType || (role === 'USER' ? 'parent' : 'Individual Provider'),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { success: false, error: data.message || 'Registration failed.' };
-      }
 
       const userSession = {
         ...data.user,
         token: data.token,
-        plan:   'free',
-        status: 'pending',
+        plan:   data.user?.role === 'PROVIDER' ? 'free' : undefined,
+        status: data.user?.role === 'PROVIDER' ? 'pending' : undefined,
       };
 
       setUser(userSession);
       localStorage.setItem('sah_user', JSON.stringify(userSession));
       localStorage.setItem('sah_current_user', JSON.stringify(userSession));
+      localStorage.setItem('sah_token', data.token);
 
       return { success: true, user: userSession, message: data.message };
 
     } catch (err) {
       console.error('Register error:', err);
-      return { success: false, error: 'Network error. Please try again.' };
+      return { success: false, error: err.status === 409 ? 'email_taken' : (err.message || 'Network error. Please try again.') };
     }
   };
+
+  const registerUser = (userData) => register({ ...userData, role: 'USER', accountType: 'parent' });
 
   // ── LOGIN ─────────────────────────────────────────────────────────────────
   // Accepts either:
@@ -81,36 +75,28 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       localStorage.setItem('sah_user', JSON.stringify(userData));
       localStorage.setItem('sah_current_user', JSON.stringify(userData));
+      if (userData.token) localStorage.setItem('sah_token', userData.token);
       return;
     }
 
     const email = emailOrUserObj;
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email:    (email || '').trim().toLowerCase(),
-          password,
-        }),
+      const data = await api.login({
+        email:    (email || '').trim().toLowerCase(),
+        password,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return { success: false, error: data.message || 'Invalid email or password.' };
-      }
 
       const userData = { ...data.user, token: data.token };
       setUser(userData);
       localStorage.setItem('sah_user', JSON.stringify(userData));
       localStorage.setItem('sah_current_user', JSON.stringify(userData));
+      localStorage.setItem('sah_token', data.token);
 
       return { success: true, user: userData, message: data.message };
 
     } catch (err) {
       console.error('Login error:', err);
-      return { success: false, error: 'Network error. Please try again.' };
+      return { success: false, error: err.message || 'Network error. Please try again.' };
     }
   };
 
@@ -119,6 +105,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('sah_user');
     localStorage.removeItem('sah_current_user');
+    localStorage.removeItem('sah_token');
   };
 
   // ── UPDATE PLAN ───────────────────────────────────────────────────────────
@@ -134,7 +121,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const value = { user, loading, register, login, logout, updateUserPlan };
+  const value = { user, loading, register, registerUser, login, logout, updateUserPlan };
 
   return (
     <AuthContext.Provider value={value}>

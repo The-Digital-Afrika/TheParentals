@@ -1,6 +1,7 @@
 // frontend/src/pages/HomePage.jsx
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { api } from "../services/api";
 
 const injectHead = () => {
   if (document.getElementById("sah-fonts")) return;
@@ -525,6 +526,32 @@ function getAll() {
   } catch { return SEED; }
 }
 
+function normalizeProvider(p) {
+  const tier = p.tier || p.plan || p.listingPlan || "free";
+  return {
+    ...p,
+    id: p.userId || p.id,
+    userId: p.userId || p.id,
+    name: p.name || p.fullName || "",
+    email: p.email || p.user?.email || p.inquiryEmail || "",
+    contactEmail: p.contactEmail || p.inquiryEmail || p.user?.email || "",
+    status: String(p.status || "pending").toLowerCase(),
+    tier,
+    plan: tier,
+    listingPlan: tier,
+    category: p.category || p.primaryCategory || "provider",
+    primaryCategory: p.primaryCategory || p.category || "",
+    location: p.location || [p.city, p.province].filter(Boolean).join(", "),
+    delivery: p.delivery || p.deliveryMode || "",
+    image: p.image || p.profilePhoto || null,
+    photo: p.photo || p.profilePhoto || null,
+    priceFrom: p.priceFrom || p.startingPrice || "Contact",
+    tags: p.tags || (p.subjects ? String(p.subjects).split(",").map(s => s.trim()).filter(Boolean) : []),
+    registered: p.registered || p.createdAt || "",
+    badge: p.badge || (tier === "featured" ? "featured" : tier === "pro" ? "verified" : null),
+  };
+}
+
 // ── Validate that a stored session is legitimate ───────────────────────────
 // Accepts sessions set by either Registration/Login page (sah_token) or
 // the AuthContext login (sah_user) so the user stays logged in on the
@@ -741,7 +768,29 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setProviders(getAll());
+    let cancelled = false;
+
+    const loadProviders = async () => {
+      const localProviders = getAll();
+      setProviders(localProviders);
+
+      try {
+        const rows = await api.getProviders();
+        const live = (Array.isArray(rows) ? rows : rows?.data || [])
+          .map(normalizeProvider)
+          .filter(p => p.status === "approved");
+
+        if (!cancelled && live.length) {
+          localStorage.setItem("sah_providers", JSON.stringify(live));
+          setProviders(getAll());
+        }
+      } catch (error) {
+        console.warn("Provider API load failed, using local data:", error.message);
+      }
+    };
+
+    loadProviders();
+    return () => { cancelled = true; };
   }, []);
 
   const showToast = useCallback((msg, err = false) => {

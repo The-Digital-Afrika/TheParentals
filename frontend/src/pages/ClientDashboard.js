@@ -8,10 +8,9 @@ import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
 import { DAYS_OF_WEEK, PRICING_MODELS, PROVINCES } from '../utils/constants';
 import { getPlanLimits } from '../utils/helpers';
+import { API_BASE_URL } from '../services/api';
 
-const API_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL)
-  ? process.env.REACT_APP_API_URL
-  : 'http://localhost:5000/api';
+const API_URL = `${API_BASE_URL}/api`;
 
 /* ─────────────── localStorage helpers ─────────────── */
 function getCurrentUser() {
