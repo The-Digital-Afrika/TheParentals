@@ -240,11 +240,15 @@ const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack 
   try { currentUser = JSON.parse(localStorage.getItem('sah_current_user')); } catch {}
 
   const isLoggedIn = !!user || !!currentUser;
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'admin';
   const isHomepage = location.pathname === '/';
   const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
   const showBackButton = showBack && !isHomepage && !isAdminDashboard;
   const closeMob = () => setMobileOpen(false);
+
+  // Where to send the logged-in user when they click their name
+  const dashboardPath = isAdmin ? '/admin-dashboard' : '/client-dashboard';
+  const displayName = currentUser?.name ? currentUser.name.split(' ')[0] : (user?.name ? user.name.split(' ')[0] : 'Account');
 
   return (
     <>
@@ -282,9 +286,10 @@ const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack 
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
-                  <Link to="/login" className="sah-hdr-ghost">
+                  {/* FIX: clicking the name now goes to dashboard, not /login */}
+                  <Link to={dashboardPath} className="sah-hdr-ghost">
                     <i className="fas fa-user-circle" />
-                    {currentUser?.name ? currentUser.name.split(' ')[0] : 'Login'}
+                    {displayName}
                   </Link>
                   <button className="sah-hdr-solid" onClick={handleLogout}>
                     <i className="fas fa-sign-out-alt" /> Log Out

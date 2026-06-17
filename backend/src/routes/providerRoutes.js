@@ -9,13 +9,61 @@ const multer  = require('multer');
 // ── multer: keep files in memory so we can convert to base64 ──────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits:  { fileSize: 100 * 1024 * 1024 }, // 100 MB
+  limits:  { fileSize: 10 * 1024 * 1024 }, // Keep database-backed uploads small.
 });
 
 // ── Helper: Buffer → base64 data-URL ─────────────────────────────────────────
 function toDataUrl(buffer, mimetype) {
   if (!buffer) return null;
   return `data:${mimetype};base64,${buffer.toString('base64')}`;
+}
+
+function mapProvider(profile) {
+  const status = (profile.status || 'PENDING').toLowerCase();
+  const tier = profile.listingPlan || 'free';
+
+  return {
+    ...profile,
+    id: profile.userId,
+    profileId: profile.id,
+    userId: profile.userId,
+    name: profile.fullName,
+    email: profile.user?.email || profile.inquiryEmail || '',
+    contactEmail: profile.inquiryEmail || profile.user?.email || '',
+    status,
+    plan: tier,
+    tier,
+    listingPlan: tier,
+    registered: profile.createdAt,
+    lastLogin: profile.user?.lastLogin,
+    category: profile.primaryCategory,
+    delivery: profile.deliveryMode,
+    location: [profile.city, profile.province].filter(Boolean).join(', '),
+    image: profile.profilePhoto,
+    photo: profile.profilePhoto,
+    publicToggle: profile.publicDisplay,
+    listingPublic: profile.publicDisplay,
+  };
+}
+
+function normalizeStatus(status) {
+  const value = String(status || '').toUpperCase();
+  return ['PENDING', 'APPROVED', 'REJECTED'].includes(value) ? value : null;
+}
+
+async function updateProviderStatus(userId, statusValue, res) {
+  const status = normalizeStatus(statusValue);
+  if (!status) {
+    return res.status(400).json({ message: 'Invalid status value' });
+  }
+
+  const profile = await prisma.providerProfile.update({
+    where: { userId },
+    data:  { status, publicDisplay: status === 'APPROVED' },
+    include: { user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } } },
+  });
+
+  return res.json({ message: `Provider ${status.toLowerCase()}`, profile: mapProvider(profile) });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,7 +233,7 @@ router.get('/', async (req, res) => {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return res.json(providers);
+    return res.json(providers.map(mapProvider));
   } catch (error) {
     console.error('GET /api/providers error:', error);
     return res.status(500).json({ message: 'Server error fetching providers' });
@@ -205,7 +253,7 @@ router.get('/:userId', async (req, res) => {
       },
     });
     if (!profile) return res.status(404).json({ message: 'Provider profile not found' });
-    return res.json(profile);
+    return res.json(mapProvider(profile));
   } catch (error) {
     console.error('GET /api/providers/:userId error:', error);
     return res.status(500).json({ message: 'Server error' });
@@ -226,8 +274,8 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     }
 
     const files        = req.files || [];
-    const newCert      = files.find(f => f.fieldname.startsWith('certFile_'));
-    const newClearance = files.find(f => f.fieldname.startsWith('clearanceFile_'));
+    const newCert      = files.find(f => f.fieldname.startsWith('certFile'));
+    const newClearance = files.find(f => f.fieldname.startsWith('clearanceFile'));
 
     // Build safe update object (only known schema fields)
     const ALLOWED = new Set([
@@ -274,17 +322,28 @@ router.patch('/:userId', upload.any(), async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.patch('/:userId/status', async (req, res) => {
   try {
-    const { status } = req.body;
-    if (!['PENDING', 'APPROVED', 'REJECTED'].includes(status))
-      return res.status(400).json({ message: 'Invalid status value' });
-
-    const profile = await prisma.providerProfile.update({
-      where: { userId: req.params.userId },
-      data:  { status, publicDisplay: status === 'APPROVED' },
-    });
-    return res.json({ message: `Provider ${status.toLowerCase()}`, profile });
+    return updateProviderStatus(req.params.userId, req.body.status, res);
   } catch (error) {
     console.error('PATCH /api/providers/:userId/status error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Legacy admin URLs kept for older frontend service calls.
+router.post('/:userId/approve', async (req, res) => {
+  try {
+    return updateProviderStatus(req.params.userId, 'APPROVED', res);
+  } catch (error) {
+    console.error('POST /api/providers/:userId/approve error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+router.post('/:userId/reject', async (req, res) => {
+  try {
+    return updateProviderStatus(req.params.userId, 'REJECTED', res);
+  } catch (error) {
+    console.error('POST /api/providers/:userId/reject error:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

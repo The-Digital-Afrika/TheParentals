@@ -392,6 +392,17 @@ const ClientDashboard = () => {
           if (res.ok) {
             const dbRow  = await res.json();
             const mapped = mapDbProfileToLocal(dbRow);
+
+            // ── FIX: restore locally-saved photo if the API didn't return one ──
+            try {
+              const localPhoto = localStorage.getItem(`sah_photo_${cu.id}`);
+              if (localPhoto && !mapped.profilePhoto) {
+                mapped.profilePhoto = localPhoto;
+                mapped.photo        = localPhoto;
+                mapped.image        = localPhoto;
+              }
+            } catch {}
+
             setProfileData(mapped);
             setPhotoPreview(mapped.profilePhoto || null);
             saveProviderById({ ...mapped, id: cu.id, userId: cu.id });
@@ -407,6 +418,17 @@ const ClientDashboard = () => {
       const stored = cu.id ? getProviderById(cu.id) : null;
       if (stored) {
         const mapped = mapDbProfileToLocal(stored);
+
+        // ── FIX: also restore photo from dedicated key for localStorage path ──
+        try {
+          const localPhoto = localStorage.getItem(`sah_photo_${cu.id}`);
+          if (localPhoto && !mapped.profilePhoto) {
+            mapped.profilePhoto = localPhoto;
+            mapped.photo        = localPhoto;
+            mapped.image        = localPhoto;
+          }
+        } catch {}
+
         setProfileData(mapped);
         setPhotoPreview(mapped.profilePhoto || null);
       } else {
@@ -540,6 +562,11 @@ const ClientDashboard = () => {
       setProfileData(prev => {
         const updated = { ...prev, photo: b64, image: b64, profilePhoto: b64 };
         saveProviderById(updated);
+        // ── FIX: persist photo to a dedicated key so it survives API reloads on refresh ──
+        try {
+          const cu = getCurrentUser();
+          if (cu?.id) localStorage.setItem(`sah_photo_${cu.id}`, b64);
+        } catch {}
         return updated;
       });
       showNotification('Photo updated!', 'success');
@@ -1531,4 +1558,3 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
-

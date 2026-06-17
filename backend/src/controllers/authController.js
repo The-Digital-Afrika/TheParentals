@@ -9,11 +9,11 @@ const prisma = new PrismaClient();
 
 // ─────────────────────────────────────────────────────────────
 //  Hardcoded admin credentials
-//  Email:    admin@sahomeschooling.co.za
-//  Password: admin@123
+//  Email:    admin@sah.co.za
+//  Password: Admin2026!
 // ─────────────────────────────────────────────────────────────
-const ADMIN_EMAIL    = 'admin@sahomeschooling.co.za';
-const ADMIN_PASSWORD = 'admin@123';
+const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@sah.co.za';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin2026!';
 
 // ─────────────────────────────────────────────────────────────
 //  POST /api/auth/register

@@ -763,7 +763,12 @@ const Profile = () => {
 
   useEffect(() => {
     try {
-      const cu = JSON.parse(localStorage.getItem('sah_current_user'));
+      // Check both storage keys used by AuthContext
+      const cu = JSON.parse(
+        localStorage.getItem('sah_current_user') ||
+        localStorage.getItem('sah_user') ||
+        'null'
+      );
       setIsAuthenticated(!!cu);
     } catch {
       setIsAuthenticated(false);
@@ -780,6 +785,7 @@ const Profile = () => {
       setLoading(true);
       let found = null;
 
+      // 1. Try API by ID
       if (id) {
         try {
           found = normalizeApiProfile(await api.getProviderById(id));
@@ -788,14 +794,55 @@ const Profile = () => {
         }
       }
 
+      // 2. Fall back to localStorage providers list
       if (!found) found = findProvider(id, email);
+
+      // 3. Try to load the logged-in user's own profile from localStorage
       if (!found) {
         try {
-          const cu = JSON.parse(localStorage.getItem('sah_current_user') || 'null');
-          if (cu?.id) found = findProvider(cu.id, null);
+          const cu = JSON.parse(
+            localStorage.getItem('sah_current_user') ||
+            localStorage.getItem('sah_user') ||
+            'null'
+          );
+          if (cu?.id) {
+            // Look up their saved provider data
+            const stored = JSON.parse(localStorage.getItem('sah_providers') || '[]');
+            const own = stored.find(p => p.id === cu.id || p.userId === cu.id);
+            if (own) {
+              found = normalizeApiProfile(own);
+            } else {
+              // Build a minimal profile from the user session itself
+              found = {
+                id: cu.id,
+                userId: cu.id,
+                name: cu.name || '',
+                email: cu.email || '',
+                bio: cu.bio || '',
+                primaryCategory: cu.primaryCategory || cu.category || '',
+                city: cu.city || '',
+                province: cu.province || '',
+                phone: cu.phone || '',
+                contactEmail: cu.email || '',
+                image: cu.profilePhoto || cu.photo || cu.image || null,
+                photo: cu.profilePhoto || cu.photo || cu.image || null,
+                tier: cu.plan || cu.tier || 'free',
+                listingPlan: cu.plan || cu.tier || 'free',
+                tags: [],
+                ageGroups: [],
+                availabilityDays: [],
+                services: [],
+                reviews: { average: 0, count: 0, items: [] },
+              };
+            }
+          }
         } catch {}
       }
-      if (!found) found = SEED_PROVIDERS.find(p => p.id === 'khan');
+
+      // 4. Only fall back to seed data if explicitly viewing a seed profile by ID
+      if (!found && id) {
+        found = SEED_PROVIDERS.find(p => p.id === id) || null;
+      }
 
       if (!cancelled) {
         setProfile(found);
@@ -1184,4 +1231,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
