@@ -1513,9 +1513,6 @@ const Registration = () => {
             <Link to="/" className="sah-rhdr-brand">
               <img className="sah-rhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
-            <button className="sah-rhdr-back" onClick={() => navigate('/')}>
-              <i className="fas fa-arrow-left" /> Back to Directory
-            </button>
           </div>
           <div className="sah-rhdr-right">
             <Link to="/login" className="sah-rhdr-ghost">Already registered? Log in</Link>
@@ -1526,6 +1523,9 @@ const Registration = () => {
       <section className="sah-reg-hero">
         <div className="sah-reg-hero-bg" />
         <div className="sah-reg-hero-inner">
+          <button className="sah-rhdr-back" onClick={() => navigate('/')} style={{ marginBottom: 18 }}>
+            <i className="fas fa-arrow-left" /> Back to Directory
+          </button>
           <h1 className="sah-reg-hero-title">Become a <em>Trusted Provider</em></h1>
           <div className="sah-step-trail">
             {STEPS.map((s, i) => {

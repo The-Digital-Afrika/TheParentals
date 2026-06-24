@@ -218,7 +218,7 @@ function injectCSS() {
   }
 }
 
-const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack = true } = {}) => {
+const Header = ({ userType = 'guest' } = {}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
   const { showNotification } = useNotification();
@@ -230,7 +230,12 @@ const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack 
 
   const handleLogout = () => {
     logout();
-    try { localStorage.removeItem('sah_current_user'); } catch {}
+    try {
+      localStorage.removeItem('sah_current_user');
+      localStorage.removeItem('sah_user');
+      localStorage.removeItem('sah_token');
+      window.dispatchEvent(new Event('sah-auth-change'));
+    } catch {}
     showNotification('Logged out successfully', 'success');
     setMobileOpen(false);
     navigate('/');
@@ -243,7 +248,6 @@ const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack 
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'admin';
   const isHomepage = location.pathname === '/';
   const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
-  const showBackButton = showBack && !isHomepage && !isAdminDashboard;
   const closeMob = () => setMobileOpen(false);
 
   // Where to send the logged-in user when they click their name
@@ -255,17 +259,11 @@ const Header = ({ userType = 'guest', backLabel = 'Back to Directory', showBack 
       <header className="sah-hdr">
         <div className="sah-hdr-inner">
 
-          {/* LEFT: Back button + Brand side by side */}
+          {/* LEFT: Brand */}
           <div className="sah-hdr-left">
             <Link to="/" className="sah-hdr-brand">
               <img className="sah-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
-            {showBackButton && (
-              <button className="sah-hdr-back" onClick={() => navigate('/')}>
-                <i className="fas fa-arrow-left" />
-                <span>{backLabel}</span>
-              </button>
-            )}
           </div>
 
           {/* RIGHT: Nav + CTAs + Hamburger */}

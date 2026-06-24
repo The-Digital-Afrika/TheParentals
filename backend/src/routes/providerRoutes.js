@@ -309,8 +309,12 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     const profile = await prisma.providerProfile.update({
       where: { userId: req.params.userId },
       data,
+      include: {
+        user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
+        reviews: true,
+      },
     });
-    return res.json({ message: 'Profile updated', profile });
+    return res.json({ message: 'Profile updated', profile: mapProvider(profile) });
   } catch (error) {
     console.error('PATCH /api/providers/:userId error:', error);
     return res.status(500).json({ message: 'Server error updating profile', error: error.message });

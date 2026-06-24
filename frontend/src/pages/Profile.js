@@ -121,9 +121,29 @@ function normalizeApiProfile(found) {
     clearance: found.clearance || '',
     image: found.image || found.profilePhoto || null,
     photo: found.photo || found.profilePhoto || null,
+    profilePhoto: found.profilePhoto || found.photo || found.image || null,
     tier: found.tier || found.plan || found.listingPlan || 'free',
     listingPlan: found.listingPlan || found.plan || found.tier || 'free',
     tags: found.tags || (found.subjects ? String(found.subjects).split(',').map(s => s.trim()).filter(Boolean) : []),
+    serviceTitle: found.serviceTitle || '',
+    serviceDesc: found.serviceDesc || '',
+    subjects: found.subjects || '',
+    services: Array.isArray(found.services) && found.services.length
+      ? found.services
+      : [{
+          title: found.serviceTitle || '',
+          description: found.serviceDesc || '',
+          subjects: found.subjects || '',
+          deliveryMode: found.deliveryMode || found.delivery || '',
+          ageGroups: found.ageGroups || [],
+        }].filter(s => s.title || s.description || s.subjects),
+    ageGroups: found.ageGroups || [],
+    availabilityDays: found.availabilityDays || [],
+    availabilityNotes: found.availabilityNotes || '',
+    linkedin: found.linkedin || '',
+    instagram: found.instagram || '',
+    tiktok: found.tiktok || '',
+    twitter: found.twitter || '',
     reviews: found.reviews || { average: found.rating || 0, count: found.reviewCount || 0, items: [] },
   };
 }
@@ -842,6 +862,21 @@ const Profile = () => {
       // 4. Only fall back to seed data if explicitly viewing a seed profile by ID
       if (!found && id) {
         found = SEED_PROVIDERS.find(p => p.id === id) || null;
+      }
+
+      // 5. FIX: restore a locally-saved photo if whatever source we used above
+      //    didn't actually have one (the API doesn't always persist/return
+      //    profilePhoto — the dashboard already works around this by reading
+      //    a dedicated `sah_photo_<id>` key, so we mirror that fix here).
+      if (found && !found.image && !found.photo) {
+        try {
+          const photoKey = found.userId || found.id || id;
+          const localPhoto = photoKey ? localStorage.getItem(`sah_photo_${photoKey}`) : null;
+          if (localPhoto) {
+            found.image = localPhoto;
+            found.photo = localPhoto;
+          }
+        } catch {}
       }
 
       if (!cancelled) {

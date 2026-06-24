@@ -284,14 +284,14 @@ const UserRegister = () => {
         <Link to="/" className="ur-hdr-brand">
           <img className="ur-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
         </Link>
-        <button className="ur-hdr-back" onClick={() => navigate('/')}>
-          <i className="fas fa-arrow-left" /> Back to Directory
-        </button>
       </header>
 
       <div className="ur-hero">
         <div className="ur-hero-bg" />
         <div className="ur-hero-inner">
+          <button className="ur-hdr-back" onClick={() => navigate('/')} style={{ marginBottom: 18 }}>
+            <i className="fas fa-arrow-left" /> Back to Directory
+          </button>
           <h1>Create Your <em>Free Account</em></h1>
           <p>
             Join thousands of South Africans discovering verified tutors, therapists,

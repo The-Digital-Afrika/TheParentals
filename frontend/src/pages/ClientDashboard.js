@@ -8,7 +8,8 @@ import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
 import { DAYS_OF_WEEK, PRICING_MODELS, PROVINCES } from '../utils/constants';
 import { getPlanLimits } from '../utils/helpers';
-import { API_BASE_URL } from '../services/api';
+import { API_BASE_URL, api } from '../services/api';
+import '../assets/css/dashboard.css'
 
 const API_URL = `${API_BASE_URL}/api`;
 
@@ -31,6 +32,50 @@ function saveProviderById(updated) {
     localStorage.setItem('sah_providers', JSON.stringify(all));
     return true;
   } catch { return false; }
+}
+
+function isMemberAccount(account) {
+  const role = String(account?.role || '').toUpperCase();
+  const accountType = String(account?.accountType || '').toLowerCase();
+  return role === 'USER' || ['parent', 'student', 'guardian', 'learner', 'member'].includes(accountType);
+}
+
+function getStoredMemberProfile(id) {
+  try {
+    const all = JSON.parse(localStorage.getItem('sah_member_profiles') || '[]');
+    return all.find(p => p.id === id || p.userId === id) || null;
+  } catch { return null; }
+}
+
+function saveStoredMemberProfile(profile) {
+  try {
+    const all = JSON.parse(localStorage.getItem('sah_member_profiles') || '[]');
+    const idx = all.findIndex(p => p.id === profile.id || p.userId === profile.userId);
+    if (idx !== -1) all[idx] = profile; else all.push(profile);
+    localStorage.setItem('sah_member_profiles', JSON.stringify(all));
+    return true;
+  } catch { return false; }
+}
+
+function buildMemberProfile(session, existing = {}) {
+  return {
+    id: session?.id || existing.id || '',
+    userId: session?.id || existing.userId || existing.id || '',
+    role: 'USER',
+    profileKind: 'member',
+    name: existing.name || session?.name || '',
+    email: existing.email || session?.email || '',
+    accountType: existing.accountType || session?.accountType || 'parent',
+    phone: existing.phone || '',
+    city: existing.city || '',
+    province: existing.province || '',
+    bio: existing.bio || '',
+    image: existing.image || existing.photo || existing.profilePhoto || session?.profilePhoto || null,
+    photo: existing.photo || existing.profilePhoto || existing.image || session?.profilePhoto || null,
+    profilePhoto: existing.profilePhoto || existing.photo || existing.image || session?.profilePhoto || null,
+    publicToggle: existing.publicToggle ?? true,
+    updatedAt: existing.updatedAt || null,
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -383,6 +428,16 @@ const ClientDashboard = () => {
       setDataLoading(true);
       const token = localStorage.getItem('sah_token');
 
+      if (isMemberAccount(cu)) {
+        const storedMember = getStoredMemberProfile(cu.id);
+        const memberProfile = buildMemberProfile(cu, storedMember || {});
+        setProfileData(memberProfile);
+        setPhotoPreview(memberProfile.profilePhoto || null);
+        saveStoredMemberProfile(memberProfile);
+        setDataLoading(false);
+        return;
+      }
+
       // 1. Try API
       if (token && cu.id && !String(token).startsWith('local_')) {
         try {
@@ -476,21 +531,32 @@ const ClientDashboard = () => {
   }, []);
 
   /* ─── saveChanges ─── */
-  const saveChanges = useCallback(() => {
+  const saveChanges = useCallback(async () => {
     setLoading(true);
-    setProfileData(currentData => {
-      const toSave = { ...currentData, social: currentData.website || currentData.social || '' };
+    const currentData = profileData;
+    const toSave = {
+      ...currentData,
+      id: currentData.userId || currentData.id,
+      userId: currentData.userId || currentData.id,
+      social: currentData.website || currentData.social || '',
+      image: currentData.profilePhoto || currentData.photo || currentData.image || null,
+      photo: currentData.profilePhoto || currentData.photo || currentData.image || null,
+    };
 
-      try {
-        const saved = saveProviderById(toSave);
-        if (saved) {
-          const cu = getCurrentUser();
-          if (cu) localStorage.setItem('sah_current_user', JSON.stringify({ ...cu, name: currentData.name, plan: currentData.plan }));
-        }
-      } catch (err) { console.error('Save error:', err); }
+    try {
+      saveProviderById(toSave);
+      const cu = getCurrentUser();
+      if (cu) {
+        localStorage.setItem('sah_current_user', JSON.stringify({
+          ...cu,
+          id: toSave.userId,
+          name: currentData.name,
+          plan: currentData.plan,
+        }));
+      }
 
       const token = localStorage.getItem('sah_token');
-      if (token && currentData.userId && !String(token).startsWith('local_')) {
+      if (token && toSave.userId && !String(token).startsWith('local_')) {
         const fd = new FormData();
         fd.append('providerData', JSON.stringify({
           fullName:            currentData.name,
@@ -534,23 +600,71 @@ const ClientDashboard = () => {
         if (currentData._newCertFile) fd.append('certFile', currentData._newCertFile);
         if (currentData._newClearanceFile) fd.append('clearanceFile', currentData._newClearanceFile);
 
-        fetch(`${API_URL}/providers/${currentData.userId}`, {
-          method: 'PATCH', headers: { Authorization: `Bearer ${token}` }, body: fd,
-        }).catch(e => console.warn('API sync (non-fatal):', e.message));
+        const result = await api.updateProvider(toSave.userId, fd, token);
+        const mapped = mapDbProfileToLocal(result.profile || result);
+        setProfileData(prev => ({
+          ...prev,
+          ...mapped,
+          id: mapped.userId || mapped.id || toSave.userId,
+          userId: mapped.userId || toSave.userId,
+          _newCertFile: null,
+          _newClearanceFile: null,
+        }));
+        setPhotoPreview(mapped.profilePhoto || toSave.profilePhoto || null);
+        saveProviderById({ ...mapped, id: mapped.userId || toSave.userId, userId: mapped.userId || toSave.userId });
+      } else {
+        setProfileData(toSave);
       }
 
-      return currentData;
-    });
-
-    setTimeout(() => {
       setSnapshot(null);
       setEditing(false);
-      setLoading(false);
       setQualFileName('');
       setClearanceFileName('');
       showNotification('Changes saved successfully!', 'success');
-    }, 100);
-  }, [showNotification]);
+    } catch (err) {
+      console.error('Save error:', err);
+      showNotification(err.message || 'Save failed. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [profileData, showNotification]);
+
+  const saveMemberChanges = useCallback(async () => {
+    setLoading(true);
+    try {
+      const currentData = {
+        ...buildMemberProfile(getCurrentUser(), profileData),
+        updatedAt: new Date().toISOString(),
+      };
+
+      saveStoredMemberProfile(currentData);
+      setProfileData(currentData);
+      setPhotoPreview(currentData.profilePhoto || null);
+
+      const cu = getCurrentUser();
+      if (cu) {
+        const updatedSession = {
+          ...cu,
+          id: currentData.userId || currentData.id,
+          name: currentData.name,
+          email: currentData.email,
+          accountType: currentData.accountType,
+          profilePhoto: currentData.profilePhoto,
+        };
+        localStorage.setItem('sah_current_user', JSON.stringify(updatedSession));
+        localStorage.setItem('sah_user', JSON.stringify(updatedSession));
+      }
+
+      setSnapshot(null);
+      setEditing(false);
+      showNotification('Member profile saved successfully!', 'success');
+    } catch (err) {
+      console.error('Member save error:', err);
+      showNotification('Could not save member profile. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }, [profileData, showNotification]);
 
   /* ─── photo ─── */
   const handlePhotoChange = (e) => {
@@ -559,9 +673,11 @@ const ClientDashboard = () => {
     reader.onload = (ev) => {
       const b64 = ev.target.result;
       setPhotoPreview(b64);
+      setEditing(true);
       setProfileData(prev => {
         const updated = { ...prev, photo: b64, image: b64, profilePhoto: b64 };
-        saveProviderById(updated);
+        if (isMemberAccount(updated)) saveStoredMemberProfile(buildMemberProfile(getCurrentUser(), updated));
+        else saveProviderById(updated);
         // ── FIX: persist photo to a dedicated key so it survives API reloads on refresh ──
         try {
           const cu = getCurrentUser();
@@ -569,7 +685,7 @@ const ClientDashboard = () => {
         } catch {}
         return updated;
       });
-      showNotification('Photo updated!', 'success');
+      showNotification('Photo updated. Click Save Changes to publish it.', 'info');
     };
     reader.readAsDataURL(file);
   };
@@ -584,6 +700,7 @@ const ClientDashboard = () => {
       return;
     }
     setQualFileName(file.name);
+    setEditing(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
       const b64 = ev.target.result;
@@ -610,6 +727,7 @@ const ClientDashboard = () => {
       return;
     }
     setClearanceFileName(file.name);
+    setEditing(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
       const b64 = ev.target.result;
@@ -1507,6 +1625,184 @@ const ClientDashboard = () => {
     }
   };
 
+  const renderMemberDashboard = () => {
+    const memberId = profileData.userId || profileData.id;
+
+    if (dataLoading) {
+      return (
+        <div className="cd-wrap">
+          <Header userType="client" showBack={false} />
+          <main className="cd-main">
+            <div style={{ display:'flex', justifyContent:'center', alignItems:'center', minHeight:260 }}>
+              <div style={{ textAlign:'center', color:'#888' }}>
+                <i className="fas fa-spinner fa-spin" style={{ fontSize:'1.5rem', marginBottom:8, display:'block' }}></i>
+                Loading your member profile...
+              </div>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
+    return (
+      <div className="cd-wrap">
+        <Header userType="client" showBack={false} />
+        <section className="cd-hero">
+          <div className="cd-hero-top">
+            <div className="cd-hero-left">
+              <div className="cd-hero-eyebrow"><span></span>Member Dashboard</div>
+              <h1 className="cd-hero-title">Welcome back, <em>{profileData.name || 'Member'}</em></h1>
+              <div className="cd-hero-meta">
+                <div className="cd-status-pill approved">
+                  <i className="fas fa-user-circle"></i> Member Profile
+                </div>
+                <div style={{ color: 'rgba(255,255,255,.72)', fontSize: '0.75rem' }}>
+                  Account type: {profileData.accountType || 'parent'}
+                </div>
+              </div>
+            </div>
+            <div className="cd-hero-right">
+              <button
+                className="cd-btn-ghost"
+                onClick={() => navigate(memberId ? `/profile?member=${memberId}&from=dashboard` : '/profile?from=dashboard')}
+              >
+                <i className="fas fa-eye"></i> Public View
+              </button>
+              {editing && (
+                <>
+                  <button className="cd-btn-solid" onClick={saveMemberChanges} disabled={loading}>
+                    <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save'}
+                  </button>
+                  <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <main className="cd-main">
+          <div className="cd-layout" style={{ gridTemplateColumns: 'minmax(0, 760px) minmax(240px, 320px)' }}>
+            <div className="cd-card">
+              <div className="cd-card-header">
+                <div className="cd-card-header-icon"><i className="fas fa-user"></i></div>
+                <div>
+                  <div className="cd-card-title">Account Information</div>
+                  <div className="cd-card-subtitle">Your normal member profile details</div>
+                </div>
+                <button className={`cd-edit-toggle ${editing ? 'active' : 'inactive'}`} onClick={editing ? cancelEdit : startEdit}>
+                  <i className={`fas ${editing ? 'fa-pencil-alt' : 'fa-edit'}`}></i>
+                  {editing ? 'Editing...' : 'Edit Profile'}
+                </button>
+              </div>
+              <div className="cd-card-body">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18, paddingBottom: 16, borderBottom: '1px solid #f0ece5' }}>
+                  <div className="cd-photo-wrap">
+                    {photoPreview
+                      ? <img src={photoPreview} alt="Member profile" className="cd-photo-img" />
+                      : <div className="cd-photo-placeholder"><i className="fas fa-user"></i></div>}
+                    <div className="cd-photo-btn" onClick={() => photoInputRef.current?.click()}>
+                      <i className="fas fa-camera"></i>
+                    </div>
+                    <input ref={photoInputRef} type="file" accept="image/*" className="cd-photo-input" onChange={handlePhotoChange} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1a1a1a' }}>{profileData.name || 'Your Name'}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#888', margin: '2px 0 6px' }}>{profileData.email}</div>
+                    <button onClick={() => photoInputRef.current?.click()} style={{ background: 'none', border: 'none', color: '#6f8da6', fontSize: '0.73rem', fontWeight: 600, cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+                      <i className="fas fa-camera"></i> Change profile photo
+                    </button>
+                  </div>
+                </div>
+
+                <div className="cd-row">
+                  <div className="cd-field">
+                    <label className="cd-label">Full Name</label>
+                    {editing
+                      ? <input className="cd-input" type="text" value={profileData.name || ''} onChange={e => upd({ name: e.target.value })} />
+                      : <div className={`cd-value ${!profileData.name ? 'empty' : ''}`}>{profileData.name || '-'}</div>}
+                  </div>
+                  <div className="cd-field">
+                    <label className="cd-label">Email Address</label>
+                    {editing
+                      ? <input className="cd-input" type="email" value={profileData.email || ''} onChange={e => upd({ email: e.target.value })} />
+                      : <div className={`cd-value ${!profileData.email ? 'empty' : ''}`}>{profileData.email || '-'}</div>}
+                  </div>
+                  <div className="cd-field">
+                    <label className="cd-label">Account Type</label>
+                    {editing
+                      ? (
+                        <select className="cd-input cd-select" value={profileData.accountType || 'parent'} onChange={e => upd({ accountType: e.target.value })}>
+                          <option value="parent">Parent</option>
+                          <option value="student">Student</option>
+                          <option value="guardian">Guardian</option>
+                          <option value="educator">Educator</option>
+                          <option value="member">Member</option>
+                        </select>
+                      )
+                      : <div className="cd-value">{profileData.accountType || 'parent'}</div>}
+                  </div>
+                  <div className="cd-field">
+                    <label className="cd-label">Phone</label>
+                    {editing
+                      ? <input className="cd-input" type="tel" value={profileData.phone || ''} onChange={e => upd({ phone: e.target.value })} />
+                      : <div className={`cd-value ${!profileData.phone ? 'empty' : ''}`}>{profileData.phone || '-'}</div>}
+                  </div>
+                  <div className="cd-field">
+                    <label className="cd-label">Province</label>
+                    {editing
+                      ? (
+                        <select className="cd-input cd-select" value={profileData.province || ''} onChange={e => upd({ province: e.target.value })}>
+                          <option value="">-- Select --</option>
+                          {(PROVINCES || []).map(p => <option key={p}>{p}</option>)}
+                        </select>
+                      )
+                      : <div className={`cd-value ${!profileData.province ? 'empty' : ''}`}>{profileData.province || '-'}</div>}
+                  </div>
+                  <div className="cd-field">
+                    <label className="cd-label">City</label>
+                    {editing
+                      ? <input className="cd-input" type="text" value={profileData.city || ''} onChange={e => upd({ city: e.target.value })} />
+                      : <div className={`cd-value ${!profileData.city ? 'empty' : ''}`}>{profileData.city || '-'}</div>}
+                  </div>
+                </div>
+
+                <div className="cd-field" style={{ marginTop: 4 }}>
+                  <label className="cd-label">Short Bio</label>
+                  {editing
+                    ? <textarea className="cd-input cd-textarea" value={profileData.bio || ''} onChange={e => upd({ bio: e.target.value })} placeholder="A short note about you..." />
+                    : <div className={`cd-value ${!profileData.bio ? 'empty' : ''}`} style={{ display: 'block', lineHeight: 1.6, padding: '7px 0' }}>{profileData.bio || 'No bio added yet.'}</div>}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="cd-sidebar-card">
+                <div className="cd-sidebar-header">
+                  <div className="cd-sidebar-title"><i className="fas fa-circle-info" style={{ marginRight: 6 }}></i>Member Profile</div>
+                </div>
+                <div className="cd-sidebar-body">
+                  <p style={{ fontSize: '0.8rem', color: '#555', lineHeight: 1.65 }}>
+                    This profile is for your member account only. Provider listings, services, pricing, qualifications and plan settings are managed separately by provider accounts.
+                  </p>
+                  <button className="cd-btn-solid" style={{ width: '100%', justifyContent: 'center', marginTop: 10 }} onClick={saveMemberChanges} disabled={loading || !editing}>
+                    <i className="fas fa-floppy-disk"></i> Save Member Profile
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  };
+
+  const currentSession = getCurrentUser();
+  if (isMemberAccount(currentSession) || isMemberAccount(profileData)) {
+    return renderMemberDashboard();
+  }
+
   return (
     <div className="cd-wrap">
       <Header userType="client" backPath="/" />
@@ -1527,7 +1823,10 @@ const ClientDashboard = () => {
           <div className="cd-hero-right">
             <button
               className="cd-btn-ghost"
-              onClick={() => navigate(profileData.id ? `/profile?id=${profileData.id}&from=dashboard` : '/profile?from=dashboard')}
+              onClick={() => {
+                const profileId = profileData.userId || profileData.id;
+                navigate(profileId ? `/profile?id=${profileId}&from=dashboard` : '/profile?from=dashboard');
+              }}
             >
               <i className="fas fa-eye"></i> Public View
             </button>
