@@ -246,12 +246,16 @@ const Header = ({ userType = 'guest' } = {}) => {
 
   const isLoggedIn = !!user || !!currentUser;
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'admin';
+  const accountForPath = currentUser || user;
+  const roleForPath = String(accountForPath?.role || '').toLowerCase();
+  const accountTypeForPath = String(accountForPath?.accountType || '').toLowerCase();
+  const isProvider = ['provider', 'client', 'provideraccount'].includes(roleForPath) || accountTypeForPath.includes('provider');
   const isHomepage = location.pathname === '/';
   const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
   const closeMob = () => setMobileOpen(false);
 
   // Where to send the logged-in user when they click their name
-  const dashboardPath = isAdmin ? '/admin-dashboard' : '/client-dashboard';
+  const dashboardPath = isAdmin ? '/admin-dashboard' : (isProvider ? '/provider-dashboard' : '/client-dashboard');
   const displayName = currentUser?.name ? currentUser.name.split(' ')[0] : (user?.name ? user.name.split(' ')[0] : 'Account');
 
   return (
@@ -277,7 +281,7 @@ const Header = ({ userType = 'guest' } = {}) => {
                   Magazine <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.58rem' }} />
                 </a>
                 {isLoggedIn && isAdmin && <Link to="/admin-dashboard">Admin</Link>}
-                {isLoggedIn && !isAdmin && <Link to="/client-dashboard">Dashboard</Link>}
+                {isLoggedIn && !isAdmin && <Link to={dashboardPath}>Dashboard</Link>}
               </nav>
             )}
 
@@ -326,7 +330,7 @@ const Header = ({ userType = 'guest' } = {}) => {
           <Link to="/admin-dashboard" onClick={closeMob}><i className="fas fa-shield-halved" /> Admin</Link>
         )}
         {isLoggedIn && !isAdmin && (
-          <Link to="/client-dashboard" onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
+          <Link to={dashboardPath} onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
         )}
         {isLoggedIn ? (
           <button className="mob-link" onClick={handleLogout}>

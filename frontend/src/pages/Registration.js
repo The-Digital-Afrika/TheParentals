@@ -848,7 +848,7 @@ const Registration = () => {
         }
 
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
-        setTimeout(() => navigate('/client-dashboard'), 300);
+        setTimeout(() => navigate('/provider-dashboard'), 300);
         return;
       }
     } catch (apiErr) {
@@ -871,7 +871,7 @@ const Registration = () => {
       }
 
       showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
-      setTimeout(() => navigate('/client-dashboard'), 300);
+      setTimeout(() => navigate('/provider-dashboard'), 300);
     } catch (localErr) {
       console.error('localStorage fallback failed:', localErr);
       setFieldErrors({ _submit: 'Registration failed. Please try again.' });

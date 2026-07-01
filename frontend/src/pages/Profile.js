@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
+import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import '../assets/css/profile.css';
 
@@ -91,6 +92,41 @@ function findProvider(id, email) {
     }
     return null;
   } catch { return null; }
+}
+
+function findMemberProfile(id) {
+  if (!id) return null;
+
+  try {
+    const stored = JSON.parse(localStorage.getItem('sah_member_profiles') || '[]');
+    const found = stored.find(p => p.id === id || p.userId === id);
+
+    if (!found) return null;
+
+    return {
+      ...found,
+      id: found.userId || found.id,
+      userId: found.userId || found.id,
+      name: found.name || '',
+      email: found.email || '',
+      contactEmail: found.email || '',
+      primaryCategory: 'Member Profile',
+      category: 'Member Profile',
+      location: [found.city, found.province].filter(Boolean).join(', '),
+      image: found.profilePhoto || found.photo || found.image || null,
+      photo: found.profilePhoto || found.photo || found.image || null,
+      profilePhoto: found.profilePhoto || found.photo || found.image || null,
+      tier: 'free',
+      listingPlan: 'free',
+      tags: [],
+      ageGroups: [],
+      availabilityDays: [],
+      services: [],
+      reviews: { average: 0, count: 0, items: [] },
+    };
+  } catch {
+    return null;
+  }
 }
 
 function normalizeApiProfile(found) {
@@ -255,6 +291,28 @@ const injectStyles = () => {
       align-items: stretch;
       margin-bottom: 24px;
     }
+    .pv2-directory-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      margin-bottom: 16px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(111,141,166,0.35);
+      background: #ffffff;
+      color: ${ORANGE};
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      transition: all 0.15s;
+    }
+    .pv2-directory-back:hover {
+      border-color: ${ORANGE};
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
 
     /* ── Left panel — side-by-side sections ── */
     .pv2-left {
@@ -383,7 +441,7 @@ const injectStyles = () => {
       background-position: center 20%;
       box-shadow: 0 12px 40px rgba(0,0,0,0.32);
       width: 100%;
-      min-height: 420px;
+      min-height: 300px;
     }
     .pv2-right-overlay {
       position: absolute;
@@ -394,12 +452,12 @@ const injectStyles = () => {
     .pv2-right-content {
       position: relative;
       z-index: 1;
-      padding: 44px 48px;
+      padding: 34px 40px;
       display: flex;
       flex-direction: row;
       align-items: stretch;
       gap: 0;
-      min-height: 420px;
+      min-height: 300px;
     }
 
     /* Avatar column — left strip */
@@ -411,7 +469,7 @@ const injectStyles = () => {
       padding-right: 40px;
       border-right: 1px solid rgba(255,255,255,0.1);
       flex-shrink: 0;
-      width: 160px;
+      width: 140px;
     }
 
     /* Info column — center, takes all remaining space */
@@ -420,7 +478,7 @@ const injectStyles = () => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0 44px;
+      padding: 0 36px;
     }
 
     /* Actions column — right strip */
@@ -430,25 +488,25 @@ const injectStyles = () => {
       align-items: flex-end;
       justify-content: space-between;
       flex-shrink: 0;
-      width: 220px;
-      padding-left: 40px;
+      width: 200px;
+      padding-left: 32px;
       border-left: 1px solid rgba(255,255,255,0.1);
     }
 
     .pv2-avatar {
-      width: 130px; height: 130px;
+      width: 112px; height: 112px;
       border-radius: 50%; object-fit: cover;
       border: 4px solid ${ORANGE};
       display: block;
       box-shadow: 0 8px 28px rgba(194,81,10,0.45);
     }
     .pv2-avatar-placeholder {
-      width: 130px; height: 130px;
+      width: 112px; height: 112px;
       border-radius: 50%;
       background: rgba(255,255,255,0.1);
       border: 4px solid ${ORANGE};
       display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.5); font-size: 2.8rem;
+      color: rgba(255,255,255,0.5); font-size: 2.3rem;
       box-shadow: 0 8px 28px rgba(194,81,10,0.35);
     }
     .pv2-badges {
@@ -516,6 +574,45 @@ const injectStyles = () => {
       white-space: nowrap;
     }
     .pv2-share-btn:hover { background: rgba(255,255,255,0.2); }
+
+    .pv2-member-profile .pv2-right {
+      min-height: 230px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .pv2-member-profile .pv2-right-content {
+      min-height: 230px;
+      padding: 28px 34px;
+    }
+    .pv2-member-profile .pv2-right-avatar-col {
+      width: 120px;
+      padding-right: 24px;
+      justify-content: center;
+    }
+    .pv2-member-profile .pv2-right-info-col {
+      padding: 0 28px;
+      justify-content: center;
+      gap: 28px;
+    }
+    .pv2-member-profile .pv2-right-actions-col {
+      width: 170px;
+      padding-left: 24px;
+      justify-content: flex-start;
+    }
+    .pv2-member-profile .pv2-avatar,
+    .pv2-member-profile .pv2-avatar-placeholder {
+      width: 96px;
+      height: 96px;
+      border-width: 3px;
+    }
+    .pv2-member-profile .pv2-avatar-placeholder { font-size: 2rem; }
+    .pv2-member-profile .pv2-name { font-size: 2rem; }
+    .pv2-member-profile .pv2-meta-strip { gap: 6px 22px; }
+    .pv2-member-profile .pv2-meta-item { font-size: 0.86rem; }
+    .pv2-member-profile .pv2-share-btn {
+      padding: 9px 16px;
+      font-size: 0.8rem;
+    }
 
     /* ── Contact accordion ── */
     .pv2-contact-accordion {
@@ -777,6 +874,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const fromDashboard = searchParams.get('from') === 'dashboard';
@@ -799,14 +897,20 @@ const Profile = () => {
     injectStyles();
     const id = searchParams.get('id');
     const email = searchParams.get('email');
+    const memberId = searchParams.get('member');
     let cancelled = false;
 
     const loadProfile = async () => {
       setLoading(true);
       let found = null;
 
-      // 1. Try API by ID
-      if (id) {
+      // 1. Load member profiles saved from the member dashboard.
+      if (memberId) {
+        found = findMemberProfile(memberId);
+      }
+
+      // 2. Try API by provider ID
+      if (!found && id) {
         try {
           found = normalizeApiProfile(await api.getProviderById(id));
         } catch (error) {
@@ -814,10 +918,10 @@ const Profile = () => {
         }
       }
 
-      // 2. Fall back to localStorage providers list
+      // 3. Fall back to localStorage providers list
       if (!found) found = findProvider(id, email);
 
-      // 3. Try to load the logged-in user's own profile from localStorage
+      // 4. Try to load the logged-in user's own profile from localStorage
       if (!found) {
         try {
           const cu = JSON.parse(
@@ -826,9 +930,10 @@ const Profile = () => {
             'null'
           );
           if (cu?.id) {
-            // Look up their saved provider data
+            // Look up their saved member/provider data
+            const memberProfile = findMemberProfile(cu.id);
             const stored = JSON.parse(localStorage.getItem('sah_providers') || '[]');
-            const own = stored.find(p => p.id === cu.id || p.userId === cu.id);
+            const own = memberProfile || stored.find(p => p.id === cu.id || p.userId === cu.id);
             if (own) {
               found = normalizeApiProfile(own);
             } else {
@@ -899,8 +1004,15 @@ const Profile = () => {
   };
 
   const handleBack = () => {
-    if (fromDashboard) navigate('/client-dashboard');
+    const isMember = profile?.profileKind === 'member' || profile?.primaryCategory === 'Member Profile' || profile?.category === 'Member Profile';
+    if (fromDashboard) navigate(isMember ? '/client-dashboard' : '/provider-dashboard');
     else navigate('/');
+  };
+
+  const handleProfileLogout = () => {
+    logout();
+    setIsAuthenticated(false);
+    navigate('/');
   };
 
   if (loading) return (
@@ -916,7 +1028,7 @@ const Profile = () => {
       <Header />
       <main style={{ padding: '4rem', textAlign: 'center' }}>
         <h2>Profile not found</h2>
-        <Link to="/">Back to Home</Link>
+        <Link to="/#sah-providers">Back to Directory</Link>
       </main>
       <Footer />
     </>
@@ -936,6 +1048,7 @@ const Profile = () => {
 
   const tier = profile.listingPlan || profile.tier || 'free';
   const isPaid = tier === 'pro' || tier === 'featured';
+  const isMemberProfile = profile.profileKind === 'member' || profile.primaryCategory === 'Member Profile' || profile.category === 'Member Profile';
 
   const ratingStars = (r) => {
     if (!r) return '';
@@ -969,7 +1082,7 @@ const Profile = () => {
               <button style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 6, border: '1.5px solid rgba(255,255,255,0.55)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                 <i className="fas fa-user-circle" /> {profile?.name || 'Provider'}
               </button>
-              <button onClick={() => { localStorage.removeItem('sah_current_user'); navigate('/'); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 18px', borderRadius: 6, border: 'none', background: ORANGE, color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
+              <button onClick={handleProfileLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 18px', borderRadius: 6, border: 'none', background: ORANGE, color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                 <i className="fas fa-right-from-bracket" /> Log Out
               </button>
             </div>
@@ -979,8 +1092,11 @@ const Profile = () => {
         <Header />
       )}
 
-      <main id="profilePageV2">
+      <main id="profilePageV2" className={isMemberProfile ? 'pv2-member-profile' : ''}>
         <div className="pv2-inner">
+          <Link to="/#sah-providers" className="pv2-directory-back">
+            <i className="fas fa-arrow-left" /> Back to Directory
+          </Link>
 
           {/* ── TOP GRID ── */}
           <div className="pv2-top-grid">
@@ -1062,12 +1178,12 @@ const Profile = () => {
                       <span><i className="fas fa-address-book" style={{ marginRight: 8, color: ORANGE }} />Contact Details</span>
                       <i className="fas fa-arrow-down" style={{ fontSize: '0.8rem' }} />
                     </button>
-                  ) : (
+                  ) : !isMemberProfile ? (
                     <div className="pv2-upgrade-note">
                       <i className="fas fa-lock" style={{ marginRight: 6 }} />
                       Upgrade to <strong>Trusted Provider</strong> to display your contact details.
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
               </div>

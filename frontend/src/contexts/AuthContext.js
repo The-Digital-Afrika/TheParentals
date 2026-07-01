@@ -17,17 +17,41 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('sah_user');
-      if (storedUser) {
+    const syncUserFromStorage = () => {
+      try {
+        const storedUser = localStorage.getItem('sah_user') || localStorage.getItem('sah_current_user');
+        if (!storedUser) {
+          setUser(null);
+          return;
+        }
+
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
+      } catch (e) {
+        localStorage.removeItem('sah_user');
+        localStorage.removeItem('sah_current_user');
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      localStorage.removeItem('sah_user');
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    syncUserFromStorage();
+
+    const handleAuthChange = () => syncUserFromStorage();
+    const handleStorage = (event) => {
+      if (!event.key || ['sah_user', 'sah_current_user', 'sah_token'].includes(event.key)) {
+        syncUserFromStorage();
+      }
+    };
+
+    window.addEventListener('sah-auth-change', handleAuthChange);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      window.removeEventListener('sah-auth-change', handleAuthChange);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, []);
 
   // ── REGISTER ─────────────────────────────────────────────────────────────
@@ -106,6 +130,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('sah_user');
     localStorage.removeItem('sah_current_user');
     localStorage.removeItem('sah_token');
+    window.dispatchEvent(new Event('sah-auth-change'));
   };
 
   // ── UPDATE PLAN ───────────────────────────────────────────────────────────

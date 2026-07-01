@@ -883,7 +883,10 @@ export default function HomePage() {
 
   const getDashboardPath = () => {
     if (!currentUser) return '/login';
-    return currentUser.role === 'admin' ? '/admin-dashboard' : '/client-dashboard';
+    const role = String(currentUser.role || '').toLowerCase();
+    const accountType = String(currentUser.accountType || '').toLowerCase();
+    const isProvider = ['provider', 'client', 'provideraccount'].includes(role) || accountType.includes('provider');
+    return role === 'admin' ? '/admin-dashboard' : (isProvider ? '/provider-dashboard' : '/client-dashboard');
   };
 
   const FILTER_PILLS = [

@@ -453,8 +453,8 @@ const ForgotPasswordModal = ({ onClose }) => {
 const getRedirectPath = (userData) => {
   const role = (userData?.role || '').toLowerCase();
   if (role === 'admin') return '/admin-dashboard';
-  if (['provider', 'client', 'provideraccount'].includes(role)) return '/client-dashboard';
-  if (userData?.accountType === 'provider') return '/client-dashboard';
+  if (['provider', 'client', 'provideraccount'].includes(role)) return '/provider-dashboard';
+  if (userData?.accountType === 'provider') return '/provider-dashboard';
   // Normal users (role === 'user', 'USER', or anything else) go home
   return '/';
 };

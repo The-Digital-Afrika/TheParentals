@@ -1,6 +1,6 @@
 // frontend/src/pages/ClientDashboard.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import Header from '../components/common/Header';
@@ -75,6 +75,31 @@ function buildMemberProfile(session, existing = {}) {
     profilePhoto: existing.profilePhoto || existing.photo || existing.image || session?.profilePhoto || null,
     publicToggle: existing.publicToggle ?? true,
     updatedAt: existing.updatedAt || null,
+  };
+}
+
+function toPublicMemberProfile(profile) {
+  return {
+    ...profile,
+    id: profile.userId || profile.id,
+    userId: profile.userId || profile.id,
+    name: profile.name || '',
+    email: profile.email || '',
+    contactEmail: profile.email || '',
+    primaryCategory: 'Member Profile',
+    category: 'Member Profile',
+    location: [profile.city, profile.province].filter(Boolean).join(', '),
+    image: profile.profilePhoto || profile.photo || profile.image || null,
+    photo: profile.profilePhoto || profile.photo || profile.image || null,
+    profilePhoto: profile.profilePhoto || profile.photo || profile.image || null,
+    listingPlan: 'free',
+    tier: 'free',
+    plan: 'free',
+    services: [],
+    tags: [],
+    ageGroups: [],
+    availabilityDays: [],
+    reviews: { average: 0, count: 0, items: [] },
   };
 }
 
@@ -247,6 +272,7 @@ const DASH_CSS = `
   .cd-status-pill.approved { background:rgba(16,185,129,.2); color:#34d399; border:1px solid rgba(16,185,129,.35); }
   .cd-status-pill.rejected { background:rgba(239,68,68,.2);  color:#f87171; border:1px solid rgba(239,68,68,.35); }
   .cd-hero-right { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .cd-hero-right .cd-btn-solid { display:none; }
   .cd-btn-ghost { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:7px; border:1.5px solid rgba(255,255,255,.38); background:rgba(255,255,255,.07); color:#fff; font-size:0.81rem; font-weight:600; cursor:pointer; font-family:inherit; transition:all .17s; text-decoration:none; white-space:nowrap; }
   .cd-btn-ghost:hover { background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.75); }
   .cd-btn-solid { display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:7px; border:none; background:#6f8da6; color:#fff; font-size:0.81rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all .17s; white-space:nowrap; }
@@ -259,6 +285,8 @@ const DASH_CSS = `
   .cd-tab-btn:hover { background:#f47b2b; color:#fff; }
   .cd-tab-btn.active { background:#e96f1f; color:#fff; font-weight:800; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
+  .cd-directory-back { display:inline-flex; align-items:center; gap:8px; width:fit-content; margin:0 0 16px; padding:9px 16px; border-radius:8px; border:1.5px solid rgba(111,141,166,.35); background:#fff; color:#6f8da6; font-size:.86rem; font-weight:800; text-decoration:none; box-shadow:0 4px 14px rgba(0,0,0,.05); transition:all .15s; }
+  .cd-directory-back:hover { border-color:#6f8da6; transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
   .cd-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; align-items:start; }
   .cd-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04); margin-bottom:16px; border:1px solid rgba(0,0,0,.05); }
   .cd-card-header { display:flex; align-items:center; gap:11px; padding:14px 20px; border-bottom:1px solid #f0ece5; background:#faf9f7; }
@@ -267,6 +295,7 @@ const DASH_CSS = `
   .cd-card-subtitle { font-size:0.71rem; color:#888; margin:1px 0 0; }
   .cd-card-body     { padding:20px; }
   .cd-card-body.tight { padding:14px 20px; }
+  .cd-card-actions { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
   .cd-edit-toggle { margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; border:1.5px solid; transition:all .15s; font-family:inherit; }
   .cd-edit-toggle.inactive { border-color:#d1d5db; background:transparent; color:#6b7280; }
   .cd-edit-toggle.inactive:hover { border-color:#6f8da6; color:#6f8da6; }
@@ -377,6 +406,8 @@ const DASH_CSS = `
   .cd-layout { grid-template-columns: 1fr; }
   .cd-row { grid-template-columns: 1fr; }
   .cd-card-body { padding: 14px; }
+  .cd-card-header { align-items: flex-start; }
+  .cd-card-actions { width: 100%; margin-left: 0; justify-content: flex-start; }
   .cd-hero-title { font-size: 1.3rem; }
   .cd-btn-ghost, .cd-btn-solid { font-size: 0.75rem; padding: 6px 10px; }
   .cd-plan-grid { grid-template-columns: 1fr; }
@@ -396,6 +427,7 @@ const ClientDashboard = () => {
 
   const [activeTab,    setActiveTab]    = useState('profile');
   const [editing,      setEditing]      = useState(false);
+  const [editSection,  setEditSection]  = useState(null);
   const [snapshot,     setSnapshot]     = useState(null);
   const [profileData,  setProfileData]  = useState(EMPTY_PROFILE);
   const [photoPreview, setPhotoPreview] = useState(null);
@@ -512,14 +544,16 @@ const ClientDashboard = () => {
   const days        = DAYS_OF_WEEK || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   /* ─── edit helpers ─── */
-  const startEdit = useCallback(() => {
+  const startEdit = useCallback((section = 'all') => {
     setSnapshot({ ...profileData });
+    setEditSection(section);
     setEditing(true);
   }, [profileData]);
 
   const cancelEdit = useCallback(() => {
     if (snapshot) setProfileData(snapshot);
     setEditing(false);
+    setEditSection(null);
     setSnapshot(null);
     setQualFileName('');
     setClearanceFileName('');
@@ -547,12 +581,15 @@ const ClientDashboard = () => {
       saveProviderById(toSave);
       const cu = getCurrentUser();
       if (cu) {
-        localStorage.setItem('sah_current_user', JSON.stringify({
+        const updatedSession = {
           ...cu,
           id: toSave.userId,
           name: currentData.name,
           plan: currentData.plan,
-        }));
+          email: currentData.email || cu.email,
+        };
+        localStorage.setItem('sah_current_user', JSON.stringify(updatedSession));
+        localStorage.setItem('sah_user', JSON.stringify(updatedSession));
       }
 
       const token = localStorage.getItem('sah_token');
@@ -601,29 +638,64 @@ const ClientDashboard = () => {
         if (currentData._newClearanceFile) fd.append('clearanceFile', currentData._newClearanceFile);
 
         const result = await api.updateProvider(toSave.userId, fd, token);
-        const mapped = mapDbProfileToLocal(result.profile || result);
-        setProfileData(prev => ({
-          ...prev,
+        const mapped = mapDbProfileToLocal(result.profile || result) || {};
+        const finalProfile = {
+          ...toSave,
           ...mapped,
           id: mapped.userId || mapped.id || toSave.userId,
           userId: mapped.userId || toSave.userId,
+          name: currentData.name,
+          email: currentData.email,
+          accountType: currentData.accountType,
+          bio: currentData.bio,
+          yearsExperience: currentData.yearsExperience,
+          languages: currentData.languages,
+          primaryCategory: currentData.primaryCategory,
+          secondaryCategories: currentData.secondaryCategories,
+          tags: currentData.tags,
+          degrees: currentData.degrees,
+          certifications: currentData.certifications,
+          memberships: currentData.memberships,
+          clearance: currentData.clearance,
+          certFilesAll: mapped.certFilesAll?.length ? mapped.certFilesAll : currentData.certFilesAll,
+          certDocuments: mapped.certDocuments?.length ? mapped.certDocuments : currentData.certDocuments,
+          clearanceFilesAll: mapped.clearanceFilesAll?.length ? mapped.clearanceFilesAll : currentData.clearanceFilesAll,
+          clearanceDocuments: mapped.clearanceDocuments?.length ? mapped.clearanceDocuments : currentData.clearanceDocuments,
           _newCertFile: null,
           _newClearanceFile: null,
-        }));
-        setPhotoPreview(mapped.profilePhoto || toSave.profilePhoto || null);
-        saveProviderById({ ...mapped, id: mapped.userId || toSave.userId, userId: mapped.userId || toSave.userId });
+        };
+        setProfileData(finalProfile);
+        setPhotoPreview(finalProfile.profilePhoto || finalProfile.photo || finalProfile.image || null);
+        saveProviderById(finalProfile);
       } else {
         setProfileData(toSave);
+        saveProviderById(toSave);
       }
 
       setSnapshot(null);
       setEditing(false);
+      setEditSection(null);
       setQualFileName('');
       setClearanceFileName('');
       showNotification('Changes saved successfully!', 'success');
     } catch (err) {
       console.error('Save error:', err);
-      showNotification(err.message || 'Save failed. Please try again.', 'error');
+      const fallbackData = {
+        ...profileData,
+        id: profileData.userId || profileData.id,
+        userId: profileData.userId || profileData.id,
+        social: profileData.website || profileData.social || '',
+        image: profileData.profilePhoto || profileData.photo || profileData.image || null,
+        photo: profileData.profilePhoto || profileData.photo || profileData.image || null,
+      };
+      saveProviderById(fallbackData);
+      setProfileData(fallbackData);
+      setSnapshot(null);
+      setEditing(false);
+      setEditSection(null);
+      setQualFileName('');
+      setClearanceFileName('');
+      showNotification('Changes saved on this device. The server could not be reached right now.', 'info');
     } finally {
       setLoading(false);
     }
@@ -636,8 +708,10 @@ const ClientDashboard = () => {
         ...buildMemberProfile(getCurrentUser(), profileData),
         updatedAt: new Date().toISOString(),
       };
+      const publicMemberProfile = toPublicMemberProfile(currentData);
 
       saveStoredMemberProfile(currentData);
+      saveProviderById(publicMemberProfile);
       setProfileData(currentData);
       setPhotoPreview(currentData.profilePhoto || null);
 
@@ -650,13 +724,21 @@ const ClientDashboard = () => {
           email: currentData.email,
           accountType: currentData.accountType,
           profilePhoto: currentData.profilePhoto,
+          phone: currentData.phone,
+          city: currentData.city,
+          province: currentData.province,
+          bio: currentData.bio,
         };
         localStorage.setItem('sah_current_user', JSON.stringify(updatedSession));
         localStorage.setItem('sah_user', JSON.stringify(updatedSession));
       }
+      if (currentData.profilePhoto && currentData.userId) {
+        localStorage.setItem(`sah_photo_${currentData.userId}`, currentData.profilePhoto);
+      }
 
       setSnapshot(null);
       setEditing(false);
+      setEditSection(null);
       showNotification('Member profile saved successfully!', 'success');
     } catch (err) {
       console.error('Member save error:', err);
@@ -673,6 +755,7 @@ const ClientDashboard = () => {
     reader.onload = (ev) => {
       const b64 = ev.target.result;
       setPhotoPreview(b64);
+      setEditSection('profileInfo');
       setEditing(true);
       setProfileData(prev => {
         const updated = { ...prev, photo: b64, image: b64, profilePhoto: b64 };
@@ -700,6 +783,7 @@ const ClientDashboard = () => {
       return;
     }
     setQualFileName(file.name);
+    setEditSection('qualifications');
     setEditing(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -727,6 +811,7 @@ const ClientDashboard = () => {
       return;
     }
     setClearanceFileName(file.name);
+    setEditSection('qualifications');
     setEditing(true);
     const reader = new FileReader();
     reader.onload = (ev) => {
@@ -791,7 +876,9 @@ const ClientDashboard = () => {
   ];
   const compPct = Math.round(compItems.filter(x => x.done).length / compItems.length * 100);
 
-  const renderSaveBar = () => editing ? (
+  const isEditingSection = useCallback((section) => editing && editSection === section, [editing, editSection]);
+
+  const renderSaveBar = (section = 'all') => (editing && editSection === section) ? (
     <div className="cd-footer-bar">
       <span className="cd-last-edit"><i className="far fa-clock"></i> unsaved changes</span>
       <div style={{ display: 'flex', gap: 8 }}>
@@ -948,10 +1035,18 @@ const ClientDashboard = () => {
           <div className="cd-card-header">
             <div className="cd-card-header-icon"><i className="fas fa-id-card"></i></div>
             <div><div className="cd-card-title">Account Information</div><div className="cd-card-subtitle">Your public-facing identity</div></div>
-            <button className={`cd-edit-toggle ${editing ? 'active' : 'inactive'}`} onClick={editing ? cancelEdit : startEdit}>
-              <i className={`fas ${editing ? 'fa-pencil-alt' : 'fa-edit'}`}></i>
+            {isEditingSection('profileInfo') && (
+              <div className="cd-card-actions">
+                <button className="cd-btn-solid" onClick={saveChanges} disabled={loading}>
+                  <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save'}
+                </button>
+                <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
+              </div>
+            )}
+            {!editing && <button className="cd-edit-toggle inactive" onClick={() => startEdit('profileInfo')}>
+              <i className="fas fa-edit"></i>
               {editing ? 'Editing…' : 'Edit Profile'}
-            </button>
+            </button>}
           </div>
           <div className="cd-card-body">
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18, paddingBottom: 16, borderBottom: '1px solid #f0ece5' }}>
@@ -975,19 +1070,19 @@ const ClientDashboard = () => {
             <div className="cd-row">
               <div className="cd-field">
                 <label className="cd-label">Full Name / Business <span className="req">*</span></label>
-                {editing
+                {isEditingSection('profileInfo')
                   ? <input className="cd-input" type="text" value={profileData.name || ''} onChange={e => upd({ name: e.target.value })} placeholder="Name or business name" />
                   : <div className={`cd-value ${!profileData.name ? 'empty' : ''}`}>{profileData.name || '—'}</div>}
               </div>
               <div className="cd-field">
                 <label className="cd-label">Email Address <span className="req">*</span></label>
-                {editing
+                {isEditingSection('profileInfo')
                   ? <input className="cd-input" type="email" value={profileData.email || ''} onChange={e => upd({ email: e.target.value })} />
                   : <div className={`cd-value ${!profileData.email ? 'empty' : ''}`}>{profileData.email || '—'}</div>}
               </div>
               <div className="cd-field">
                 <label className="cd-label">Account Type</label>
-                {editing
+                {isEditingSection('profileInfo')
                   ? <select className="cd-input cd-select" value={profileData.accountType || 'Individual Provider'} onChange={e => upd({ accountType: e.target.value })}>
                       <option>Individual Provider</option>
                       <option>Organisation / Company</option>
@@ -996,20 +1091,20 @@ const ClientDashboard = () => {
               </div>
               <div className="cd-field">
                 <label className="cd-label">Years of Experience</label>
-                {editing
+                {isEditingSection('profileInfo')
                   ? <input className="cd-input" type="number" value={profileData.yearsExperience || ''} min={0} max={60} onChange={e => upd({ yearsExperience: e.target.value })} />
                   : <div className={`cd-value ${!profileData.yearsExperience ? 'empty' : ''}`}>{profileData.yearsExperience || '—'}</div>}
               </div>
             </div>
             <div className="cd-field" style={{ marginTop: 4 }}>
               <label className="cd-label">Short Bio <span className="req">*</span></label>
-              {editing
+              {isEditingSection('profileInfo')
                 ? <textarea className="cd-input cd-textarea" value={profileData.bio || ''} onChange={e => upd({ bio: e.target.value })} placeholder="Tell families about your experience and approach…" />
                 : <div className={`cd-value ${!profileData.bio ? 'empty' : ''}`} style={{ display: 'block', lineHeight: 1.6, padding: '7px 0' }}>{profileData.bio || 'No bio added yet.'}</div>}
             </div>
             <div className="cd-field">
               <label className="cd-label">Primary Category</label>
-              {editing
+              {isEditingSection('profileInfo')
                 ? <select className="cd-input cd-select" value={profileData.primaryCategory || ''} onChange={e => upd({ primaryCategory: e.target.value })}>
                     <option value="">-- Select --</option>
                     {['Tutor', 'Therapist', 'Curriculum Provider', 'Online / Hybrid School', 'Educational Consultant', 'Extracurricular / Enrichment'].map(o => <option key={o}>{o}</option>)}
@@ -1026,7 +1121,7 @@ const ClientDashboard = () => {
             )}
             <div className="cd-field">
               <label className="cd-label">Tags / Subjects</label>
-              {editing
+              {isEditingSection('profileInfo')
                 ? <TagsInput
                     tags={profileData.tags || []}
                     isEditing
@@ -1041,7 +1136,7 @@ const ClientDashboard = () => {
             </div>
             <div className="cd-field">
               <label className="cd-label">Languages Spoken</label>
-              {editing ? (
+              {isEditingSection('profileInfo') ? (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 4 }}>
                   {['English','Afrikaans','isiZulu','isiXhosa','Sepedi','Setswana','Sesotho','Xitsonga','SiSwati','Tshivenda','isiNdebele','Other'].map(lang => (
                     <label key={lang} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:'0.8rem', cursor:'pointer', padding:'5px 11px', border:'1.5px solid', borderColor:(profileData.languages||[]).includes(lang)?'#6f8da6':'#e5e0d8', borderRadius:6, background:(profileData.languages||[]).includes(lang)?'rgba(85,118,145,0.08)':'#faf9f7', color:(profileData.languages||[]).includes(lang)?'#6f8da6':'#555', fontWeight:600 }}>
@@ -1064,7 +1159,6 @@ const ClientDashboard = () => {
               )}
             </div>
           </div>
-          {renderSaveBar()}
         </div>
 
         {/* Qualifications card */}
@@ -1072,7 +1166,15 @@ const ClientDashboard = () => {
           <div className="cd-card-header">
             <div className="cd-card-header-icon"><i className="fas fa-graduation-cap"></i></div>
             <div><div className="cd-card-title">Qualifications & Experience</div><div className="cd-card-subtitle">Credentials that build trust</div></div>
-            <button className={`cd-edit-toggle ${editing ? 'active' : 'inactive'}`} onClick={editing ? cancelEdit : startEdit}>
+            {isEditingSection('qualifications') && (
+              <div className="cd-card-actions">
+                <button className="cd-btn-solid" onClick={saveChanges} disabled={loading}>
+                  <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
+              </div>
+            )}
+            <button className="cd-edit-toggle inactive" style={{ display: editing ? 'none' : undefined }} onClick={() => startEdit('qualifications')}>
               <i className={`fas ${editing ? 'fa-pencil-alt' : 'fa-edit'}`}></i>
               {editing ? 'Editing…' : 'Edit'}
             </button>
@@ -1081,25 +1183,25 @@ const ClientDashboard = () => {
             <div className="cd-row">
               <div className="cd-field">
                 <label className="cd-label">Degrees / Diplomas</label>
-                {editing
+                {isEditingSection('qualifications')
                   ? <input className="cd-input" type="text" value={profileData.degrees || ''} onChange={e => upd({ degrees: e.target.value })} placeholder="e.g. BEd Honours, Mathematics" />
                   : <div className={`cd-value ${!profileData.degrees ? 'empty' : ''}`}>{profileData.degrees || '—'}</div>}
               </div>
               <div className="cd-field">
                 <label className="cd-label">Certifications</label>
-                {editing
+                {isEditingSection('qualifications')
                   ? <input className="cd-input" type="text" value={profileData.certifications || ''} onChange={e => upd({ certifications: e.target.value })} placeholder="e.g. SACE Registered" />
                   : <div className={`cd-value ${!profileData.certifications ? 'empty' : ''}`}>{profileData.certifications || '—'}</div>}
               </div>
               <div className="cd-field">
                 <label className="cd-label">Professional Memberships</label>
-                {editing
+                {isEditingSection('qualifications')
                   ? <input className="cd-input" type="text" value={profileData.memberships || ''} onChange={e => upd({ memberships: e.target.value })} placeholder="e.g. SA Curriculum Association" />
                   : <div className={`cd-value ${!profileData.memberships ? 'empty' : ''}`}>{profileData.memberships || '—'}</div>}
               </div>
               <div className="cd-field">
                 <label className="cd-label">Background Clearance</label>
-                {editing
+                {isEditingSection('qualifications')
                   ? <input className="cd-input" type="text" value={profileData.clearance || ''} onChange={e => upd({ clearance: e.target.value })} placeholder="e.g. Verified 2024 — Cert No. 12345" />
                   : profileData.clearance
                     ? <span className="cd-clearance"><i className="fas fa-shield-alt"></i>{profileData.clearance}</span>
@@ -1108,7 +1210,7 @@ const ClientDashboard = () => {
             </div>
 
             {/* ── PDF uploads (edit mode) ── */}
-            {editing && (
+            {isEditingSection('qualifications') && (
               <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #f0ece5' }}>
                 <div className="cd-sec-label"><i className="fas fa-file-pdf"></i> Upload Supporting Documents (PDF only)</div>
                 <div className="cd-info-note" style={{ marginBottom: 14 }}>
@@ -1669,19 +1771,14 @@ const ClientDashboard = () => {
               >
                 <i className="fas fa-eye"></i> Public View
               </button>
-              {editing && (
-                <>
-                  <button className="cd-btn-solid" onClick={saveMemberChanges} disabled={loading}>
-                    <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save'}
-                  </button>
-                  <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
-                </>
-              )}
             </div>
           </div>
         </section>
 
         <main className="cd-main">
+          <Link to="/#sah-providers" className="cd-directory-back">
+            <i className="fas fa-arrow-left"></i> Back to Directory
+          </Link>
           <div className="cd-layout" style={{ gridTemplateColumns: 'minmax(0, 760px) minmax(240px, 320px)' }}>
             <div className="cd-card">
               <div className="cd-card-header">
@@ -1690,10 +1787,19 @@ const ClientDashboard = () => {
                   <div className="cd-card-title">Account Information</div>
                   <div className="cd-card-subtitle">Your normal member profile details</div>
                 </div>
-                <button className={`cd-edit-toggle ${editing ? 'active' : 'inactive'}`} onClick={editing ? cancelEdit : startEdit}>
-                  <i className={`fas ${editing ? 'fa-pencil-alt' : 'fa-edit'}`}></i>
-                  {editing ? 'Editing...' : 'Edit Profile'}
-                </button>
+                {editing ? (
+                  <div className="cd-card-actions">
+                    <button className="cd-btn-solid" onClick={saveMemberChanges} disabled={loading}>
+                      <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save'}
+                    </button>
+                    <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
+                  </div>
+                ) : (
+                  <button className="cd-edit-toggle inactive" onClick={startEdit}>
+                    <i className="fas fa-edit"></i>
+                    Edit Profile
+                  </button>
+                )}
               </div>
               <div className="cd-card-body">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18, paddingBottom: 16, borderBottom: '1px solid #f0ece5' }}>
@@ -1785,9 +1891,6 @@ const ClientDashboard = () => {
                   <p style={{ fontSize: '0.8rem', color: '#555', lineHeight: 1.65 }}>
                     This profile is for your member account only. Provider listings, services, pricing, qualifications and plan settings are managed separately by provider accounts.
                   </p>
-                  <button className="cd-btn-solid" style={{ width: '100%', justifyContent: 'center', marginTop: 10 }} onClick={saveMemberChanges} disabled={loading || !editing}>
-                    <i className="fas fa-floppy-disk"></i> Save Member Profile
-                  </button>
                 </div>
               </div>
             </div>
@@ -1849,6 +1952,9 @@ const ClientDashboard = () => {
         </div>
       </section>
       <main className="cd-main">
+        <Link to="/#sah-providers" className="cd-directory-back">
+          <i className="fas fa-arrow-left"></i> Back to Directory
+        </Link>
         {renderActiveTab()}
       </main>
       <Footer />
