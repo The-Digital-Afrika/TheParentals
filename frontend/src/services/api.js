@@ -1,17 +1,35 @@
-export const API_BASE_URL = (() => {
+const trimSlash = (url) => String(url || '').replace(/\/$/, '');
+
+const getConfiguredApiUrl = () => {
   const viteUrl = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_API_URL : '';
   const reactUrl = typeof process !== 'undefined' ? process.env?.REACT_APP_API_URL : '';
-  const configured = viteUrl || reactUrl;
-  if (configured) return configured.replace(/\/$/, '');
+  return trimSlash(viteUrl || reactUrl);
+};
 
-  if (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
-    return 'http://localhost:5000';
+const isLocalBrowser = () => (
+  typeof window !== 'undefined'
+  && ['localhost', '127.0.0.1'].includes(window.location.hostname)
+);
+
+const unique = (items) => [...new Set(items.filter(item => item !== null && item !== undefined))];
+
+const getApiBaseCandidates = () => {
+  const configured = getConfiguredApiUrl();
+  if (configured) return [configured];
+
+  if (isLocalBrowser()) {
+    return unique([
+      'http://127.0.0.1:5000',
+      'http://localhost:5000',
+    ]);
   }
 
-  return 'https://sahomeschooling-services-4.onrender.com';
-})();
+  return ['https://sahomeschooling-services-4.onrender.com'];
+};
 
-const request = async (method, endpoint, body = null, token = null) => {
+export const API_BASE_URL = getApiBaseCandidates()[0] || '';
+
+export const apiRequest = async (method, endpoint, body = null, token = null) => {
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   const headers = isForm ? {} : { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -19,39 +37,64 @@ const request = async (method, endpoint, body = null, token = null) => {
   const options = { method, headers };
   if (body) options.body = isForm ? body : JSON.stringify(body);
 
-  const res = await fetch(`${API_BASE_URL}${endpoint}`, options);
-  const data = await res.json().catch(() => ({}));
+  const candidates = getApiBaseCandidates();
+  const errors = [];
 
-  if (!res.ok) {
-    const error = new Error(data.message || data.error || 'Request failed');
-    error.status = res.status;
-    error.data = data;
-    throw error;
+  for (const baseUrl of candidates) {
+    const url = `${baseUrl}${endpoint}`;
+
+    try {
+      const res = await fetch(url, options);
+      const contentType = res.headers.get('content-type') || '';
+      const data = contentType.includes('application/json') ? await res.json().catch(() => ({})) : {};
+
+      if (!res.ok) {
+        const shouldTryNext = [404, 405, 500, 502, 503, 504].includes(res.status) && candidates.length > 1;
+        if (shouldTryNext) {
+          errors.push(`${url} returned ${res.status}`);
+          continue;
+        }
+
+        const error = new Error(data.message || data.error || `Request failed (${res.status})`);
+        error.status = res.status;
+        error.data = data;
+        error.url = url;
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      if (error.status) throw error;
+      errors.push(`${url}: ${error.message || 'network error'}`);
+    }
   }
 
-  return data;
+  const error = new Error(`Unable to reach the backend. Tried: ${errors.join(' | ')}`);
+  error.status = 0;
+  error.tried = errors;
+  throw error;
 };
 
 export const api = {
   // Auth
-  login: (data) => request('POST', '/api/auth/login', data),
-  register: (data) => request('POST', '/api/auth/register', data),
-  getUsers: (token) => request('GET', '/api/auth/users', null, token),
+  login: (data) => apiRequest('POST', '/api/auth/login', data),
+  register: (data) => apiRequest('POST', '/api/auth/register', data),
+  getUsers: (token) => apiRequest('GET', '/api/auth/users', null, token),
 
   // Providers
-  getProviders: () => request('GET', '/api/providers'),
-  getProviderById: (id) => request('GET', `/api/providers/${id}`),
-  createProvider: (data) => request('POST', '/api/providers', data),
-  updateProvider: (id, data, token) => request('PATCH', `/api/providers/${id}`, data, token),
-  updateProviderStatus: (id, status, token) => request('PATCH', `/api/providers/${id}/status`, { status }, token),
-  approveProvider: (id, token) => request('POST', `/api/providers/${id}/approve`, null, token),
-  rejectProvider: (id, token) => request('POST', `/api/providers/${id}/reject`, null, token),
+  getProviders: () => apiRequest('GET', '/api/providers'),
+  getProviderById: (id) => apiRequest('GET', `/api/providers/${id}`),
+  createProvider: (data) => apiRequest('POST', '/api/providers', data),
+  updateProvider: (id, data, token) => apiRequest('PATCH', `/api/providers/${id}`, data, token),
+  updateProviderStatus: (id, status, token) => apiRequest('PATCH', `/api/providers/${id}/status`, { status }, token),
+  approveProvider: (id, token) => apiRequest('POST', `/api/providers/${id}/approve`, null, token),
+  rejectProvider: (id, token) => apiRequest('POST', `/api/providers/${id}/reject`, null, token),
 
   // Stats & Reviews
-  getStats: (token) => request('GET', '/api/stats', null, token),
-  getReviews: (token) => request('GET', '/api/reviews', null, token),
-  getFeaturedSlots: (token) => request('GET', '/api/featured-slots', null, token),
-  assignFeaturedSlot: (data, token) => request('POST', '/api/featured-slots/assign', data, token),
-  removeFeaturedSlot: (slotId, token) => request('POST', `/api/featured-slots/${slotId}/remove`, null, token),
-  rotateFeaturedSlot: (slotId, token) => request('POST', `/api/featured-slots/${slotId}/rotate`, null, token),
+  getStats: (token) => apiRequest('GET', '/api/stats', null, token),
+  getReviews: (token) => apiRequest('GET', '/api/reviews', null, token),
+  getFeaturedSlots: (token) => apiRequest('GET', '/api/featured-slots', null, token),
+  assignFeaturedSlot: (data, token) => apiRequest('POST', '/api/featured-slots/assign', data, token),
+  removeFeaturedSlot: (slotId, token) => apiRequest('POST', `/api/featured-slots/${slotId}/remove`, null, token),
+  rotateFeaturedSlot: (slotId, token) => apiRequest('POST', `/api/featured-slots/${slotId}/rotate`, null, token),
 };

@@ -60,35 +60,10 @@ function findProvider(id, email) {
     const stored = JSON.parse(localStorage.getItem('sah_providers') || '[]');
     const all = [...stored, ...SEED_PROVIDERS];
     let found = null;
-    if (id) found = all.find(p => p.id === id) || null;
+    if (id) found = all.find(p => p.id === id || p.userId === id) || null;
     else if (email) found = all.find(p => p.email === email || p.contactEmail === email) || null;
     if (found) {
-      return {
-        ...found,
-        name: found.name || '',
-        bio: found.bio || '',
-        primaryCategory: found.primaryCategory || found.category || '',
-        city: found.city || '',
-        province: found.province || '',
-        phone: found.phone || '',
-        whatsapp: found.whatsapp || '',
-        contactEmail: found.contactEmail || found.email || '',
-        website: found.website || found.social || '',
-        facebook: found.facebook || '',
-        social: found.social || found.website || '',
-        startingPrice: typeof found.startingPrice === 'string' ? found.startingPrice : (found.priceFrom || ''),
-        deliveryMode: found.deliveryMode || found.delivery || '',
-        degrees: found.degrees || '',
-        certifications: found.certifications || '',
-        memberships: found.memberships || '',
-        clearance: found.clearance || '',
-        availabilityNotes: found.availabilityNotes || '',
-        tags: Array.isArray(found.tags) ? found.tags : [],
-        ageGroups: Array.isArray(found.ageGroups) ? found.ageGroups : [],
-        availabilityDays: Array.isArray(found.availabilityDays) ? found.availabilityDays : [],
-        services: Array.isArray(found.services) ? found.services : [],
-        reviews: found.reviews || { average: 0, count: 0, items: [] },
-      };
+      return normalizeApiProfile(found);
     }
     return null;
   } catch { return null; }
@@ -131,10 +106,17 @@ function findMemberProfile(id) {
 
 function normalizeApiProfile(found) {
   if (!found) return null;
+  const profileId = found.userId || found.id;
+  let localPhoto = null;
+  try {
+    localPhoto = profileId ? localStorage.getItem(`sah_photo_${profileId}`) : null;
+  } catch {}
+  const photo = found.profilePhoto || found.photo || found.image || localPhoto || null;
+
   return {
     ...found,
-    id: found.userId || found.id,
-    userId: found.userId || found.id,
+    id: profileId,
+    userId: profileId,
     name: found.name || found.fullName || '',
     bio: found.bio || '',
     primaryCategory: found.primaryCategory || found.category || '',
@@ -155,9 +137,9 @@ function normalizeApiProfile(found) {
     certifications: found.certifications || '',
     memberships: found.memberships || '',
     clearance: found.clearance || '',
-    image: found.image || found.profilePhoto || null,
-    photo: found.photo || found.profilePhoto || null,
-    profilePhoto: found.profilePhoto || found.photo || found.image || null,
+    image: photo,
+    photo,
+    profilePhoto: photo,
     tier: found.tier || found.plan || found.listingPlan || 'free',
     listingPlan: found.listingPlan || found.plan || found.tier || 'free',
     tags: found.tags || (found.subjects ? String(found.subjects).split(',').map(s => s.trim()).filter(Boolean) : []),
@@ -485,11 +467,12 @@ const injectStyles = () => {
     .pv2-right-actions-col {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      justify-content: space-between;
+      align-items: stretch;
+      justify-content: center;
+      gap: 10px;
       flex-shrink: 0;
-      width: 200px;
-      padding-left: 32px;
+      width: 230px;
+      padding-left: 34px;
       border-left: 1px solid rgba(255,255,255,0.1);
     }
 
@@ -538,6 +521,17 @@ const injectStyles = () => {
       margin-bottom: 0;
       letter-spacing: 0.2px;
     }
+    .pv2-offer-summary {
+      max-width: 580px;
+      margin: 14px 0 0;
+      color: rgba(255,255,255,0.78);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .pv2-offer-summary strong {
+      color: #fff;
+      font-weight: 800;
+    }
     .pv2-price-badge {
       display: inline-flex; align-items: center; gap: 7px;
       background: ${ORANGE}; color: #fff;
@@ -565,19 +559,21 @@ const injectStyles = () => {
     .pv2-rating-stars { color: ${ORANGE}; font-size: 1.1rem; letter-spacing: 2px; }
     .pv2-rating-sub { font-size: 0.8rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
     .pv2-share-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; border-radius: 8px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      min-height: 38px;
+      padding: 10px 16px; border-radius: 8px;
       border: 1.5px solid rgba(255,255,255,0.45); background: rgba(255,255,255,0.08);
-      color: #fff; font-size: 0.88rem; font-weight: 600;
+      color: #fff; font-size: 0.86rem; font-weight: 700;
       cursor: pointer; font-family: inherit;
       transition: background 0.15s;
-      white-space: nowrap;
+      text-align: center;
     }
     .pv2-share-btn:hover { background: rgba(255,255,255,0.2); }
 
     .pv2-member-profile .pv2-right {
       min-height: 230px;
-      max-width: 960px;
+      max-width: 1020px;
       margin: 0 auto;
     }
     .pv2-member-profile .pv2-right-content {
@@ -590,14 +586,15 @@ const injectStyles = () => {
       justify-content: center;
     }
     .pv2-member-profile .pv2-right-info-col {
-      padding: 0 28px;
+      padding: 0 30px;
       justify-content: center;
       gap: 28px;
     }
     .pv2-member-profile .pv2-right-actions-col {
-      width: 170px;
-      padding-left: 24px;
-      justify-content: flex-start;
+      width: 225px;
+      padding-left: 28px;
+      justify-content: center;
+      gap: 10px;
     }
     .pv2-member-profile .pv2-avatar,
     .pv2-member-profile .pv2-avatar-placeholder {
@@ -609,8 +606,13 @@ const injectStyles = () => {
     .pv2-member-profile .pv2-name { font-size: 2rem; }
     .pv2-member-profile .pv2-meta-strip { gap: 6px 22px; }
     .pv2-member-profile .pv2-meta-item { font-size: 0.86rem; }
+    .pv2-member-profile .pv2-offer-summary {
+      max-width: 520px;
+      font-size: 0.84rem;
+      margin-top: 10px;
+    }
     .pv2-member-profile .pv2-share-btn {
-      padding: 9px 16px;
+      padding: 9px 14px;
       font-size: 0.8rem;
     }
 
@@ -623,12 +625,15 @@ const injectStyles = () => {
       margin-top: 4px;
     }
     .pv2-contact-toggle {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      min-height: 42px;
       padding: 13px 16px; cursor: pointer;
       font-size: 0.85rem; font-weight: 700; color: #fff;
       background: rgba(0,0,0,0.4); border: none; width: 100%;
       font-family: inherit; transition: background 0.15s;
       letter-spacing: 0.2px;
+      text-align: center;
     }
     .pv2-contact-toggle:hover { background: rgba(0,0,0,0.6); }
     .pv2-contact-toggle i.arrow { transition: transform 0.2s; font-size: 0.7rem; color: rgba(255,255,255,0.7); }
@@ -649,7 +654,8 @@ const injectStyles = () => {
     .pv2-upgrade-note {
       background: rgba(85,118,145,0.2); border: 1px solid rgba(85,118,145,0.45);
       border-radius: 8px; padding: 12px 16px; margin-top: 4px;
-      font-size: 0.8rem; color: rgba(255,255,255,0.8); text-align: center;
+      font-size: 0.78rem; color: rgba(255,255,255,0.82); text-align: center;
+      line-height: 1.35;
     }
     .pv2-upgrade-note strong { color: #b7d5ea; }
 
@@ -702,6 +708,42 @@ const injectStyles = () => {
       padding: 40px 36px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
+    .pv2-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(18, 28, 39, 0.62);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .pv2-modal-overlay .pv2-enquiry-section {
+      width: min(960px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 24px 70px rgba(0,0,0,0.26);
+    }
+    .pv2-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+    .pv2-modal-close:hover { background: #f8f8f8; }
     .pv2-enquiry-header {
       text-align: center;
       margin-bottom: 28px;
@@ -784,6 +826,9 @@ const injectStyles = () => {
       .pv2-right-info-col {
         padding: 0;
         gap: 16px;
+      }
+      .pv2-offer-summary {
+        max-width: 100%;
       }
       .pv2-right-actions-col {
         align-items: flex-start;
@@ -1049,6 +1094,38 @@ const Profile = () => {
   const tier = profile.listingPlan || profile.tier || 'free';
   const isPaid = tier === 'pro' || tier === 'featured';
   const isMemberProfile = profile.profileKind === 'member' || profile.primaryCategory === 'Member Profile' || profile.category === 'Member Profile';
+  const serviceCards = (profile.services || []).map((svc) => {
+    if (typeof svc === 'string') return svc;
+    return {
+      ...svc,
+      description: isPaid ? svc.description : '',
+    };
+  });
+  const cleanText = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+  const compactList = (items, limit = 3) => [...new Set(items.map(cleanText).filter(Boolean))].slice(0, limit);
+  const serviceSummary = (() => {
+    const serviceTitles = compactList(serviceCards.map((svc) => (
+      typeof svc === 'string' ? svc : svc.title || svc.serviceTitle
+    )));
+    const subjects = compactList(serviceCards.flatMap((svc) => {
+      if (typeof svc === 'string') return [];
+      if (Array.isArray(svc.subjects)) return svc.subjects;
+      return String(svc.subjects || '').split(',');
+    }));
+    const tags = compactList(profile.tags || [], 2);
+    const ages = compactList(profile.ageGroups || [], 2);
+    const focus = serviceTitles.length ? serviceTitles : (tags.length ? tags : [profile.primaryCategory || profile.category]);
+    const delivery = cleanText(profile.deliveryMode || profile.delivery);
+    const parts = [];
+
+    if (focus.length) parts.push(`Offers ${focus.join(', ')}`);
+    if (subjects.length) parts.push(`with support in ${subjects.join(', ')}`);
+    if (ages.length) parts.push(`for ages ${ages.join(', ')}`);
+    if (delivery) parts.push(`via ${delivery}`);
+
+    const summary = parts.join(' ');
+    return summary ? `${summary}.` : '';
+  })();
 
   const ratingStars = (r) => {
     if (!r) return '';
@@ -1068,10 +1145,6 @@ const Profile = () => {
         }}>
           <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 32px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <button onClick={handleBack} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', color: 'rgba(255,255,255,0.88)', fontSize: '0.88rem', fontWeight: 600, cursor: 'pointer', padding: '6px 0', fontFamily: 'inherit' }}>
-                <i className="fas fa-arrow-left" /> Back to Dashboard
-              </button>
-              <span style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.28)', margin: '0 16px' }} />
               <img
                 src="/parentals-logo-header.png"
                 alt="Parentals"
@@ -1095,7 +1168,7 @@ const Profile = () => {
       <main id="profilePageV2" className={isMemberProfile ? 'pv2-member-profile' : ''}>
         <div className="pv2-inner">
           <Link to="/#sah-providers" className="pv2-directory-back">
-            <i className="fas fa-arrow-left" /> Back to Directory
+            <i className="fas fa-arrow-left" /> Directory
           </Link>
 
           {/* ── TOP GRID ── */}
@@ -1126,11 +1199,16 @@ const Profile = () => {
                   <div>
                     <h1 className="pv2-name">{profile.name}</h1>
                     <p className="pv2-tagline">{profile.primaryCategory || profile.category || ''}</p>
+                    {serviceSummary && !isMemberProfile && (
+                      <p className="pv2-offer-summary">
+                        <strong>What we offer:</strong> {serviceSummary}
+                      </p>
+                    )}
                   </div>
 
                   {/* Middle: price + meta */}
                   <div>
-                    {profile.startingPrice && profile.startingPrice !== 'Contact' && (
+                    {isPaid && profile.startingPrice && profile.startingPrice !== 'Contact' && (
                       <div className="pv2-price-badge" style={{ alignSelf: 'flex-start', marginBottom: 18 }}>
                         <i className="fas fa-tag" /> From {profile.startingPrice || profile.priceFrom}
                       </div>
@@ -1168,28 +1246,34 @@ const Profile = () => {
                   <button className="pv2-share-btn" onClick={shareProfile}>
                     <i className="fas fa-share-alt" /> Share Profile
                   </button>
+                  {fromDashboard && (
+                    <button className="pv2-share-btn" onClick={handleBack}>
+                      Dashboard
+                    </button>
+                  )}
 
-                  {isPaid ? (
+                  {!isMemberProfile ? (
                     <button
                       className="pv2-contact-toggle"
-                      onClick={() => document.getElementById('pv2-get-in-touch')?.scrollIntoView({ behavior: 'smooth' })}
+                      onClick={() => setContactOpen(true)}
                       style={{ width: '100%', borderRadius: 8 }}
                     >
-                      <span><i className="fas fa-address-book" style={{ marginRight: 8, color: ORANGE }} />Contact Details</span>
-                      <i className="fas fa-arrow-down" style={{ fontSize: '0.8rem' }} />
+                      <span><i className="fas fa-paper-plane" style={{ marginRight: 8, color: ORANGE }} />{isPaid ? 'Get in Touch' : 'Contact via Parental\'s'}</span>
                     </button>
-                  ) : !isMemberProfile ? (
+                  ) : null}
+                  {!isPaid && !isMemberProfile && (
                     <div className="pv2-upgrade-note">
                       <i className="fas fa-lock" style={{ marginRight: 6 }} />
-                      Upgrade to <strong>Trusted Provider</strong> to display your contact details.
+                      Direct phone, email, website and pricing are available on <strong>Parental Plus+</strong>.
                     </div>
-                  ) : null}
+                  )}
                 </div>
 
               </div>
             </div>
 
             {/* LEFT: Services + About — side by side (order:2) */}
+            {!isMemberProfile && (
             <div className="pv2-left">
 
               {/* What We Offer */}
@@ -1205,9 +1289,9 @@ const Profile = () => {
                   </div>
                 )}
 
-                {profile.services?.length > 0 ? (
+                {serviceCards?.length > 0 ? (
                   <div style={{ marginTop: profile.tags?.length > 0 ? 16 : 0 }}>
-                    {profile.services.map((svc, idx) => {
+                    {serviceCards.map((svc, idx) => {
                       if (typeof svc === 'string') {
                         return <span key={idx} className="pv2-tag" style={{ marginRight: 8, marginBottom: 8, display: 'inline-flex' }}>{svc}</span>;
                       }
@@ -1260,10 +1344,12 @@ const Profile = () => {
               </div>
 
             </div>
+            )}
             {/* ── end pv2-top-grid ── */}
           </div>
 
           {/* ── MIDDLE: Credentials + Availability ── */}
+          {!isMemberProfile && (
           <div className="pv2-mid-row">
             <div className="pv2-card">
               <span className="pv2-eyebrow">Credentials</span>
@@ -1296,6 +1382,7 @@ const Profile = () => {
               </p>
             </div>
           </div>
+          )}
 
           {/* ── Reviews ── */}
           {isPaid && profile.reviews?.items?.length > 0 && (
@@ -1313,13 +1400,36 @@ const Profile = () => {
           )}
 
           {/* ── BOTTOM: Get in Touch ── */}
+          {contactOpen && !isMemberProfile && (
+          <div className="pv2-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pv2-get-in-touch-title" onClick={(e) => { if (e.target === e.currentTarget) setContactOpen(false); }}>
           <div className="pv2-enquiry-section" id="pv2-get-in-touch">
+            <button className="pv2-modal-close" type="button" aria-label="Close" onClick={() => setContactOpen(false)}>
+              <i className="fas fa-times" />
+            </button>
             <div className="pv2-enquiry-header">
-              <h2 className="pv2-heading" style={{ textAlign: 'center', marginBottom: 8, color: '#1a1a1a', fontSize: '1.6rem' }}>Get in Touch</h2>
+              <h2 id="pv2-get-in-touch-title" className="pv2-heading" style={{ textAlign: 'center', marginBottom: 8, color: '#1a1a1a', fontSize: '1.6rem' }}>Get in Touch</h2>
               <p style={{ fontSize: '0.88rem', color: '#777', textAlign: 'center' }}>
-                Fill in your details below and we'll connect you with {profile.name || 'this provider'}.
+                {isPaid
+                  ? `Use the form or direct details below to reach ${profile.name || 'this provider'}.`
+                  : `Fill in your details below and we'll relay your enquiry to ${profile.name || 'this provider'}.`}
               </p>
             </div>
+
+            {isPaid && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
+                {[
+                  { icon: 'fa-phone', label: 'Phone', value: profile.phone, href: profile.phone ? `tel:${profile.phone}` : '' },
+                  { icon: 'fa-whatsapp', label: 'WhatsApp', value: profile.whatsapp || profile.phone, href: (profile.whatsapp || profile.phone) ? `https://wa.me/${String(profile.whatsapp || profile.phone).replace(/\D/g, '')}` : '' },
+                  { icon: 'fa-envelope', label: 'Email', value: profile.contactEmail, href: profile.contactEmail ? `mailto:${profile.contactEmail}` : '' },
+                  { icon: 'fa-globe', label: 'Website', value: profile.website, href: profile.website },
+                ].filter(item => item.value).map(item => (
+                  <a key={item.label} href={item.href} target={item.label === 'Website' || item.label === 'WhatsApp' ? '_blank' : undefined} rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 8, background: '#fff', border: '1px solid rgba(0,0,0,0.1)', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, minWidth: 0 }}>
+                    <i className={`fas ${item.icon}`} style={{ color: ORANGE, flexShrink: 0 }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.value}</span>
+                  </a>
+                ))}
+              </div>
+            )}
 
             <div className="pv2-enquiry-grid">
               <div className="pv2-enquiry-field">
@@ -1361,7 +1471,7 @@ const Profile = () => {
               <button
                 className="pv2-enquiry-send-btn"
                 style={{ width: 'auto', paddingLeft: 40, paddingRight: 40 }}
-                onClick={() => alert('Enquiry sent! (Demo)')}
+                onClick={() => { alert('Enquiry sent! (Demo)'); setContactOpen(false); }}
               >
                 <i className="fas fa-paper-plane" /> Get in Touch
               </button>
@@ -1373,6 +1483,8 @@ const Profile = () => {
               )}
             </div>
           </div>
+          </div>
+          )}
 
         </div>
       </main>

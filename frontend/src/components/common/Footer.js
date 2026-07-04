@@ -47,7 +47,7 @@ const FOOTER_CSS = `
   }
   .sah-footer-brand-mark img {
     display: block;
-    width: 116px;
+    width: 190px;
     max-width: 42vw;
     height: auto;
     filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22));
@@ -248,10 +248,10 @@ const Footer = () => {
             <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
               <img src="/parentals-footer-logo.png" alt="Parentals" />
             </Link>
-            <Link to="/" className="sah-footer-logo">SA Homeschooling Directory</Link>
+            <Link to="/" className="sah-footer-logo">Parental's</Link>
             <p>
-              Connecting South African homeschooling families with verified tutors,
-              therapists, curriculum providers and education specialists nationwide.
+              Helping South African families discover trusted products, services and
+              professionals for every stage of parenting.
             </p>
             <div className="sah-footer-newsletter">
               <div className="sah-footer-newsletter-row">
@@ -275,10 +275,10 @@ const Footer = () => {
           <div className="sah-footer-col">
             <h4>For Families</h4>
             <ul>
-              <li><a href="/#sah-providers">Find a Tutor</a></li>
-              <li><a href="/#sah-providers">Browse Curriculum</a></li>
-              <li><a href="/#sah-providers">Therapists</a></li>
-              <li><a href="/#sah-providers">Online Schools</a></li>
+              <li><a href="/#sah-providers">Education</a></li>
+              <li><a href="/#sah-providers">Wellness</a></li>
+              <li><a href="/#sah-providers">Activities</a></li>
+              <li><a href="/#sah-providers">Family Shops</a></li>
             </ul>
           </div>
 
@@ -286,19 +286,19 @@ const Footer = () => {
           <div className="sah-footer-col">
             <h4>For Providers</h4>
             <ul>
-              <li><a href="/#sah-list">List a Service</a></li>
-              <li><a href="/#sah-list">Pricing Plans</a></li>
+              <li><a href="/#sah-list">Create a Listing</a></li>
+              <li><a href="/#sah-list">Parental Plus+</a></li>
               <li><Link to="/login">Provider Login</Link></li>
               <li><a href="/#sah-how">Verification Process</a></li>
             </ul>
           </div>
 
-          {/* SA Homeschooling */}
+          {/* Parental's */}
           <div className="sah-footer-col">
-            <h4>SA Homeschooling</h4>
+            <h4>Parental's</h4>
             <ul>
               <li><a href="https://sahomeschooling.com" target="_blank" rel="noreferrer">Magazine</a></li>
-              <li><Link to="/about">About the Directory</Link></li>
+              <li><Link to="/about">About Parental's</Link></li>
               <li><Link to="/contact">Contact Us</Link></li>
               <li>
                 <a href="https://sahomeschooling.com/privacy-policy-for-sa-homeschooling-beyond/" target="_blank" rel="noreferrer">
@@ -312,9 +312,9 @@ const Footer = () => {
         {/* ── Trust strip + office ── */}
         <div className="sah-footer-trust">
           {[
-            ['fa-shield-alt', 'All providers manually verified'],
+            ['fa-shield-alt', 'Listings reviewed with parents in mind'],
             ['fa-lock',       'Secure & private enquiries'],
-            ['fa-star',       '4.9 average provider rating'],
+            ['fa-star',       'Curated, relevant results'],
           ].map(([ic, txt]) => (
             <div key={txt} className="sah-footer-trust-item">
               <i className={`fas ${ic}`} /> {txt}
@@ -331,7 +331,7 @@ const Footer = () => {
 
         {/* ── Bottom bar ── */}
         <div className="sah-footer-bottom">
-          <p>&copy; 2025 SA Homeschooling Directory. All rights reserved.</p>
+          <p>&copy; 2025 Parental's. All rights reserved.</p>
 
           <div className="sah-footer-bottom-links">
             <a href="https://sahomeschooling.com/privacy-policy-for-sa-homeschooling-beyond/" target="_blank" rel="noreferrer">

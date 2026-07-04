@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { API_BASE_URL } from '../services/api';
+import { apiRequest } from '../services/api';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -52,7 +52,7 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-step-card-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
 .sah-step-card-head p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
 .sah-step-card-body { padding: 32px 36px 28px; overflow: visible; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
-.sah-plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.sah-plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 760px; margin: 0 auto 28px; }
 .sah-plan-card { border: 2px solid rgba(0,0,0,0.10); border-radius: var(--radius-lg); background: var(--card-white); cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
 .sah-plan-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .sah-plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.18), var(--shadow-md); }
@@ -223,7 +223,6 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
   .sah-file-upload-zone { padding: 12px; }
 }`; 
 // ── Config ────────────────────────────────────────────────────────────────────
-const API_URL = `${API_BASE_URL}/api`;
 const MAX_TOTAL_UPLOAD_MB = 10;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
@@ -242,49 +241,34 @@ const TOTAL = STEPS.length;
 
 const PLANS = [
   {
-    id: 'free', name: 'Community Member', desc: 'Basic profile — always free', price: 'R0',
-    param: 'Free Listing – basic profile',
+    id: 'free', name: 'Community Member', desc: 'Basic visibility for parent-focused providers', price: 'R0',
+    param: 'Free Listing - basic profile',
     features: [
-      { t: 'Public profile listing', y: true },
-      { t: '1 service category', y: true },
-      { t: 'Basic contact form', y: true },
+      { t: 'Basic profile listing', y: true },
+      { t: 'Appears in search results', y: true },
+      { t: 'Contact via Parental\'s form', y: true },
+      { t: 'No pricing or website links', y: false },
       { t: 'Direct contact details visible', y: false },
-      { t: 'Featured placement', y: false },
     ],
-    cta: 'Get Started Free',
+    cta: 'Get Started for Free',
   },
   {
-    id: 'pro', name: 'Trusted Provider', desc: 'Full profile + direct contact details', price: 'R149',
-    param: 'Professional Listing – R149/month (full contact, direct enquiries)',
+    id: 'pro', name: 'Parental Plus+', desc: 'Discounted to R149/month for the first 12 months', price: 'R149',
+    param: 'Parental Plus+ - R149/month introductory offer',
     highlight: true,
     features: [
-      { t: 'Everything in Community', y: true },
-      { t: 'Direct phone & email visible', y: true },
-      { t: 'Up to 3 service categories', y: true },
-      { t: 'Verified badge on profile', y: true },
-      { t: 'Priority in search results', y: true },
+      { t: 'Full provider profile', y: true },
+      { t: 'Direct phone, email, WhatsApp & website', y: true },
+      { t: 'Pricing, availability and reviews', y: true },
+      { t: 'Priority placement in results', y: true },
+      { t: 'Up to 3 services listed', y: true },
+      { t: 'Monthly newsletter inclusion', y: true },
+      { t: '1 Facebook & Instagram post', y: true },
+      { t: '1 native article: 800 words + image', y: true },
     ],
-    cta: 'Start Trusted Plan',
-  },
-  {
-    id: 'featured', name: 'Deluxe Package', desc: '3-month campaign · maximum exposure', price: 'R399',
-    param: 'Deluxe Package – R399/month (3-month campaign, max exposure)',
-    features: [
-      { t: '24x Billboard banners', y: true },
-      { t: '24x Leaderboard banners', y: true },
-      { t: '24x Skyscrapers / side panels', y: true },
-      { t: '1x Business listing', y: true },
-      { t: '6x Newsletter banner ads', y: true },
-      { t: '6x Facebook post / reel', y: true },
-      { t: '6x Instagram posts / reels', y: true },
-      { t: '4x Newsletter ad posting', y: true },
-      { t: '2x Full page ad in PDF per magazine', y: true },
-      { t: '1x Native article per month', y: true },
-    ],
-    cta: 'Get the Deluxe Package',
+    cta: 'Start Parental Plus+',
   },
 ];
-
 const PRICING_UNIT_MAP = { 'Hourly': '/hr', 'Per package': '/package', 'Per term': '/term', 'Custom quote': '' };
 const TIME_SLOT_REGEX = /^(\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})(\s*,\s*\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})*$/;
 const ALL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -299,19 +283,18 @@ const EXTRA_SOCIALS = [
 ];
 
 const ALL_CATEGORIES = [
-  'Tutor', 'Therapist', 'Curriculum Provider',
-  'Online / Hybrid School', 'Educational Consultant', 'Extracurricular / Enrichment',
+  'Education & Tutoring', 'Child Wellness & Therapy', 'Learning Resources',
+  'Activities & Enrichment', 'Healthcare', 'Family Shops', 'Everyday Family Services',
 ];
 
 const SECONDARY_CAT_MAP = {
-  'Tutor': 'Tutor',
-  'Therapist': 'Therapist',
-  'Curriculum': 'Curriculum Provider',
-  'School': 'Online / Hybrid School',
-  'Consultant': 'Educational Consultant',
-  'Enrichment': 'Extracurricular / Enrichment',
+  'Tutor': 'Education & Tutoring',
+  'Therapist': 'Child Wellness & Therapy',
+  'Curriculum': 'Learning Resources',
+  'School': 'Activities & Enrichment',
+  'Consultant': 'Everyday Family Services',
+  'Enrichment': 'Activities & Enrichment',
 };
-
 // ── Password strength helper ──────────────────────────────────────────────────
 const getPasswordStrength = (pw) => {
   if (!pw) return { score: 0, label: '', color: '', pct: 0 };
@@ -330,20 +313,18 @@ const getPasswordStrength = (pw) => {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const planToTier = (param) => {
-  if (param?.includes('R399') || param?.includes('Deluxe')) return 'featured';
-  if (param?.includes('R149') || param?.includes('Professional')) return 'pro';
+  if (param?.includes('R149') || param?.includes('Plus+')) return 'pro';
   return 'free';
 };
 
 const catToSlug = (cat) => {
   const m = {
-    'Tutor': 'tutor', 'Therapist': 'therapist', 'Curriculum Provider': 'curriculum',
-    'Online / Hybrid School': 'school', 'Educational Consultant': 'consultant',
-    'Extracurricular / Enrichment': 'extracurricular',
+    'Education & Tutoring': 'education', 'Child Wellness & Therapy': 'wellness', 'Learning Resources': 'education',
+    'Activities & Enrichment': 'activities', 'Healthcare': 'healthcare', 'Family Shops': 'shopping',
+    'Everyday Family Services': 'family',
   };
-  return m[cat] || 'tutor';
+  return m[cat] || 'family';
 };
-
 const formatBytes = (bytes) => {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -368,6 +349,9 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
         accountType: 'provider',
         name: fullName,
         password: password || '',
+        profilePhoto: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
+        photo: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
+        image: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
         registered: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
       });
@@ -381,6 +365,11 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
       localStorage.setItem('sah_providers', JSON.stringify(providers));
     }
 
+    const providerPhoto = newProvider.profilePhoto || newProvider.photo || newProvider.image || null;
+    if (providerPhoto) {
+      localStorage.setItem(`sah_photo_${userId}`, providerPhoto);
+    }
+
     // sah_auth_logs
     const authLogs = JSON.parse(localStorage.getItem('sah_auth_logs') || '[]');
     authLogs.unshift({
@@ -390,7 +379,16 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
     localStorage.setItem('sah_auth_logs', JSON.stringify(authLogs.slice(0, 500)));
 
     // session
-    const sessionUser = { role: 'client', email: email.toLowerCase(), id: userId, name: fullName, plan: tier };
+    const sessionUser = {
+      role: 'client',
+      email: email.toLowerCase(),
+      id: userId,
+      name: fullName,
+      plan: tier,
+      profilePhoto: providerPhoto,
+      photo: providerPhoto,
+      image: providerPhoto,
+    };
     localStorage.setItem('sah_current_user', JSON.stringify(sessionUser));
     localStorage.setItem('sah_user', JSON.stringify(sessionUser));
     localStorage.setItem('sah_token', token || ('local_' + userId));
@@ -742,7 +740,7 @@ const Registration = () => {
       linkedin: data.linkedin || '', instagram: data.instagram || '',
       facebook: data.facebook || '', tiktok: data.tiktok || '',
       twitter: data.twitter || '', youtube: data.youtube || '',
-      image: data.profilePhoto || null, photo: data.profilePhoto || null,
+      image: data.profilePhoto || null, photo: data.profilePhoto || null, profilePhoto: data.profilePhoto || null,
       rating: null, reviewCount: 0,
       reviews: { average: 0, count: 0, items: [] },
       listingPublic: true, publicToggle: true,
@@ -764,25 +762,13 @@ const Registration = () => {
 
     // ── Try real API ─────────────────────────────────────────────────────────
     try {
-      const registerResponse = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailLower,
-          password: data.password,
-          role: 'PROVIDER',
-          name: data.fullName,
-          accountType: data.accountType || 'Individual Provider',
-        }),
+      const userData = await apiRequest('POST', '/api/auth/register', {
+        email: emailLower,
+        password: data.password,
+        role: 'PROVIDER',
+        name: data.fullName,
+        accountType: data.accountType || 'Individual Provider',
       });
-
-      if (registerResponse.status === 409) {
-        console.warn('409 from API — falling through to localStorage-only registration');
-      } else if (!registerResponse.ok) {
-        const errData = await registerResponse.json().catch(() => ({}));
-        console.warn('Register API error:', errData.message);
-      } else {
-        const userData = await registerResponse.json().catch(() => ({}));
         const dbUserId = userData?.user?.id || userData?.userId || providerId;
 
         const formData = new FormData();
@@ -823,15 +809,13 @@ const Registration = () => {
           clearanceText: data.clearanceText || null,
           listingPlan: tier,
           languages: data.languages || [],
+          profilePhoto: data.profilePhoto || null,
         }));
 
         certFiles.forEach((f, i) => formData.append(`certFile_${i}`, f.file));
         clearanceFiles.forEach((f, i) => formData.append(`clearanceFile_${i}`, f.file));
 
-        const providerRes = await fetch(`${API_URL}/providers`, { method: 'POST', body: formData });
-        if (!providerRes.ok) {
-          console.warn('Provider API failed — will use localStorage');
-        }
+        await apiRequest('POST', '/api/providers', formData);
 
         const sessionUser = saveToLocalStorage({
           userId: dbUserId,
@@ -850,9 +834,13 @@ const Registration = () => {
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
         setTimeout(() => navigate('/provider-dashboard'), 300);
         return;
-      }
     } catch (apiErr) {
-      console.warn('API unreachable, using localStorage fallback:', apiErr.message);
+      if (apiErr.status === 409) {
+        setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
+        setSubmitting(false);
+        return;
+      }
+      console.warn('Provider registration API failed, using localStorage fallback:', apiErr.message);
     }
 
     // ── localStorage-only fallback ───────────────────────────────────────────
@@ -1418,7 +1406,7 @@ const Registration = () => {
         <div className="sah-terms-box-head" onClick={() => setTermsOpen(o => !o)}>
           <div className="sah-terms-box-head-title">
             <i className="fas fa-file-contract" />
-            SA Homeschooling Services Directory — Terms & Community Guidelines
+            Parental's Directory — Terms & Community Guidelines
           </div>
           <button type="button" className="sah-terms-view-btn"
             onClick={e => { e.stopPropagation(); setTermsOpen(o => !o); }}>
@@ -1431,9 +1419,9 @@ const Registration = () => {
           <h4>1. Eligibility & Accuracy</h4>
           <p>By registering as a service provider, you confirm that all information provided is accurate, current, and complete. You must be at least 18 years of age or represent a legally registered organisation.</p>
           <h4>2. Listing Standards</h4>
-          <p>Your listing must represent genuine educational or support services relevant to the homeschooling community. Listings that are misleading, fraudulent, or offensive will be removed without notice.</p>
+          <p>Your listing must represent genuine products, services or professional support relevant to parents and families. Listings that are misleading, fraudulent, or offensive will be removed without notice.</p>
           <h4>3. Qualifications & Credentials</h4>
-          <p>Any qualifications, certifications, police clearances, or memberships listed must be legitimate and verifiable upon request. SA Homeschooling reserves the right to request proof of credentials at any time.</p>
+          <p>Any qualifications, certifications, police clearances, or memberships listed must be legitimate and verifiable upon request. Parental's reserves the right to request proof of credentials at any time.</p>
           <h4>4. Conduct & Community Standards</h4>
           <ul>
             <li>Treat all families and platform users with respect.</li>
@@ -1443,11 +1431,11 @@ const Registration = () => {
           <h4>5. Privacy & Data Use</h4>
           <p>Information you provide will be stored and used to create and display your public provider profile. Contact information will be shared with families according to your selected plan. We do not sell personal data to third parties.</p>
           <h4>6. Profile Approval</h4>
-          <p>All new profiles are subject to admin review before going live. SA Homeschooling reserves the right to reject or remove any listing that does not meet our community standards.</p>
+          <p>All new profiles are subject to admin review before going live. Parental's reserves the right to reject or remove any listing that does not meet our community standards.</p>
           <h4>7. Paid Plans & Billing</h4>
           <p>Paid listing plans are billed monthly. Cancellation can be requested at any time with effect from the next billing cycle. Refunds are not provided for partial months.</p>
           <h4>8. Liability</h4>
-          <p>SA Homeschooling acts as a directory platform and is not responsible for the quality, safety, or outcome of services provided by listed providers. Families are encouraged to conduct their own due diligence.</p>
+          <p>Parental's acts as a directory platform and is not responsible for the quality, safety, or outcome of services provided by listed businesses or providers. Families are encouraged to conduct their own due diligence.</p>
           <h4>9. Amendments</h4>
           <p>These terms may be updated periodically. Continued use of the platform constitutes acceptance of the updated terms.</p>
           <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--muted)' }}>Last updated: January 2025</p>
@@ -1526,7 +1514,7 @@ const Registration = () => {
           <button className="sah-rhdr-back" onClick={() => navigate('/')} style={{ marginBottom: 18 }}>
             <i className="fas fa-arrow-left" /> Back to Directory
           </button>
-          <h1 className="sah-reg-hero-title">Become a <em>Trusted Provider</em></h1>
+          <h1 className="sah-reg-hero-title">List on <em>Parental's</em></h1>
           <div className="sah-step-trail">
             {STEPS.map((s, i) => {
               const n = i + 1;
@@ -1593,4 +1581,5 @@ const Registration = () => {
 };
 
 export default Registration;
+
 

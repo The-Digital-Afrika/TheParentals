@@ -86,8 +86,8 @@ function normalizeUserForAdmin(u) {
 /* ── Package pricing config — must match Registration.js exactly ── */
 const PACKAGE_CONFIG = {
   community: { label: 'Community',         tier: 'free',     price: 0,    color: '#6b7280', bg: '#f9fafb', badge: 'community' },
-  trusted:   { label: 'Trusted Provider',  tier: 'pro',      price: 149,  color: '#1d4ed8', bg: '#eff6ff', badge: 'pro'       },
-  deluxe:    { label: 'Deluxe Provider',   tier: 'featured', price: 399,  color: '#d97706', bg: '#fffbeb', badge: 'featured'  },
+  trusted:   { label: 'Parental Plus+',    tier: 'pro',      price: 149,  color: '#1d4ed8', bg: '#eff6ff', badge: 'pro'       },
+  deluxe:    { label: 'Parental Plus+',    tier: 'featured', price: 149,  color: '#d97706', bg: '#fffbeb', badge: 'featured'  },
 };
 
 /* ── Date helpers ── */
@@ -1787,8 +1787,7 @@ const AdminDashboard = () => {
                   value={revenueSearch} onChange={e => setRevenueSearch(e.target.value)} />
                 <select className="adm-filter-select" value={revenuePkgFilter} onChange={e => setRevenuePkgFilter(e.target.value)}>
                   <option value="ALL">All Paid Packages</option>
-                  <option value="trusted">Trusted Provider</option>
-                  <option value="deluxe">Deluxe Provider</option>
+                  <option value="trusted">Parental Plus+ Intro</option>
                 </select>
               </div>
               {revenueProviders.length === 0 ? (

@@ -36,9 +36,7 @@ const CSS = `
   .sah-login-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
   .sah-lhdr { position: sticky; top: 0; z-index: 100; height: var(--header-h); background: #6f8da6; box-shadow: 0 2px 12px rgba(18,45,82,0.28); display: flex; align-items: center; flex-shrink: 0; }
   .sah-lhdr-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
-  .sah-lhdr-left { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
-  .sah-lhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 0; text-decoration: none; white-space: nowrap; }
-  .sah-lhdr-back:hover { color: #fff; }
+  .sah-lhdr-left { display: flex; align-items: center; justify-content: center; }
   .sah-lhdr-brand { text-decoration: none; display: flex; align-items: center; }
   .sah-lhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
   .sah-lhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
@@ -58,6 +56,9 @@ const CSS = `
   .sah-login-left-perk { display: flex; align-items: center; gap: 11px; font-size: 0.84rem; font-weight: 600; color: rgba(255,255,255,0.88); }
   .sah-login-left-perk i { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--accent-light); flex-shrink: 0; }
   .sah-login-right { flex: 1; min-width: 0; background: var(--card-white); display: flex; flex-direction: column; justify-content: center; padding: 32px 48px; overflow-y: auto; }
+  .sah-login-back { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; margin-bottom: 18px; color: var(--accent-dark); font-size: 0.82rem; font-weight: 700; text-decoration: none; transition: color 0.15s, transform 0.15s; }
+  .sah-login-back:hover { color: var(--dark); transform: translateX(-2px); }
+  .sah-login-back i { font-size: 0.72rem; }
   .sah-login-heading { font-family: 'Playfair Display', serif; font-size: 1.9rem; font-weight: 800; color: var(--dark); margin-bottom: 3px; line-height: 1.15; }
   .sah-login-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 18px; }
   .sah-login-alert { display: none; padding: 11px 16px; border-radius: 8px; font-weight: 600; font-size: 0.86rem; margin-bottom: 16px; border: 1px solid transparent; }
@@ -184,9 +185,8 @@ const CSS = `
   @media(max-width:480px){
   .sah-login-right { padding: 20px 16px; }
   .sah-lhdr-inner { padding: 0 16px; }
-  .sah-lhdr-back { font-size: 0.72rem; gap: 6px; }
-  .sah-lhdr-back i { font-size: 0.68rem; }
   .sah-lhdr-logo { width:132px; height:88px; max-width:40vw; }
+  .sah-login-back { margin-bottom: 14px; font-size: 0.78rem; }
   .sah-login-card-body { padding: 14px; }
   .sah-login-heading { font-size: 1.5rem; }
 }
@@ -538,9 +538,6 @@ const Login = () => {
             <Link to="/" className="sah-lhdr-brand">
               <img className="sah-lhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
-            <button className="sah-lhdr-back" onClick={() => navigate('/')}>
-              <i className="fas fa-arrow-left" /> Back to Directory
-            </button>
           </div>
           <div className="sah-lhdr-right">
             <Link to="/register" className="sah-lhdr-solid">Register</Link>
@@ -553,16 +550,16 @@ const Login = () => {
           <div className="sah-login-left-bg" />
           <div className="sah-login-left-content">
             <h2 className="sah-login-left-title">
-              South Africa's<br /><em>Homeschooling</em><br />Directory
+              South Africa's<br /><em>Parent-First</em><br />Directory
             </h2>
             <p className="sah-login-left-desc">
-              Connect with verified tutors, therapists, curriculum providers and education specialists nationwide.
+              Discover trusted products, services and professionals for every stage of parenting.
             </p>
             <div className="sah-login-left-perks">
               {[
-                ['fa-shield-alt', 'All providers manually verified'],
+                ['fa-shield-alt', 'Listings reviewed with parents in mind'],
                 ['fa-lock',       'Secure & private enquiries'],
-                ['fa-star',       '4.9 average provider rating'],
+                ['fa-star',       'Curated, relevant results'],
                 ['fa-map-marker-alt', 'Nationwide coverage across all 9 provinces'],
               ].map(([icon, text]) => (
                 <div key={text} className="sah-login-left-perk">
@@ -575,8 +572,11 @@ const Login = () => {
         </div>
 
         <div className="sah-login-right">
+          <Link to="/" className="sah-login-back">
+            <i className="fas fa-arrow-left" /> Back to Directory
+          </Link>
           <h1 className="sah-login-heading">Welcome Back</h1>
-          <p className="sah-login-sub">Sign in to your SA Homeschooling Directory account</p>
+          <p className="sah-login-sub">Sign in to your Parental's account</p>
 
           {alert.msg && (
             <div className={`sah-login-alert show ${alert.type}`}>
@@ -588,7 +588,7 @@ const Login = () => {
           <div className="sah-login-card">
             <div className="sah-login-card-head">
               <h3><i className="fas fa-lock" /> Sign in with your credentials</h3>
-              <p>Access your provider dashboard and manage your listings</p>
+              <p>Access your dashboard and manage your saved searches or listings</p>
             </div>
 
             <div className="sah-login-card-body">

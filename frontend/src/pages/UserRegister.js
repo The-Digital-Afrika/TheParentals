@@ -30,8 +30,9 @@ const CSS = `
   .ur-wrap * { box-sizing:border-box; margin:0; padding:0; }
 
   .ur-hdr { height:140px; background:#6f8da6; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:0 32px; gap:2px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
-  .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.76rem; font-weight:700; background:none; border:none; cursor:pointer; font-family:inherit; }
-  .ur-hdr-back:hover { color:#fff; }
+  .ur-back-link { display:inline-flex; align-items:center; gap:7px; align-self:flex-start; color:var(--acc-d); font-size:0.82rem; font-weight:800; background:none; border:none; cursor:pointer; font-family:inherit; text-decoration:none; margin-bottom:14px; transition:color 0.15s, transform 0.15s; }
+  .ur-back-link:hover { color:var(--dark); transform:translateX(-2px); }
+  .ur-back-link i { font-size:0.72rem; }
   .ur-hdr-brand { color:#fff; text-decoration:none; display:flex; align-items:center; }
   .ur-hdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 
@@ -44,6 +45,7 @@ const CSS = `
   .ur-hero-inner p { font-size:0.88rem; color:rgba(255,255,255,0.72); margin-top:8px; line-height:1.65; }
 
   .ur-body { flex:1; display:flex; align-items:flex-start; justify-content:center; padding:36px 24px 64px; }
+  .ur-body-inner { width:100%; max-width:840px; display:flex; flex-direction:column; align-items:stretch; }
 
   .ur-card { background:var(--white); border-radius:var(--r-lg); box-shadow:var(--shadow); width:100%; max-width:840px; overflow:hidden; }
   .ur-card-head { background:#6f8da6; padding:24px 36px 18px; }
@@ -105,6 +107,7 @@ const CSS = `
     .ur-hdr-logo { width:132px; height:88px; max-width:40vw; }
     .ur-hero-inner { padding:32px 16px; }
     .ur-body { padding:24px 14px 48px; }
+    .ur-back-link { margin-bottom:12px; font-size:0.78rem; }
   }
 `;
 
@@ -289,25 +292,27 @@ const UserRegister = () => {
       <div className="ur-hero">
         <div className="ur-hero-bg" />
         <div className="ur-hero-inner">
-          <button className="ur-hdr-back" onClick={() => navigate('/')} style={{ marginBottom: 18 }}>
-            <i className="fas fa-arrow-left" /> Back to Directory
-          </button>
           <h1>Create Your <em>Free Account</em></h1>
           <p>
-            Join thousands of South Africans discovering verified tutors, therapists,
-            curriculum providers and enrichment services — all in one trusted directory.
+            Join South African families discovering trusted products, services,
+            providers and everyday support — all in one parent-first directory.
           </p>
         </div>
       </div>
 
       <div className="ur-body">
-        <div className="ur-card">
+        <div className="ur-body-inner">
+          <button className="ur-back-link" onClick={() => navigate('/')}>
+            <i className="fas fa-arrow-left" /> Directory
+          </button>
+
+          <div className="ur-card">
           <div className="ur-card-head">
             <h2>
               <i className="fas fa-user-plus" style={{ marginRight: 9, color: 'var(--acc-l)', fontSize: '1.1rem' }} />
               Register Your Account
             </h2>
-            <p>Free access — browse all verified provider profiles instantly</p>
+            <p>Free access — browse trusted parent-focused listings instantly</p>
           </div>
 
           <div className="ur-card-body">
@@ -437,12 +442,12 @@ const UserRegister = () => {
                 <div className="ur-perks">
                   <div className="ur-perks-title">Why create an account?</div>
                   {[
-                    ['fa-search',    'Browse & search all verified service providers'],
-                    ['fa-envelope',  'Send direct enquiries to tutors and therapists'],
+                    ['fa-search',    'Browse & search trusted products and services'],
+                    ['fa-envelope',  'Send direct enquiries to businesses and providers'],
                     ['fa-heart',     'Save and compare your favourite listings'],
-                    ['fa-bell',      'Get notified when new providers join your area'],
+                    ['fa-bell',      'Get notified when new listings join your area'],
                     ['fa-star',      'Leave reviews and help other users choose'],
-                    ['fa-shield-alt','All providers are manually verified for trust'],
+                    ['fa-shield-alt','Listings are reviewed with parents in mind'],
                   ].map(([ic, txt]) => (
                     <div key={txt} className="ur-perk">
                       <i className={`fas ${ic}`} /> {txt}
@@ -459,6 +464,7 @@ const UserRegister = () => {
 
             </div>
           </div>
+        </div>
         </div>
       </div>
 

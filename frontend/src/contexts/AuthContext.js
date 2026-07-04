@@ -4,6 +4,17 @@ import { api } from '../services/api';
 
 const AuthContext = createContext();
 
+const getFriendlyApiError = (err, fallback = 'Network error. Please try again.') => {
+  if (!err) return fallback;
+  if (err.status === 0) {
+    return 'Cannot reach the backend. Confirm the backend is running on port 5000, then refresh and try again.';
+  }
+  if (err.message === 'Failed to fetch') {
+    return 'Cannot reach the backend. Confirm the backend is running on port 5000, then refresh and try again.';
+  }
+  return err.message || fallback;
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -82,7 +93,7 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error('Register error:', err);
-      return { success: false, error: err.status === 409 ? 'email_taken' : (err.message || 'Network error. Please try again.') };
+      return { success: false, error: err.status === 409 ? 'email_taken' : getFriendlyApiError(err) };
     }
   };
 
@@ -120,7 +131,7 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error('Login error:', err);
-      return { success: false, error: err.message || 'Network error. Please try again.' };
+      return { success: false, error: getFriendlyApiError(err) };
     }
   };
 

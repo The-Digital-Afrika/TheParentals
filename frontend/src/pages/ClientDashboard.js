@@ -8,10 +8,8 @@ import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
 import { DAYS_OF_WEEK, PRICING_MODELS, PROVINCES } from '../utils/constants';
 import { getPlanLimits } from '../utils/helpers';
-import { API_BASE_URL, api } from '../services/api';
+import { api, apiRequest } from '../services/api';
 import '../assets/css/dashboard.css'
-
-const API_URL = `${API_BASE_URL}/api`;
 
 /* ─────────────── localStorage helpers ─────────────── */
 function getCurrentUser() {
@@ -235,15 +233,11 @@ const EMPTY_PROFILE = {
 const PLAN_CARDS = [
   {
     id: 'free', name: 'Community Member', desc: 'Basic profile — always free', price: 'R0',
-    features: ['Basic profile information', '1 service listing', 'Contact form only', 'Max 1 service'],
+    features: ['Basic profile information', '1 service listing', 'Contact via Parental\'s form', 'Max 1 service'],
   },
   {
-    id: 'pro', name: 'Trusted Provider', desc: 'Full profile + direct contact details', price: 'R149',
-    features: ['Everything in Community', 'Up to 5 services', 'Direct contact details', 'Phone & WhatsApp visible', 'Max 5 services'],
-  },
-  {
-    id: 'featured', name: 'Featured Partner', desc: 'Homepage placement + analytics', price: 'R399',
-    features: ['Everything in Trusted', 'Homepage featured slot', 'Priority in search results', 'Basic analytics', 'Max 10 services'],
+    id: 'pro', name: 'Parental Plus+', desc: 'Discounted to R149/month for the first 12 months', price: 'R149',
+    features: ['Everything in Community', 'Up to 3 services', 'Direct contact details', 'Pricing and availability visible', 'Newsletter, social post and native article'],
   },
 ];
 const TABS = [
@@ -330,7 +324,7 @@ const DASH_CSS = `
   .cd-plan-badge.free     { background:#f9f9f9; color:#666;    border-color:#e5e5e5; }
   .cd-plan-badge.pro      { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
   .cd-plan-badge.featured { background:#fffbeb; color:#d97706; border-color:#fde68a; }
-  .cd-plan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .cd-plan-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; max-width:760px; margin:0 auto; }
   .cd-plan-card { border:2px solid #e5e0d8; border-radius:11px; padding:17px; background:#fff; position:relative; transition:border-color .18s; }
   .cd-plan-card.is-current { border-color:#6f8da6; background:#f8fcff; }
   .cd-plan-current-badge { position:absolute; top:-1px; right:14px; background:#6f8da6; color:#fff; font-size:0.63rem; font-weight:800; letter-spacing:.8px; text-transform:uppercase; padding:3px 9px; border-radius:0 0 7px 7px; }
@@ -473,11 +467,7 @@ const ClientDashboard = () => {
       // 1. Try API
       if (token && cu.id && !String(token).startsWith('local_')) {
         try {
-          const res = await fetch(`${API_URL}/providers/${cu.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (res.ok) {
-            const dbRow  = await res.json();
+            const dbRow  = await apiRequest('GET', `/api/providers/${cu.id}`, null, token);
             const mapped = mapDbProfileToLocal(dbRow);
 
             // ── FIX: restore locally-saved photo if the API didn't return one ──
@@ -495,7 +485,6 @@ const ClientDashboard = () => {
             saveProviderById({ ...mapped, id: cu.id, userId: cu.id });
             setDataLoading(false);
             return;
-          }
         } catch (err) {
           console.warn('API load failed, falling back to localStorage:', err.message);
         }
@@ -537,7 +526,7 @@ const ClientDashboard = () => {
 
   /* computed */
   const maxServices = (getPlanLimits && getPlanLimits(profileData.plan)?.maxServices)
-    || (profileData.plan === 'featured' ? 10 : profileData.plan === 'pro' ? 5 : 1);
+    || (profileData.plan === 'featured' ? 3 : profileData.plan === 'pro' ? 3 : 1);
   const svcCount    = profileData.services?.length || 1;
   const isPaidPlan  = profileData.plan === 'pro' || profileData.plan === 'featured';
   const planOrder   = { free: 0, pro: 1, featured: 2 };
@@ -845,7 +834,7 @@ const ClientDashboard = () => {
   const handlePlanChange = (p) => {
     upd({ plan: p });
     if (updateUserPlan) updateUserPlan(p);
-    const names = { free: 'Community Member', pro: 'Trusted Provider', featured: 'Featured Partner' };
+    const names = { free: 'Community Member', pro: 'Parental Plus+', featured: 'Parental Plus+' };
     showNotification(`Plan changed to ${names[p] || p}`, 'success');
   };
 
@@ -861,7 +850,7 @@ const ClientDashboard = () => {
   };
 
   /* ─── misc ─── */
-  const getPlanName = () => ({ free: 'Community Member (Free)', pro: 'Trusted Provider (R149/mo)', featured: 'Featured Partner (R399/mo)' }[profileData.plan] || 'Community Member');
+  const getPlanName = () => ({ free: 'Community Member (Free)', pro: 'Parental Plus+ (R149/mo)', featured: 'Parental Plus+' }[profileData.plan] || 'Community Member');
   const statusInfo  = { approved: { cls: 'approved', icon: 'fa-check-circle', label: 'Approved — Live' }, rejected: { cls: 'rejected', icon: 'fa-times-circle', label: 'Rejected' }, pending: { cls: 'pending', icon: 'fa-clock', label: 'Pending Approval' } }[profileData.status] || { cls: 'pending', icon: 'fa-clock', label: 'Pending Approval' };
 
   /* completeness */
@@ -1317,8 +1306,8 @@ const ClientDashboard = () => {
           <div className="cd-card-body">
             <div className="cd-info-note">
               <i className="fas fa-info-circle"></i>
-              {profileData.plan === 'featured' ? 'Featured Partner: up to 10 services.'
-                : profileData.plan === 'pro' ? 'Trusted Provider: up to 5 services.'
+              {profileData.plan === 'featured' ? 'Parental Plus+: up to 3 services.'
+                : profileData.plan === 'pro' ? 'Parental Plus+: up to 3 services.'
                 : 'Free plan: 1 service. Upgrade to add more.'}
             </div>
             {(profileData.services || []).map((svc, idx) => (

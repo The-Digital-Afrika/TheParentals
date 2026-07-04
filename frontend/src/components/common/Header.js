@@ -276,7 +276,7 @@ const Header = ({ userType = 'guest' } = {}) => {
               <nav className="sah-hdr-nav" aria-label="Main navigation">
                 <a href="/#sah-providers">Find Services</a>
                 <a href="/#sah-how">How It Works</a>
-                <a href="/#sah-list">View Packages</a>
+                <a href="/#sah-list">Parental Plus+</a>
                 <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer">
                   Magazine <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.58rem' }} />
                 </a>
@@ -288,11 +288,12 @@ const Header = ({ userType = 'guest' } = {}) => {
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
-                  {/* FIX: clicking the name now goes to dashboard, not /login */}
-                  <Link to={dashboardPath} className="sah-hdr-ghost">
-                    <i className="fas fa-user-circle" />
-                    {displayName}
-                  </Link>
+                  {!isAdmin && (
+                    <Link to={dashboardPath} className="sah-hdr-ghost">
+                      <i className="fas fa-user-circle" />
+                      {displayName}
+                    </Link>
+                  )}
                   <button className="sah-hdr-solid" onClick={handleLogout}>
                     <i className="fas fa-sign-out-alt" /> Log Out
                   </button>
@@ -322,7 +323,7 @@ const Header = ({ userType = 'guest' } = {}) => {
         <Link to="/" onClick={closeMob}><i className="fas fa-home" /> Home</Link>
         <a href="/#sah-providers" onClick={closeMob}><i className="fas fa-search" /> Find Services</a>
         <a href="/#sah-how" onClick={closeMob}><i className="fas fa-info-circle" /> How It Works</a>
-        <a href="/#sah-list" onClick={closeMob}><i className="fas fa-layer-group" /> View Packages</a>
+        <a href="/#sah-list" onClick={closeMob}><i className="fas fa-layer-group" /> Parental Plus+</a>
         <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer" onClick={closeMob}>
           <i className="fas fa-newspaper" /> Magazine
         </a>
