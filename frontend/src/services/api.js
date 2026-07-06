@@ -49,7 +49,7 @@ export const apiRequest = async (method, endpoint, body = null, token = null) =>
       const data = contentType.includes('application/json') ? await res.json().catch(() => ({})) : {};
 
       if (!res.ok) {
-        const shouldTryNext = [404, 405, 500, 502, 503, 504].includes(res.status) && candidates.length > 1;
+        const shouldTryNext = !data.message && !data.error && [404, 405, 500, 502, 503, 504].includes(res.status) && candidates.length > 1;
         if (shouldTryNext) {
           errors.push(`${url} returned ${res.status}`);
           continue;

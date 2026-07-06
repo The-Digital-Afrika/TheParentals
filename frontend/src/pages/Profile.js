@@ -5,6 +5,7 @@ import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
+import { createInquiry } from '../utils/inquiries';
 import '../assets/css/profile.css';
 
 const SEED_PROVIDERS = [
@@ -168,6 +169,14 @@ function normalizeApiProfile(found) {
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const ORANGE = '#6f8da6';
+const EMPTY_ENQUIRY_FORM = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  subject: 'General enquiry',
+  message: '',
+};
 
 /* ── Inject all styles ── */
 const injectStyles = () => {
@@ -509,6 +518,29 @@ const injectStyles = () => {
       font-size: 0.78rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
       white-space: nowrap;
     }
+    .pv2-badge-member {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,0.18); color: #6ee7b7;
+      border: 1px solid rgba(16,185,129,0.42);
+      font-size: 0.78rem; font-weight: 800; padding: 7px 13px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .pv2-member-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .pv2-member-title-row .pv2-name { margin: 0; }
+    .pv2-member-intro {
+      max-width: 560px;
+      margin: 0;
+      color: rgba(255,255,255,0.82);
+      font-size: 1rem;
+      line-height: 1.6;
+      font-weight: 600;
+    }
     .pv2-name {
       font-family: 'Playfair Display', serif;
       font-size: 2.4rem; font-weight: 900; color: #fff;
@@ -524,13 +556,15 @@ const injectStyles = () => {
     .pv2-offer-summary {
       max-width: 580px;
       margin: 14px 0 0;
-      color: rgba(255,255,255,0.78);
-      font-size: 0.9rem;
-      line-height: 1.5;
+      color: rgba(255,255,255,0.9);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      font-weight: 600;
     }
     .pv2-offer-summary strong {
       color: #fff;
       font-weight: 800;
+      font-size: 1.05em;
     }
     .pv2-price-badge {
       display: inline-flex; align-items: center; gap: 7px;
@@ -575,23 +609,24 @@ const injectStyles = () => {
       min-height: 230px;
       max-width: 1020px;
       margin: 0 auto;
+      background: linear-gradient(135deg, #34495b 0%, #2f4354 54%, #243747 100%);
     }
     .pv2-member-profile .pv2-right-content {
       min-height: 230px;
-      padding: 28px 34px;
+      padding: 34px 40px;
     }
     .pv2-member-profile .pv2-right-avatar-col {
-      width: 120px;
-      padding-right: 24px;
+      width: 132px;
+      padding-right: 30px;
       justify-content: center;
     }
     .pv2-member-profile .pv2-right-info-col {
-      padding: 0 30px;
+      padding: 0 34px;
       justify-content: center;
-      gap: 28px;
+      gap: 22px;
     }
     .pv2-member-profile .pv2-right-actions-col {
-      width: 225px;
+      width: 205px;
       padding-left: 28px;
       justify-content: center;
       gap: 10px;
@@ -603,9 +638,16 @@ const injectStyles = () => {
       border-width: 3px;
     }
     .pv2-member-profile .pv2-avatar-placeholder { font-size: 2rem; }
+    .pv2-member-profile .pv2-badges { display: none; }
     .pv2-member-profile .pv2-name { font-size: 2rem; }
-    .pv2-member-profile .pv2-meta-strip { gap: 6px 22px; }
-    .pv2-member-profile .pv2-meta-item { font-size: 0.86rem; }
+    .pv2-member-profile .pv2-meta-strip { gap: 10px; }
+    .pv2-member-profile .pv2-meta-item {
+      font-size: 0.88rem;
+      padding: 8px 11px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
     .pv2-member-profile .pv2-offer-summary {
       max-width: 520px;
       font-size: 0.84rem;
@@ -918,6 +960,9 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
+  const [enquiryForm, setEnquiryForm] = useState(EMPTY_ENQUIRY_FORM);
+  const [enquiryStatus, setEnquiryStatus] = useState('idle');
+  const [enquiryError, setEnquiryError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -1039,15 +1084,6 @@ const Profile = () => {
     return () => { cancelled = true; };
   }, [searchParams]);
 
-  const shareProfile = () => {
-    if (navigator.share) {
-      navigator.share({ title: profile?.name, url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
-    }
-  };
-
   const handleBack = () => {
     const isMember = profile?.profileKind === 'member' || profile?.primaryCategory === 'Member Profile' || profile?.category === 'Member Profile';
     if (fromDashboard) navigate(isMember ? '/client-dashboard' : '/provider-dashboard');
@@ -1058,6 +1094,61 @@ const Profile = () => {
     logout();
     setIsAuthenticated(false);
     navigate('/');
+  };
+
+  const closeContactModal = () => {
+    setContactOpen(false);
+    setEnquiryStatus('idle');
+    setEnquiryError('');
+  };
+
+  const updateEnquiryField = (field, value) => {
+    setEnquiryForm(prev => ({ ...prev, [field]: value }));
+    if (enquiryError) setEnquiryError('');
+    if (enquiryStatus === 'sent') setEnquiryStatus('idle');
+  };
+
+  const handleEnquirySubmit = (event) => {
+    event.preventDefault();
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryForm.email.trim());
+    if (!enquiryForm.firstName.trim() || !enquiryForm.lastName.trim() || !emailOk || !enquiryForm.message.trim()) {
+      setEnquiryError('Please complete your name, a valid email address, and your message.');
+      return;
+    }
+
+    setEnquiryStatus('sending');
+    setEnquiryError('');
+
+    try {
+      const currentUser = (() => {
+        try {
+          return JSON.parse(localStorage.getItem('sah_current_user') || localStorage.getItem('sah_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+
+      createInquiry({
+        providerId: profile.id || profile.userId || '',
+        providerUserId: profile.userId || profile.id || '',
+        providerName: profile.name || '',
+        clientId: currentUser?.id || '',
+        clientName: `${enquiryForm.firstName.trim()} ${enquiryForm.lastName.trim()}`.trim(),
+        clientEmail: enquiryForm.email.trim(),
+        clientPhone: enquiryForm.phone.trim(),
+        subject: enquiryForm.subject,
+        message: enquiryForm.message.trim(),
+        category: profile.primaryCategory || profile.category || '',
+      });
+
+      setEnquiryStatus('sent');
+      setEnquiryForm(EMPTY_ENQUIRY_FORM);
+    } catch (error) {
+      console.error('Enquiry submit failed:', error);
+      setEnquiryStatus('idle');
+      setEnquiryError('We could not save your enquiry right now. Please try again.');
+    }
   };
 
   if (loading) return (
@@ -1112,16 +1203,11 @@ const Profile = () => {
       if (Array.isArray(svc.subjects)) return svc.subjects;
       return String(svc.subjects || '').split(',');
     }));
-    const tags = compactList(profile.tags || [], 2);
-    const ages = compactList(profile.ageGroups || [], 2);
-    const focus = serviceTitles.length ? serviceTitles : (tags.length ? tags : [profile.primaryCategory || profile.category]);
-    const delivery = cleanText(profile.deliveryMode || profile.delivery);
+    const focus = serviceTitles.length ? serviceTitles : compactList(profile.tags || [], 2);
     const parts = [];
 
-    if (focus.length) parts.push(`Offers ${focus.join(', ')}`);
+    if (focus.length) parts.push(focus.join(', '));
     if (subjects.length) parts.push(`with support in ${subjects.join(', ')}`);
-    if (ages.length) parts.push(`for ages ${ages.join(', ')}`);
-    if (delivery) parts.push(`via ${delivery}`);
 
     const summary = parts.join(' ');
     return summary ? `${summary}.` : '';
@@ -1197,11 +1283,18 @@ const Profile = () => {
                 <div className="pv2-right-info-col">
                   {/* Top: name */}
                   <div>
-                    <h1 className="pv2-name">{profile.name}</h1>
-                    <p className="pv2-tagline">{profile.primaryCategory || profile.category || ''}</p>
+                    <div className={isMemberProfile ? 'pv2-member-title-row' : ''}>
+                      <h1 className="pv2-name">{profile.name}</h1>
+                      {isMemberProfile && <span className="pv2-badge-member"><i className="fas fa-user-circle" /> Member</span>}
+                    </div>
+                    {isMemberProfile && (
+                      <p className="pv2-member-intro">
+                        Parentals community member profile.
+                      </p>
+                    )}
                     {serviceSummary && !isMemberProfile && (
                       <p className="pv2-offer-summary">
-                        <strong>What we offer:</strong> {serviceSummary}
+                        <strong>What we do:</strong> {serviceSummary}
                       </p>
                     )}
                   </div>
@@ -1214,10 +1307,6 @@ const Profile = () => {
                       </div>
                     )}
                     <div className="pv2-meta-strip">
-                      <div className="pv2-meta-item">
-                        <i className="fas fa-tag" />
-                        <strong>{profile.primaryCategory || profile.category || 'Provider'}</strong>
-                      </div>
                       <div className="pv2-meta-item">
                         <i className="fas fa-map-marker-alt" />
                         <span>{profile.city ? `${profile.city}, ${profile.province}` : profile.location || 'South Africa'}</span>
@@ -1243,9 +1332,6 @@ const Profile = () => {
 
                 {/* Actions column — share at top, contact at bottom */}
                 <div className="pv2-right-actions-col">
-                  <button className="pv2-share-btn" onClick={shareProfile}>
-                    <i className="fas fa-share-alt" /> Share Profile
-                  </button>
                   {fromDashboard && (
                     <button className="pv2-share-btn" onClick={handleBack}>
                       Dashboard
@@ -1401,17 +1487,17 @@ const Profile = () => {
 
           {/* ── BOTTOM: Get in Touch ── */}
           {contactOpen && !isMemberProfile && (
-          <div className="pv2-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pv2-get-in-touch-title" onClick={(e) => { if (e.target === e.currentTarget) setContactOpen(false); }}>
-          <div className="pv2-enquiry-section" id="pv2-get-in-touch">
-            <button className="pv2-modal-close" type="button" aria-label="Close" onClick={() => setContactOpen(false)}>
+          <div className="pv2-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pv2-get-in-touch-title" onClick={(e) => { if (e.target === e.currentTarget) closeContactModal(); }}>
+          <form className="pv2-enquiry-section" id="pv2-get-in-touch" onSubmit={handleEnquirySubmit}>
+            <button className="pv2-modal-close" type="button" aria-label="Close" onClick={closeContactModal}>
               <i className="fas fa-times" />
             </button>
             <div className="pv2-enquiry-header">
               <h2 id="pv2-get-in-touch-title" className="pv2-heading" style={{ textAlign: 'center', marginBottom: 8, color: '#1a1a1a', fontSize: '1.6rem' }}>Get in Touch</h2>
               <p style={{ fontSize: '0.88rem', color: '#777', textAlign: 'center' }}>
                 {isPaid
-                  ? `Use the form or direct details below to reach ${profile.name || 'this provider'}.`
-                  : `Fill in your details below and we'll relay your enquiry to ${profile.name || 'this provider'}.`}
+                  ? `Send a quick in-app enquiry to ${profile.name || 'this provider'}.`
+                  : `Fill in your details below and we'll notify ${profile.name || 'this provider'} in their dashboard.`}
               </p>
             </div>
 
@@ -1420,7 +1506,6 @@ const Profile = () => {
                 {[
                   { icon: 'fa-phone', label: 'Phone', value: profile.phone, href: profile.phone ? `tel:${profile.phone}` : '' },
                   { icon: 'fa-whatsapp', label: 'WhatsApp', value: profile.whatsapp || profile.phone, href: (profile.whatsapp || profile.phone) ? `https://wa.me/${String(profile.whatsapp || profile.phone).replace(/\D/g, '')}` : '' },
-                  { icon: 'fa-envelope', label: 'Email', value: profile.contactEmail, href: profile.contactEmail ? `mailto:${profile.contactEmail}` : '' },
                   { icon: 'fa-globe', label: 'Website', value: profile.website, href: profile.website },
                 ].filter(item => item.value).map(item => (
                   <a key={item.label} href={item.href} target={item.label === 'Website' || item.label === 'WhatsApp' ? '_blank' : undefined} rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 8, background: '#fff', border: '1px solid rgba(0,0,0,0.1)', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, minWidth: 0 }}>
@@ -1434,47 +1519,67 @@ const Profile = () => {
             <div className="pv2-enquiry-grid">
               <div className="pv2-enquiry-field">
                 <label>First Name</label>
-                <input type="text" placeholder="Sarah" />
+                <input type="text" placeholder="Sarah" value={enquiryForm.firstName} onChange={(e) => updateEnquiryField('firstName', e.target.value)} required />
               </div>
               <div className="pv2-enquiry-field">
                 <label>Last Name</label>
-                <input type="text" placeholder="Smith" />
+                <input type="text" placeholder="Smith" value={enquiryForm.lastName} onChange={(e) => updateEnquiryField('lastName', e.target.value)} required />
               </div>
               <div className="pv2-enquiry-field">
                 <label>Email Address</label>
-                <input type="email" placeholder="sarah@email.com" />
+                <input type="email" placeholder="sarah@email.com" value={enquiryForm.email} onChange={(e) => updateEnquiryField('email', e.target.value)} required />
               </div>
               <div className="pv2-enquiry-field">
                 <label>Phone Number</label>
-                <input type="tel" placeholder="082 000 0000" />
+                <input type="tel" placeholder="082 000 0000" value={enquiryForm.phone} onChange={(e) => updateEnquiryField('phone', e.target.value)} />
               </div>
             </div>
 
             <div className="pv2-enquiry-grid-wide">
               <div className="pv2-enquiry-field">
                 <label>Subject</label>
-                <select>
-                  <option>General enquiry</option>
-                  <option>Pricing &amp; availability</option>
-                  <option>Trial lesson / session</option>
-                  <option>Curriculum question</option>
-                  <option>Enrolment information</option>
+                <select value={enquiryForm.subject} onChange={(e) => updateEnquiryField('subject', e.target.value)}>
+                  <option value="General enquiry">General enquiry</option>
+                  <option value="Pricing & availability">Pricing &amp; availability</option>
+                  <option value="Trial lesson / session">Trial lesson / session</option>
+                  <option value="Curriculum question">Curriculum question</option>
+                  <option value="Enrolment information">Enrolment information</option>
                 </select>
               </div>
               <div className="pv2-enquiry-field">
                 <label>Message</label>
-                <textarea placeholder="Hi, I'd like to know more about your services…" />
+                <textarea placeholder="Hi, I'd like to know more about your services..." value={enquiryForm.message} onChange={(e) => updateEnquiryField('message', e.target.value)} required />
               </div>
             </div>
 
+            {enquiryError && (
+              <div style={{ marginTop: 14, padding: '10px 12px', borderRadius: 8, background: '#fff3f0', color: '#9f2d12', fontSize: '0.84rem', fontWeight: 700 }}>
+                <i className="fas fa-circle-exclamation" style={{ marginRight: 8 }} />
+                {enquiryError}
+              </div>
+            )}
+
+            {enquiryStatus === 'sent' && (
+              <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 8, background: '#edf8f0', color: '#256b35', fontSize: '0.9rem', fontWeight: 700, textAlign: 'center' }}>
+                <i className="fas fa-check-circle" style={{ marginRight: 8 }} />
+                Your enquiry has been sent in-app. The provider will see it on their dashboard.
+              </div>
+            )}
+
             <div className="pv2-enquiry-footer">
               <button
+                type="submit"
                 className="pv2-enquiry-send-btn"
                 style={{ width: 'auto', paddingLeft: 40, paddingRight: 40 }}
-                onClick={() => { alert('Enquiry sent! (Demo)'); setContactOpen(false); }}
+                disabled={enquiryStatus === 'sending' || enquiryStatus === 'sent'}
               >
-                <i className="fas fa-paper-plane" /> Get in Touch
+                <i className={`fas ${enquiryStatus === 'sending' ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`} /> {enquiryStatus === 'sending' ? 'Sending...' : 'Get in Touch'}
               </button>
+              {enquiryStatus === 'sent' && (
+                <button type="button" className="pv2-enquiry-send-btn" style={{ width: 'auto', paddingLeft: 28, paddingRight: 28, background: '#333330' }} onClick={closeContactModal}>
+                  Close
+                </button>
+              )}
               {profile.city && (
                 <div className="pv2-location-note">
                   <i className="fas fa-map-marker-alt" />
@@ -1482,7 +1587,7 @@ const Profile = () => {
                 </div>
               )}
             </div>
-          </div>
+          </form>
           </div>
           )}
 

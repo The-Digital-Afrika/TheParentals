@@ -8,6 +8,7 @@ import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
 import { DAYS_OF_WEEK, PRICING_MODELS, PROVINCES } from '../utils/constants';
 import { getPlanLimits } from '../utils/helpers';
+import { formatInquiryDate, getInquiries, markInquiryRead, respondToInquiry } from '../utils/inquiries';
 import { api, apiRequest } from '../services/api';
 import '../assets/css/dashboard.css'
 
@@ -279,6 +280,18 @@ const DASH_CSS = `
   .cd-tab-btn:hover { background:#f47b2b; color:#fff; }
   .cd-tab-btn.active { background:#e96f1f; color:#fff; font-weight:800; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
+  .cd-alert-wrap { max-width:1280px; margin:0 auto; padding:12px 32px 0; display:flex; justify-content:flex-end; }
+  .cd-enquiry-bell { position:relative; width:44px; height:44px; border-radius:12px; border:1.5px solid #dbe8f1; background:#fff; color:#6f8da6; box-shadow:0 6px 18px rgba(111,141,166,.12); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all .15s; }
+  .cd-enquiry-bell:hover { border-color:#6f8da6; transform:translateY(-1px); box-shadow:0 10px 24px rgba(111,141,166,.16); }
+  .cd-enquiry-bell.shake { animation:cdBellShake .34s ease-in-out; }
+  .cd-enquiry-alert-count { position:absolute; top:-7px; right:-7px; min-width:19px; height:19px; border-radius:99px; padding:0 5px; background:#ff8c42; color:#fff; display:flex; align-items:center; justify-content:center; font-size:.62rem; font-weight:900; border:2px solid #fff; }
+  @keyframes cdBellShake {
+    0%, 100% { transform:rotate(0deg); }
+    20% { transform:rotate(-14deg); }
+    40% { transform:rotate(12deg); }
+    60% { transform:rotate(-8deg); }
+    80% { transform:rotate(6deg); }
+  }
   .cd-directory-back { display:inline-flex; align-items:center; gap:8px; width:fit-content; margin:0 0 16px; padding:9px 16px; border-radius:8px; border:1.5px solid rgba(111,141,166,.35); background:#fff; color:#6f8da6; font-size:.86rem; font-weight:800; text-decoration:none; box-shadow:0 4px 14px rgba(0,0,0,.05); transition:all .15s; }
   .cd-directory-back:hover { border-color:#6f8da6; transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
   .cd-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; align-items:start; }
@@ -290,6 +303,43 @@ const DASH_CSS = `
   .cd-card-body     { padding:20px; }
   .cd-card-body.tight { padding:14px 20px; }
   .cd-card-actions { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .cd-inquiry-body { padding:12px 14px; }
+  .cd-inquiry-layout { display:grid; grid-template-columns:minmax(260px,.8fr) minmax(340px,1fr); gap:12px; align-items:start; }
+  .cd-inquiry-list { display:flex; flex-direction:column; gap:8px; align-self:start; }
+  .cd-inquiry-card { border:1.5px solid #edf1f4; background:#fff; border-radius:9px; padding:10px 12px; display:flex; align-items:flex-start; gap:10px; width:100%; cursor:pointer; text-align:left; font-family:inherit; transition:all .15s; margin:0; }
+  .cd-inquiry-card:hover { border-color:#6f8da6; box-shadow:0 8px 22px rgba(111,141,166,.12); transform:translateY(-1px); }
+  .cd-inquiry-card.unread { background:#f8fcff; border-color:#b7d5ea; }
+  .cd-inquiry-dot { width:30px; height:30px; border-radius:8px; background:#edf7ff; color:#6f8da6; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.78rem; }
+  .cd-inquiry-card.unread .cd-inquiry-dot { background:#6f8da6; color:#fff; }
+  .cd-inquiry-main { flex:1; min-width:0; }
+  .cd-inquiry-title { font-size:.82rem; font-weight:800; color:#1a1a1a; margin-bottom:2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .cd-inquiry-meta { font-size:.69rem; color:#888; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .cd-inquiry-preview { color:#555; font-size:.76rem; margin-top:5px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .cd-inquiry-new { background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; border-radius:99px; padding:2px 7px; font-size:.62rem; font-weight:900; text-transform:uppercase; letter-spacing:.4px; }
+  .cd-inquiry-empty { padding:14px; border:1.5px dashed #d9e3ea; border-radius:10px; background:#f8fcff; color:#6f8da6; font-size:.8rem; font-weight:700; text-align:center; }
+  .cd-inquiry-side-panel { border-radius:10px; padding:12px; background:#f8fcff; border:1px solid #dcebf5; color:#5d7890; }
+  .cd-inquiry-side-kicker { font-size:.62rem; font-weight:900; letter-spacing:.55px; text-transform:uppercase; color:#6f8da6; margin-bottom:7px; display:flex; align-items:center; gap:6px; }
+  .cd-inquiry-side-text { font-size:.76rem; line-height:1.55; margin:0; color:#5c6872; }
+  .cd-inquiry-side-stats { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; }
+  .cd-inquiry-side-stat { background:#fff; border:1px solid #e6eef4; border-radius:8px; padding:8px; }
+  .cd-inquiry-side-num { font-size:1rem; font-weight:900; color:#6f8da6; line-height:1; }
+  .cd-inquiry-side-label { font-size:.62rem; color:#888; margin-top:3px; font-weight:800; text-transform:uppercase; letter-spacing:.35px; }
+  .cd-inquiry-detail { background:#faf9f7; border:1px solid #f0ece5; border-radius:10px; padding:12px; align-self:start; }
+  .cd-inquiry-detail h4 { margin:0 0 8px; font-size:.86rem; color:#1a1a1a; }
+  .cd-inquiry-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:7px; }
+  .cd-inquiry-detail-row { display:block; font-size:.76rem; padding:7px 9px; border:1px solid #ece6dd; border-radius:8px; background:#fff; min-width:0; }
+  .cd-inquiry-detail-row.wide { grid-column:1 / -1; }
+  .cd-inquiry-detail-row:last-child { border-bottom:none; }
+  .cd-inquiry-detail-label { color:#888; font-weight:800; text-transform:uppercase; letter-spacing:.4px; font-size:.61rem; margin-bottom:3px; }
+  .cd-inquiry-detail-value { color:#333; line-height:1.45; word-break:break-word; }
+  .cd-inquiry-count { display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 7px; border-radius:99px; background:#6f8da6; color:#fff; font-size:.7rem; font-weight:900; }
+  .cd-inquiry-response-box { margin-top:8px; padding-top:8px; border-top:1px solid #e7ded3; }
+  .cd-inquiry-response-box textarea { width:100%; min-height:52px; resize:vertical; border:1.5px solid #e5e0d8; border-radius:8px; padding:8px 10px; font-family:inherit; font-size:.78rem; color:#333; background:#fff; outline:none; }
+  .cd-inquiry-response-box textarea:focus { border-color:#6f8da6; box-shadow:0 0 0 3px rgba(111,141,166,.1); }
+  .cd-inquiry-response-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:7px; flex-wrap:wrap; }
+  .cd-inquiry-response-note { font-size:.69rem; color:#888; line-height:1.4; }
+  .cd-inquiry-reply { margin-top:11px; padding:12px 13px; border-radius:9px; background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46; font-size:.82rem; line-height:1.55; }
+  .cd-inquiry-reply-label { display:block; font-size:.64rem; font-weight:900; text-transform:uppercase; letter-spacing:.5px; color:#059669; margin-bottom:4px; }
   .cd-edit-toggle { margin-left:auto; display:inline-flex; align-items:center; gap:6px; padding:6px 13px; border-radius:6px; cursor:pointer; font-size:0.75rem; font-weight:700; border:1.5px solid; transition:all .15s; font-family:inherit; }
   .cd-edit-toggle.inactive { border-color:#d1d5db; background:transparent; color:#6b7280; }
   .cd-edit-toggle.inactive:hover { border-color:#6f8da6; color:#6f8da6; }
@@ -373,6 +423,25 @@ const DASH_CSS = `
   .cd-sidebar-header { padding:12px 16px; background:#5a5a5a; }
   .cd-sidebar-title { font-size:0.75rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:.7px; }
   .cd-sidebar-body  { padding:14px 16px; }
+  .cd-terms-summary { font-size:.78rem; color:#555; line-height:1.6; margin:0 0 10px; }
+  .cd-sidebar-link-btn { border:none; background:none; color:#6f8da6; font-family:inherit; font-size:.77rem; font-weight:900; padding:0; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .cd-sidebar-link-btn:hover { color:#557691; text-decoration:underline; }
+  .cd-sidebar-downgrade { width:100%; margin-top:12px; padding:9px 11px; border-radius:7px; border:none; background:#ff8c42; color:#fff; font-family:inherit; font-size:.78rem; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; }
+  .cd-sidebar-downgrade:hover { background:#f47b2b; }
+  .cd-terms-card { cursor:pointer; transition:transform .15s, box-shadow .15s; }
+  .cd-terms-card:hover { transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
+  .cd-terms-card .cd-sidebar-header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .cd-terms-toggle { color:#fff; opacity:.78; font-size:.75rem; transition:transform .16s; }
+  .cd-terms-toggle.open { transform:rotate(180deg); }
+  .cd-terms-closed-note { padding:12px 16px; font-size:.76rem; color:#888; background:#fff; }
+  .cd-terms-modal-overlay { position:fixed; inset:0; background:rgba(20,29,38,.52); display:flex; align-items:center; justify-content:center; padding:18px; z-index:9999; }
+  .cd-terms-modal { width:min(560px,100%); background:#fff; border-radius:12px; box-shadow:0 22px 70px rgba(0,0,0,.22); border:1px solid rgba(0,0,0,.08); overflow:hidden; }
+  .cd-terms-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; background:#5a5a5a; color:#fff; }
+  .cd-terms-modal-title { font-size:.9rem; font-weight:900; text-transform:uppercase; letter-spacing:.7px; display:flex; align-items:center; gap:8px; }
+  .cd-terms-modal-close { width:30px; height:30px; border-radius:7px; border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .cd-terms-modal-body { padding:16px 18px; color:#444; font-size:.84rem; line-height:1.65; }
+  .cd-terms-modal-body ul { margin:10px 0 0; padding-left:18px; }
+  .cd-terms-modal-body li { margin-bottom:7px; }
   .cd-comp-item { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #f8f6f3; }
   .cd-comp-item:last-of-type { border-bottom:none; }
   /* ── uploaded document card ── */
@@ -391,7 +460,7 @@ const DASH_CSS = `
   .cd-docs-section-title { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#aaa; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
   .cd-docs-empty { font-size:0.8rem; color:#bbb; font-style:italic; padding:8px 0; }
   @media(max-width:1024px) { .cd-layout { grid-template-columns:1fr; } .cd-plan-grid { grid-template-columns:1fr; } }
-  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:0 14px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } }
+  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-alert-wrap { padding:12px 14px 0; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:0 14px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } }
   @media(max-width:768px){
   .cd-hero-top { padding: 0 14px 20px; }
   .cd-tab-bar { padding: 0 10px; gap: 1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -406,6 +475,8 @@ const DASH_CSS = `
   .cd-btn-ghost, .cd-btn-solid { font-size: 0.75rem; padding: 6px 10px; }
   .cd-plan-grid { grid-template-columns: 1fr; }
   .cd-svc-grid { grid-template-columns: 1fr; }
+  .cd-inquiry-layout { grid-template-columns: 1fr; }
+  .cd-inquiry-detail-grid { grid-template-columns: 1fr; }
 }
   @media(max-width:520px)  { .cd-svc-grid { grid-template-columns:1fr; } .cd-row-3 { grid-template-columns:1fr 1fr; } .cd-plan-grid { grid-template-columns:1fr; } }
 `;
@@ -429,6 +500,12 @@ const ClientDashboard = () => {
   const [dataLoading,  setDataLoading]  = useState(true);
   const [qualFileName,     setQualFileName]     = useState('');
   const [clearanceFileName, setClearanceFileName] = useState('');
+  const [inquiries, setInquiries] = useState([]);
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [responseDrafts, setResponseDrafts] = useState({});
+  const [shakingBell, setShakingBell] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsCardOpen, setTermsCardOpen] = useState(false);
 
   /* inject CSS once */
   useEffect(() => {
@@ -444,6 +521,17 @@ const ClientDashboard = () => {
       document.head.appendChild(l);
     }
   }, []);
+
+  const refreshInquiries = useCallback(() => {
+    setInquiries(getInquiries());
+  }, []);
+
+  useEffect(() => {
+    refreshInquiries();
+    const onFocus = () => refreshInquiries();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refreshInquiries]);
 
   /* ── load profile: try API first, fall back to localStorage ── */
   useEffect(() => {
@@ -977,6 +1065,56 @@ const ClientDashboard = () => {
           </div>
         </div>
       )}
+      <div
+        className="cd-sidebar-card cd-terms-card"
+        onClick={() => setTermsCardOpen(open => !open)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setTermsCardOpen(open => !open);
+          }
+        }}
+      >
+        <div className="cd-sidebar-header">
+          <div className="cd-sidebar-title"><i className="fas fa-file-contract" style={{ marginRight: 6 }}></i>Terms & Conditions</div>
+          <i className={`fas fa-chevron-down cd-terms-toggle${termsCardOpen ? ' open' : ''}`}></i>
+        </div>
+        {termsCardOpen ? (
+          <div className="cd-sidebar-body">
+            <p className="cd-terms-summary">
+              Parentals profiles must stay accurate, respectful and safe for families. Paid plans can be changed when your listing needs shift.
+            </p>
+            <button
+              type="button"
+              className="cd-sidebar-link-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowTermsModal(true);
+              }}
+            >
+              Read More <i className="fas fa-chevron-right"></i>
+            </button>
+            {(profileData.plan || 'free') !== 'free' && (
+              <button
+                type="button"
+                className="cd-sidebar-downgrade"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePlanChange('free');
+                }}
+              >
+                <i className="fas fa-arrow-down"></i> Downgrade Plan
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="cd-terms-closed-note">
+            Click to view terms and plan options.
+          </div>
+        )}
+      </div>
       {(profileData.languages || []).length > 0 && (
         <div className="cd-sidebar-card">
           <div className="cd-sidebar-header">
@@ -1636,6 +1774,7 @@ const ClientDashboard = () => {
               {PLAN_CARDS.map(plan => {
                 const isCurrent = profileData.plan === plan.id;
                 const isHigher  = planOrder[plan.id] > planOrder[profileData.plan || 'free'];
+                const showPlanAction = isCurrent || isHigher || plan.id !== 'free';
                 return (
                   <div key={plan.id} className={`cd-plan-card ${isCurrent ? 'is-current' : ''}`}>
                     {isCurrent && <div className="cd-plan-current-badge">Current</div>}
@@ -1645,15 +1784,17 @@ const ClientDashboard = () => {
                     <ul className="cd-plan-features">
                       {plan.features.map((f, i) => <li key={i}><i className="fas fa-check-circle"></i>{f}</li>)}
                     </ul>
-                    <button
-                      className={`cd-plan-action-btn ${isCurrent ? 'current' : isHigher ? 'upgrade' : 'downgrade'}`}
-                      disabled={isCurrent}
-                      onClick={() => !isCurrent && handlePlanChange(plan.id)}
-                    >
-                      {isCurrent ? <><i className="fas fa-check"></i> Current Plan</>
-                        : isHigher ? <><i className="fas fa-arrow-up"></i> Upgrade</>
-                        : <><i className="fas fa-arrow-down"></i> Downgrade</>}
-                    </button>
+                    {showPlanAction && (
+                      <button
+                        className={`cd-plan-action-btn ${isCurrent ? 'current' : isHigher ? 'upgrade' : 'downgrade'}`}
+                        disabled={isCurrent}
+                        onClick={() => !isCurrent && handlePlanChange(plan.id)}
+                      >
+                        {isCurrent ? <><i className="fas fa-check"></i> Current Plan</>
+                          : isHigher ? <><i className="fas fa-arrow-up"></i> Upgrade</>
+                          : <><i className="fas fa-arrow-down"></i> Downgrade</>}
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -1716,6 +1857,257 @@ const ClientDashboard = () => {
     }
   };
 
+  const getDashboardInquiries = (audience) => {
+    const profileIds = [
+      profileData.id,
+      profileData.userId,
+      getCurrentUser()?.id,
+    ].filter(Boolean).map(String);
+    const email = String(profileData.email || getCurrentUser()?.email || '').toLowerCase();
+
+    return inquiries.filter((item) => {
+      if (audience === 'provider') {
+        return profileIds.includes(String(item.providerId || ''))
+          || profileIds.includes(String(item.providerUserId || ''));
+      }
+
+      return profileIds.includes(String(item.clientId || ''))
+        || (!!email && String(item.clientEmail || '').toLowerCase() === email);
+    });
+  };
+
+  const openInquiry = (item, audience) => {
+    setSelectedInquiry(item);
+    markInquiryRead(item.id, audience);
+    refreshInquiries();
+  };
+
+  const updateResponseDraft = (id, value) => {
+    setResponseDrafts(prev => ({ ...prev, [id]: value }));
+  };
+
+  const sendInquiryResponse = (item) => {
+    const response = (responseDrafts[item.id] || '').trim();
+    if (!response) {
+      showNotification('Please write a response before sending.', 'error');
+      return;
+    }
+
+    const updated = respondToInquiry(item.id, response);
+    const refreshed = updated.find(next => next.id === item.id) || item;
+    setInquiries(updated);
+    setSelectedInquiry(refreshed);
+    setResponseDrafts(prev => ({ ...prev, [item.id]: '' }));
+    showNotification('Response sent to the client dashboard.', 'success');
+  };
+
+  const scrollToEnquiries = () => {
+    setShakingBell(true);
+    setTimeout(() => {
+      document.getElementById('dashboard-enquiries')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 240);
+    setTimeout(() => setShakingBell(false), 420);
+  };
+
+  const renderEnquiryAlert = (audience) => {
+    const visible = getDashboardInquiries(audience);
+    const isProviderView = audience === 'provider';
+    const unreadCount = visible.filter(item => isProviderView ? !item.providerRead : !item.clientRead).length;
+
+    return (
+      <div className="cd-alert-wrap">
+        <button
+          type="button"
+          className={`cd-enquiry-bell${shakingBell ? ' shake' : ''}`}
+          onClick={scrollToEnquiries}
+          aria-label="View enquiry notifications"
+          title="View enquiry notifications"
+        >
+          <i className="fas fa-bell"></i>
+          {unreadCount > 0 && <span className="cd-enquiry-alert-count">{unreadCount}</span>}
+        </button>
+      </div>
+    );
+  };
+
+  const renderInquiryCenter = (audience) => {
+    const visible = getDashboardInquiries(audience);
+    const selected = selectedInquiry && visible.some(item => item.id === selectedInquiry.id)
+      ? selectedInquiry
+      : visible[0] || null;
+    const unreadCount = visible.filter(item => audience === 'provider' ? !item.providerRead : !item.clientRead).length;
+    const isProviderView = audience === 'provider';
+
+    return (
+      <div className="cd-card" id="dashboard-enquiries">
+        <div className="cd-card-header">
+          <div className="cd-card-header-icon"><i className="fas fa-bell"></i></div>
+          <div>
+            <div className="cd-card-title">{isProviderView ? 'Enquiry Notifications' : 'Your Enquiry Updates'}</div>
+            <div className="cd-card-subtitle">
+              {isProviderView ? 'New parent and learner messages land here.' : 'Confirmations for enquiries you have sent.'}
+            </div>
+          </div>
+          {unreadCount > 0 && <span className="cd-inquiry-count">{unreadCount}</span>}
+        </div>
+        <div className="cd-card-body cd-inquiry-body">
+          {visible.length === 0 ? (
+            <div className="cd-inquiry-empty">
+              <i className="fas fa-bell" style={{ marginRight: 8 }}></i>
+              {isProviderView ? 'No enquiries yet. Fresh messages will pop up here.' : 'No sent enquiries yet. When you contact a provider, the confirmation will appear here.'}
+            </div>
+          ) : (
+            <div className="cd-inquiry-layout">
+              <div className="cd-inquiry-list">
+                {visible.map((item) => {
+                  const unread = isProviderView ? !item.providerRead : !item.clientRead;
+                  return (
+                    <button
+                      key={item.id}
+                      className={`cd-inquiry-card${unread ? ' unread' : ''}`}
+                      onClick={() => openInquiry(item, audience)}
+                    >
+                      <div className="cd-inquiry-dot"><i className={`fas ${isProviderView ? 'fa-paper-plane' : 'fa-check'}`}></i></div>
+                      <div className="cd-inquiry-main">
+                        <div className="cd-inquiry-title">
+                          {isProviderView ? item.clientName : item.providerName}
+                          {unread && <span className="cd-inquiry-new">New</span>}
+                        </div>
+                        <div className="cd-inquiry-meta">
+                          <span>{item.subject || 'General enquiry'}</span>
+                          <span>{formatInquiryDate(item.createdAt)}</span>
+                        </div>
+                        <div className="cd-inquiry-preview">
+                          {item.providerResponse && !isProviderView ? `Provider responded: ${item.providerResponse}` : item.message}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+                <div className="cd-inquiry-side-panel">
+                  <div className="cd-inquiry-side-kicker">
+                    <i className={`fas ${isProviderView ? 'fa-reply' : 'fa-clock'}`}></i>
+                    {isProviderView ? 'Response hub' : 'Request tracker'}
+                  </div>
+                  <p className="cd-inquiry-side-text">
+                    {isProviderView
+                      ? 'Open a message, reply from the panel, and the client will see your response on their dashboard.'
+                      : 'Your enquiry is saved here. Provider responses will appear as new updates.'}
+                  </p>
+                  <div className="cd-inquiry-side-stats">
+                    <div className="cd-inquiry-side-stat">
+                      <div className="cd-inquiry-side-num">{visible.length}</div>
+                      <div className="cd-inquiry-side-label">{visible.length === 1 ? 'Enquiry' : 'Enquiries'}</div>
+                    </div>
+                    <div className="cd-inquiry-side-stat">
+                      <div className="cd-inquiry-side-num">{unreadCount}</div>
+                      <div className="cd-inquiry-side-label">New</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="cd-inquiry-detail">
+                {selected ? (
+                  <>
+                    <h4>{isProviderView ? 'Enquiry details' : 'Request confirmation'}</h4>
+                    <div className="cd-inquiry-detail-grid">
+                      <div className="cd-inquiry-detail-row">
+                        <div className="cd-inquiry-detail-label">{isProviderView ? 'From' : 'Provider'}</div>
+                        <div className="cd-inquiry-detail-value">{isProviderView ? selected.clientName : selected.providerName}</div>
+                      </div>
+                      <div className="cd-inquiry-detail-row">
+                        <div className="cd-inquiry-detail-label">Subject</div>
+                        <div className="cd-inquiry-detail-value">{selected.subject}</div>
+                      </div>
+                      {isProviderView && (
+                        <>
+                          <div className="cd-inquiry-detail-row">
+                            <div className="cd-inquiry-detail-label">Email</div>
+                            <div className="cd-inquiry-detail-value">{selected.clientEmail}</div>
+                          </div>
+                          <div className="cd-inquiry-detail-row">
+                            <div className="cd-inquiry-detail-label">Phone</div>
+                            <div className="cd-inquiry-detail-value">{selected.clientPhone || 'Not provided'}</div>
+                          </div>
+                        </>
+                      )}
+                      <div className="cd-inquiry-detail-row wide">
+                        <div className="cd-inquiry-detail-label">Message</div>
+                        <div className="cd-inquiry-detail-value">{selected.message}</div>
+                      </div>
+                      {!isProviderView && !selected.providerResponse && (
+                        <div className="cd-inquiry-detail-row">
+                          <div className="cd-inquiry-detail-label">Next</div>
+                          <div className="cd-inquiry-detail-value">Your request is with the provider. They can review it from their dashboard and respond here.</div>
+                        </div>
+                      )}
+                    </div>
+                    {selected.providerResponse && (
+                      <div className="cd-inquiry-reply">
+                        <span className="cd-inquiry-reply-label">Provider response {formatInquiryDate(selected.respondedAt)}</span>
+                        {selected.providerResponse}
+                      </div>
+                    )}
+                    {isProviderView && (
+                      <div className="cd-inquiry-response-box">
+                        <label className="cd-label">Respond to client</label>
+                        <textarea
+                          value={responseDrafts[selected.id] || ''}
+                          onChange={(e) => updateResponseDraft(selected.id, e.target.value)}
+                          placeholder={selected.providerResponse ? 'Send an updated response...' : 'Write a friendly reply...'}
+                        />
+                        <div className="cd-inquiry-response-actions">
+                          <div className="cd-inquiry-response-note">
+                            The client will see this response in their dashboard.
+                          </div>
+                          <button type="button" className="cd-btn-solid" onClick={() => sendInquiryResponse(selected)}>
+                            <i className="fas fa-paper-plane"></i> Send Response
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : null}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderTermsModal = () => {
+    if (!showTermsModal) return null;
+
+    return (
+      <div className="cd-terms-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="parentals-terms-title" onClick={(e) => { if (e.target === e.currentTarget) setShowTermsModal(false); }}>
+        <div className="cd-terms-modal">
+          <div className="cd-terms-modal-head">
+            <div id="parentals-terms-title" className="cd-terms-modal-title">
+              <i className="fas fa-file-contract"></i> Parentals Terms & Conditions
+            </div>
+            <button type="button" className="cd-terms-modal-close" aria-label="Close terms" onClick={() => setShowTermsModal(false)}>
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+          <div className="cd-terms-modal-body">
+            <p>
+              Parentals helps families discover providers and community members. By using the platform, providers agree to keep listings honest, current and appropriate for families.
+            </p>
+            <ul>
+              <li>Profile details, pricing, availability and contact information should be accurate and updated when they change.</li>
+              <li>Providers are responsible for responding respectfully to enquiries received through the dashboard.</li>
+              <li>Uploaded documents and profile content may be reviewed for safety, quality and relevance.</li>
+              <li>Paid plans can be upgraded or downgraded from the dashboard. Downgrading may remove paid features from the public listing.</li>
+              <li>Parentals may hide or review listings that are misleading, unsafe, inactive or not aligned with the directory purpose.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderMemberDashboard = () => {
     const memberId = profileData.userId || profileData.id;
 
@@ -1763,6 +2155,7 @@ const ClientDashboard = () => {
             </div>
           </div>
         </section>
+        {renderEnquiryAlert('client')}
 
         <main className="cd-main">
           <Link to="/#sah-providers" className="cd-directory-back">
@@ -1884,6 +2277,7 @@ const ClientDashboard = () => {
               </div>
             </div>
           </div>
+          {renderInquiryCenter('client')}
         </main>
         <Footer />
       </div>
@@ -1940,12 +2334,15 @@ const ClientDashboard = () => {
           ))}
         </div>
       </section>
+      {renderEnquiryAlert('provider')}
       <main className="cd-main">
         <Link to="/#sah-providers" className="cd-directory-back">
           <i className="fas fa-arrow-left"></i> Back to Directory
         </Link>
         {renderActiveTab()}
+        {renderInquiryCenter('provider')}
       </main>
+      {renderTermsModal()}
       <Footer />
     </div>
   );
