@@ -15,6 +15,20 @@ const getFriendlyApiError = (err, fallback = 'Network error. Please try again.')
   return err.message || fallback;
 };
 
+const getStoredProviderForUser = (userData) => {
+  try {
+    const providers = JSON.parse(localStorage.getItem('sah_providers') || '[]');
+    const id = userData?.id || userData?.userId || '';
+    const email = String(userData?.email || '').toLowerCase();
+    return providers.find(provider =>
+      (id && (provider.id === id || provider.userId === id))
+      || (email && String(provider.email || provider.contactEmail || provider.inquiryEmail || '').toLowerCase() === email)
+    ) || null;
+  } catch {
+    return null;
+  }
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -121,7 +135,14 @@ export const AuthProvider = ({ children }) => {
         password,
       });
 
-      const userData = { ...data.user, token: data.token };
+      const storedProvider = getStoredProviderForUser(data.user);
+      const userData = {
+        ...data.user,
+        token: data.token,
+        plan: data.user?.plan || storedProvider?.listingPlan || storedProvider?.plan || storedProvider?.tier,
+        status: data.user?.status || storedProvider?.status,
+        profilePhoto: storedProvider?.profilePhoto || storedProvider?.photo || storedProvider?.image,
+      };
       setUser(userData);
       localStorage.setItem('sah_user', JSON.stringify(userData));
       localStorage.setItem('sah_current_user', JSON.stringify(userData));

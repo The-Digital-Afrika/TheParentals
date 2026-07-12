@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ClientDashboard from './pages/ClientDashboard';
 import ProviderDashboard from './pages/ProviderDashboard';
 import Profile from './pages/Profile';
+import PaymentDemo from './pages/PaymentDemo';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/register/user" element={<UserRegister />} />
             <Route path="/register/provider" element={<Registration />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/payment-demo" element={<PaymentDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>

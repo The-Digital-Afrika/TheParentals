@@ -97,4 +97,12 @@ export const api = {
   assignFeaturedSlot: (data, token) => apiRequest('POST', '/api/featured-slots/assign', data, token),
   removeFeaturedSlot: (slotId, token) => apiRequest('POST', `/api/featured-slots/${slotId}/remove`, null, token),
   rotateFeaturedSlot: (slotId, token) => apiRequest('POST', `/api/featured-slots/${slotId}/rotate`, null, token),
+
+  // Payments
+  initializePayment: (data, token) => apiRequest('POST', '/api/payments/initialize', data, token),
+  verifyPayment: (reference, token) => apiRequest('GET', `/api/payments/verify/${encodeURIComponent(reference)}`, null, token),
+  getPaymentStatus: (reference, token) => apiRequest('GET', `/api/payments/${encodeURIComponent(reference)}/status`, null, token),
+  setMockPaymentOutcome: (reference, status, token) => apiRequest('POST', `/api/payments/mock/${encodeURIComponent(reference)}/outcome`, { status }, token),
+  cancelSubscription: (token) => apiRequest('POST', '/api/payments/cancel', null, token),
+  getPaymentHistory: (token) => apiRequest('GET', '/api/payments/history', null, token),
 };

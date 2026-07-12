@@ -817,13 +817,25 @@ const Registration = () => {
 
         await apiRequest('POST', '/api/providers', formData);
 
+        const activeTier = tier === 'free' ? 'free' : 'free';
+        const localProvider = {
+          ...newProvider,
+          id: dbUserId,
+          userId: dbUserId,
+          plan: activeTier,
+          listingPlan: activeTier,
+          tier: activeTier,
+          requestedPlan: tier === 'free' ? null : tier,
+          billingStatus: tier === 'free' ? 'inactive' : 'pending',
+        };
+
         const sessionUser = saveToLocalStorage({
           userId: dbUserId,
           email: emailLower,
           fullName: data.fullName,
-          tier,
+          tier: activeTier,
           password: data.password,
-          newProvider: { ...newProvider, id: dbUserId },
+          newProvider: localProvider,
           token: userData?.token,
         });
 
@@ -832,11 +844,26 @@ const Registration = () => {
         }
 
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
+        if (tier !== 'free') {
+          showNotification?.('Profile created. Redirecting to payment...', 'info');
+          const payment = await apiRequest('POST', '/api/payments/initialize', {
+            plan: tier,
+            returnUrl: `${window.location.origin}/payment-demo`,
+          }, userData?.token);
+          window.location.href = payment.authorizationUrl;
+          return;
+        }
+
         setTimeout(() => navigate('/provider-dashboard'), 300);
         return;
     } catch (apiErr) {
       if (apiErr.status === 409) {
         setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
+        setSubmitting(false);
+        return;
+      }
+      if (tier !== 'free') {
+        setFieldErrors({ _submit: 'Parental Plus+ registration needs the backend payment service. Please confirm the backend is running, then try again.' });
         setSubmitting(false);
         return;
       }
@@ -849,9 +876,16 @@ const Registration = () => {
         userId: providerId,
         email: emailLower,
         fullName: data.fullName,
-        tier,
+        tier: tier === 'free' ? 'free' : 'free',
         password: data.password,
-        newProvider,
+        newProvider: {
+          ...newProvider,
+          plan: tier === 'free' ? 'free' : 'free',
+          listingPlan: tier === 'free' ? 'free' : 'free',
+          tier: tier === 'free' ? 'free' : 'free',
+          requestedPlan: tier === 'free' ? null : tier,
+          billingStatus: tier === 'free' ? 'inactive' : 'payment_required',
+        },
       });
 
       if (sessionUser) {
