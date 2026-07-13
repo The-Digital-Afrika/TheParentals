@@ -108,7 +108,20 @@ router.post('/login', async (req, res) => {
     }
 
     // ── Normal DB-backed login ────────────────────────────────────────────────
-    const user = await prisma.user.findUnique({ where: { email: trimmedEmail } });
+    const user = await prisma.user.findUnique({
+      where: { email: trimmedEmail },
+      include: {
+        providerProfile: {
+          select: {
+            listingPlan: true,
+            requestedPlan: true,
+            billingStatus: true,
+            status: true,
+            profilePhoto: true,
+          },
+        },
+      },
+    });
     if (!user) return res.status(401).json({ message: 'Invalid email or password.' });
 
     const valid = await bcrypt.compare(password, user.password);
@@ -122,7 +135,18 @@ router.post('/login', async (req, res) => {
     return res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, email: user.email, role: user.role, name: user.name, accountType: user.accountType },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        accountType: user.accountType,
+        plan: user.providerProfile?.listingPlan,
+        requestedPlan: user.providerProfile?.requestedPlan,
+        billingStatus: user.providerProfile?.billingStatus,
+        status: user.providerProfile?.status?.toLowerCase(),
+        profilePhoto: user.providerProfile?.profilePhoto,
+      },
     });
   } catch (error) {
     console.error('POST /api/auth/login error:', error);
@@ -151,10 +175,38 @@ router.get('/me', async (req, res) => {
 
     const user = await prisma.user.findUnique({
       where:  { id: decoded.userId },
-      select: { id: true, email: true, role: true, name: true, accountType: true, lastLogin: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        accountType: true,
+        lastLogin: true,
+        providerProfile: {
+          select: {
+            listingPlan: true,
+            requestedPlan: true,
+            billingStatus: true,
+            status: true,
+            profilePhoto: true,
+          },
+        },
+      },
     });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.json(user);
+    return res.json({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      accountType: user.accountType,
+      lastLogin: user.lastLogin,
+      plan: user.providerProfile?.listingPlan,
+      requestedPlan: user.providerProfile?.requestedPlan,
+      billingStatus: user.providerProfile?.billingStatus,
+      status: user.providerProfile?.status?.toLowerCase(),
+      profilePhoto: user.providerProfile?.profilePhoto,
+    });
   } catch (error) {
     console.error('GET /api/auth/me error:', error);
     return res.status(500).json({ message: 'Server error' });

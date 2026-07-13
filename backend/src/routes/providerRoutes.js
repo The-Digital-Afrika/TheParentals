@@ -34,6 +34,10 @@ function mapProvider(profile) {
     plan: tier,
     tier,
     listingPlan: tier,
+    requestedPlan: profile.requestedPlan,
+    billingStatus: profile.billingStatus || 'inactive',
+    paystackSubscriptionCode: profile.paystackSubscriptionCode,
+    nextBillingAt: profile.nextBillingAt,
     registered: profile.createdAt,
     lastLogin: profile.user?.lastLogin,
     category: profile.primaryCategory,
@@ -43,6 +47,8 @@ function mapProvider(profile) {
     photo: profile.profilePhoto,
     publicToggle: profile.publicDisplay,
     listingPublic: profile.publicDisplay,
+    updatedAt: profile.updatedAt,
+    createdAt: profile.createdAt,
   };
 }
 
@@ -160,6 +166,8 @@ router.post('/', upload.any(), async (req, res) => {
       return [];
     };
 
+    const requestedPaidPlan = ['pro', 'featured'].includes(listingPlan) ? listingPlan : null;
+
     const profileData = {
       fullName,
       accountType:          accountType         || 'Individual Provider',
@@ -194,7 +202,9 @@ router.post('/', upload.any(), async (req, res) => {
       certifications:       effectiveCerts,
       memberships:          memberships         || null,
       clearance:            clearanceText || clearance || null,
-      listingPlan,
+      listingPlan: 'free',
+      requestedPlan: requestedPaidPlan,
+      billingStatus: requestedPaidPlan ? 'pending' : 'inactive',
       status:               'PENDING',
       publicDisplay:        false,
       // Files — only set if we have actual data
@@ -284,7 +294,7 @@ router.patch('/:userId', upload.any(), async (req, res) => {
       'deliveryMode','city','province','serviceAreaType','radius','pricingModel',
       'startingPrice','availabilityDays','availabilityNotes','phone','whatsapp',
       'inquiryEmail','website','facebook','instagram','linkedin','tiktok','twitter',
-      'degrees','certifications','memberships','clearance','listingPlan','status',
+      'degrees','certifications','memberships','clearance','status',
       'publicDisplay','profilePhoto','certFile','certFileName','certFileType',
       'clearanceFile','clearanceFileName','clearanceFileType',
     ]);
@@ -292,8 +302,17 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     const data = {};
     Object.entries(updates).forEach(([k, v]) => { if (ALLOWED.has(k)) data[k] = v; });
 
-    if (data.experience) data.experience = parseInt(data.experience);
-    if (data.radius)     data.radius     = parseInt(data.radius);
+    if (Object.prototype.hasOwnProperty.call(data, 'experience')) {
+      const value = String(data.experience ?? '').trim();
+      data.experience = value === '' ? null : parseInt(value, 10);
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'radius')) {
+      const value = String(data.radius ?? '').trim();
+      data.radius = value === '' ? null : parseInt(value, 10);
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'publicDisplay')) {
+      data.publicDisplay = data.publicDisplay === true || data.publicDisplay === 'true';
+    }
 
     if (newCert) {
       data.certFile     = toDataUrl(newCert.buffer, newCert.mimetype);
@@ -306,14 +325,38 @@ router.patch('/:userId', upload.any(), async (req, res) => {
       data.clearanceFileType = newClearance.mimetype;
     }
 
-    const profile = await prisma.providerProfile.update({
-      where: { userId: req.params.userId },
-      data,
-      include: {
-        user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
-        reviews: true,
-      },
-    });
+    let profile;
+    try {
+      profile = await prisma.providerProfile.update({
+        where: { userId: req.params.userId },
+        data,
+        include: {
+          user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
+          reviews: true,
+        },
+      });
+    } catch (error) {
+      if (error.code !== 'P2025') throw error;
+
+      const user = await prisma.user.findUnique({ where: { id: req.params.userId } });
+      if (!user) throw error;
+
+      profile = await prisma.providerProfile.create({
+        data: {
+          userId: req.params.userId,
+          fullName: data.fullName || user.name || user.email,
+          accountType: data.accountType || user.accountType || 'Individual Provider',
+          status: 'PENDING',
+          listingPlan: 'free',
+          publicDisplay: false,
+          ...data,
+        },
+        include: {
+          user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
+          reviews: true,
+        },
+      });
+    }
     return res.json({ message: 'Profile updated', profile: mapProvider(profile) });
   } catch (error) {
     console.error('PATCH /api/providers/:userId error:', error);
