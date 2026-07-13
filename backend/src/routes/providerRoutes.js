@@ -11,6 +11,19 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits:  { fileSize: 10 * 1024 * 1024 }, // Keep database-backed uploads small.
 });
+const uploadAny = upload.any();
+
+function handleProviderUpload(req, res, next) {
+  uploadAny(req, res, (error) => {
+    if (!error) return next();
+
+    const message = error.code === 'LIMIT_FILE_SIZE'
+      ? 'Each uploaded file must be 10MB or smaller.'
+      : error.message || 'Could not process uploaded files.';
+
+    return res.status(400).json({ message });
+  });
+}
 
 // ── Helper: Buffer → base64 data-URL ─────────────────────────────────────────
 function toDataUrl(buffer, mimetype) {
@@ -57,6 +70,12 @@ function normalizeStatus(status) {
   return ['PENDING', 'APPROVED', 'REJECTED'].includes(value) ? value : null;
 }
 
+function toOptionalInt(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 async function updateProviderStatus(userId, statusValue, res) {
   const status = normalizeStatus(statusValue);
   if (!status) {
@@ -82,7 +101,7 @@ async function updateProviderStatus(userId, statusValue, res) {
 //
 //  Falls back to plain JSON body if Content-Type is application/json
 // ─────────────────────────────────────────────────────────────────────────────
-router.post('/', upload.any(), async (req, res) => {
+router.post('/', handleProviderUpload, async (req, res) => {
   try {
     // 1. Parse the JSON blob
     let d = {};
@@ -172,7 +191,7 @@ router.post('/', upload.any(), async (req, res) => {
       fullName,
       accountType:          accountType         || 'Individual Provider',
       bio:                  bio                 || null,
-      experience:           experience != null  ? parseInt(experience) : null,
+      experience:           toOptionalInt(experience),
       languages:            toArr(languages),
       primaryCategory:      primaryCategory     || null,
       secondaryCategories:  toArr(secondaryCategories),
@@ -184,7 +203,7 @@ router.post('/', upload.any(), async (req, res) => {
       city:                 city                || null,
       province:             province            || null,
       serviceAreaType:      serviceAreaType     || 'national',
-      radius:               radius != null      ? parseInt(radius) : null,
+      radius:               toOptionalInt(radius),
       pricingModel:         pricingModel        || null,
       startingPrice:        startingPrice       || null,
       availabilityDays:     toArr(availabilityDays),
@@ -273,7 +292,7 @@ router.get('/:userId', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 //  PATCH /api/providers/:userId  — update profile (client dashboard save)
 // ─────────────────────────────────────────────────────────────────────────────
-router.patch('/:userId', upload.any(), async (req, res) => {
+router.patch('/:userId', handleProviderUpload, async (req, res) => {
   try {
     let updates = {};
     if (req.body.providerData) {
@@ -303,12 +322,10 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     Object.entries(updates).forEach(([k, v]) => { if (ALLOWED.has(k)) data[k] = v; });
 
     if (Object.prototype.hasOwnProperty.call(data, 'experience')) {
-      const value = String(data.experience ?? '').trim();
-      data.experience = value === '' ? null : parseInt(value, 10);
+      data.experience = toOptionalInt(data.experience);
     }
     if (Object.prototype.hasOwnProperty.call(data, 'radius')) {
-      const value = String(data.radius ?? '').trim();
-      data.radius = value === '' ? null : parseInt(value, 10);
+      data.radius = toOptionalInt(data.radius);
     }
     if (Object.prototype.hasOwnProperty.call(data, 'publicDisplay')) {
       data.publicDisplay = data.publicDisplay === true || data.publicDisplay === 'true';

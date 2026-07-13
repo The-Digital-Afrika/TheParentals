@@ -131,6 +131,11 @@ model PaymentTransaction {
   rawResponse       Json?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([status])
+  @@index([paymentMethod])
 }
 
 model Review {

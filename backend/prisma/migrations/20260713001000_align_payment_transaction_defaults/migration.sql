@@ -1,0 +1,3 @@
+ALTER TABLE "PaymentTransaction"
+  ALTER COLUMN "status" SET DEFAULT 'INITIALIZED',
+  ALTER COLUMN "updatedAt" DROP DEFAULT;
