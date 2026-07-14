@@ -70,6 +70,59 @@ function findProvider(id, email) {
   } catch { return null; }
 }
 
+function getSavedTime(profile) {
+  const value = profile?.localSavedAt || profile?.updatedAt || profile?.createdAt || profile?.registered;
+  const time = value ? new Date(value).getTime() : 0;
+  return Number.isFinite(time) ? time : 0;
+}
+
+function profileCompletenessScore(profile) {
+  if (!profile) return 0;
+  const checks = [
+    profile.name || profile.fullName,
+    profile.email || profile.contactEmail || profile.inquiryEmail,
+    profile.bio,
+    profile.primaryCategory,
+    profile.city,
+    profile.province,
+    profile.phone,
+    profile.contactEmail || profile.inquiryEmail,
+    profile.serviceTitle || profile.services?.some(service => service?.title),
+    profile.serviceDesc || profile.services?.some(service => service?.description),
+    profile.pricingModel,
+    profile.startingPrice,
+    profile.availabilityDays?.length,
+    profile.degrees || profile.certifications,
+    profile.languages?.length,
+  ];
+  return checks.filter(Boolean).length;
+}
+
+function isBlankProfileValue(value) {
+  if (value === null || value === undefined) return true;
+  if (typeof value === 'string') return value.trim() === '';
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+}
+
+function fillMissingProfileFields(primaryProfile, fallbackProfile) {
+  if (!fallbackProfile) return primaryProfile;
+  const merged = { ...primaryProfile };
+  Object.entries(fallbackProfile).forEach(([key, value]) => {
+    if (!isBlankProfileValue(value) && isBlankProfileValue(merged[key])) {
+      merged[key] = value;
+    }
+  });
+  return merged;
+}
+
+function shouldUseLocalProfile(localProfile, remoteProfile) {
+  if (!localProfile) return false;
+  if (!remoteProfile) return true;
+  if (getSavedTime(localProfile) > getSavedTime(remoteProfile)) return true;
+  return profileCompletenessScore(localProfile) > profileCompletenessScore(remoteProfile);
+}
+
 function findMemberProfile(id) {
   if (!id) return null;
 
@@ -119,6 +172,7 @@ function normalizeApiProfile(found) {
     id: profileId,
     userId: profileId,
     name: found.name || found.fullName || '',
+    email: found.email || found.contactEmail || found.inquiryEmail || '',
     bio: found.bio || '',
     primaryCategory: found.primaryCategory || found.category || '',
     city: found.city || '',
@@ -170,10 +224,6 @@ function normalizeApiProfile(found) {
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const ORANGE = '#6f8da6';
 const EMPTY_ENQUIRY_FORM = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
   subject: 'General enquiry',
   message: '',
 };
@@ -790,6 +840,33 @@ const injectStyles = () => {
       text-align: center;
       margin-bottom: 28px;
     }
+    .pv2-contact-method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .pv2-contact-method-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      min-height: 52px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.1);
+      color: #1a1a1a;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .pv2-contact-method-card i { color: ${ORANGE}; flex-shrink: 0; }
+    .pv2-contact-method-card span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .pv2-enquiry-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -1002,7 +1079,11 @@ const Profile = () => {
       // 2. Try API by provider ID
       if (!found && id) {
         try {
-          found = normalizeApiProfile(await api.getProviderById(id));
+          const remoteProfile = normalizeApiProfile(await api.getProviderById(id));
+          const localProfile = findProvider(id, email);
+          found = shouldUseLocalProfile(localProfile, remoteProfile)
+            ? fillMissingProfileFields(localProfile, remoteProfile)
+            : fillMissingProfileFields(remoteProfile, localProfile);
         } catch (error) {
           console.warn('Profile API load failed, using local data:', error.message);
         }
@@ -1111,9 +1192,21 @@ const Profile = () => {
   const handleEnquirySubmit = (event) => {
     event.preventDefault();
 
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enquiryForm.email.trim());
-    if (!enquiryForm.firstName.trim() || !enquiryForm.lastName.trim() || !emailOk || !enquiryForm.message.trim()) {
-      setEnquiryError('Please complete your name, a valid email address, and your message.');
+    const currentUser = (() => {
+      try {
+        return JSON.parse(localStorage.getItem('sah_current_user') || localStorage.getItem('sah_user') || 'null');
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!currentUser?.id || !currentUser?.email) {
+      setEnquiryError('Please log in with your customer account before sending an enquiry.');
+      return;
+    }
+
+    if (!enquiryForm.message.trim()) {
+      setEnquiryError('Please enter your message.');
       return;
     }
 
@@ -1121,22 +1214,16 @@ const Profile = () => {
     setEnquiryError('');
 
     try {
-      const currentUser = (() => {
-        try {
-          return JSON.parse(localStorage.getItem('sah_current_user') || localStorage.getItem('sah_user') || 'null');
-        } catch {
-          return null;
-        }
-      })();
+      const clientName = currentUser.name || currentUser.fullName || currentUser.email.split('@')[0];
 
       createInquiry({
         providerId: profile.id || profile.userId || '',
         providerUserId: profile.userId || profile.id || '',
         providerName: profile.name || '',
-        clientId: currentUser?.id || '',
-        clientName: `${enquiryForm.firstName.trim()} ${enquiryForm.lastName.trim()}`.trim(),
-        clientEmail: enquiryForm.email.trim(),
-        clientPhone: enquiryForm.phone.trim(),
+        clientId: currentUser.id,
+        clientName,
+        clientEmail: currentUser.email,
+        clientPhone: currentUser.phone || '',
         subject: enquiryForm.subject,
         message: enquiryForm.message.trim(),
         category: profile.primaryCategory || profile.category || '',
@@ -1338,7 +1425,7 @@ const Profile = () => {
                     </button>
                   )}
 
-                  {!isMemberProfile ? (
+                  {!fromDashboard && !isMemberProfile ? (
                     <button
                       className="pv2-contact-toggle"
                       onClick={() => setContactOpen(true)}
@@ -1502,38 +1589,20 @@ const Profile = () => {
             </div>
 
             {isPaid && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 12, marginBottom: 20 }}>
+              <div className="pv2-contact-method-grid">
                 {[
                   { icon: 'fa-phone', label: 'Phone', value: profile.phone, href: profile.phone ? `tel:${profile.phone}` : '' },
                   { icon: 'fa-whatsapp', label: 'WhatsApp', value: profile.whatsapp || profile.phone, href: (profile.whatsapp || profile.phone) ? `https://wa.me/${String(profile.whatsapp || profile.phone).replace(/\D/g, '')}` : '' },
+                  { icon: 'fa-envelope', label: 'Email', value: profile.contactEmail || profile.email || profile.inquiryEmail, href: (profile.contactEmail || profile.email || profile.inquiryEmail) ? `mailto:${profile.contactEmail || profile.email || profile.inquiryEmail}` : '' },
                   { icon: 'fa-globe', label: 'Website', value: profile.website, href: profile.website },
                 ].filter(item => item.value).map(item => (
-                  <a key={item.label} href={item.href} target={item.label === 'Website' || item.label === 'WhatsApp' ? '_blank' : undefined} rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 8, background: '#fff', border: '1px solid rgba(0,0,0,0.1)', color: '#1a1a1a', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 700, minWidth: 0 }}>
-                    <i className={`fas ${item.icon}`} style={{ color: ORANGE, flexShrink: 0 }} />
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.value}</span>
+                  <a key={item.label} className="pv2-contact-method-card" href={item.href} target={item.label === 'Website' || item.label === 'WhatsApp' ? '_blank' : undefined} rel="noreferrer">
+                    <i className={`fas ${item.icon}`} />
+                    <span>{item.value}</span>
                   </a>
                 ))}
               </div>
             )}
-
-            <div className="pv2-enquiry-grid">
-              <div className="pv2-enquiry-field">
-                <label>First Name</label>
-                <input type="text" placeholder="Sarah" value={enquiryForm.firstName} onChange={(e) => updateEnquiryField('firstName', e.target.value)} required />
-              </div>
-              <div className="pv2-enquiry-field">
-                <label>Last Name</label>
-                <input type="text" placeholder="Smith" value={enquiryForm.lastName} onChange={(e) => updateEnquiryField('lastName', e.target.value)} required />
-              </div>
-              <div className="pv2-enquiry-field">
-                <label>Email Address</label>
-                <input type="email" placeholder="sarah@email.com" value={enquiryForm.email} onChange={(e) => updateEnquiryField('email', e.target.value)} required />
-              </div>
-              <div className="pv2-enquiry-field">
-                <label>Phone Number</label>
-                <input type="tel" placeholder="082 000 0000" value={enquiryForm.phone} onChange={(e) => updateEnquiryField('phone', e.target.value)} />
-              </div>
-            </div>
 
             <div className="pv2-enquiry-grid-wide">
               <div className="pv2-enquiry-field">

@@ -79,7 +79,7 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-terms-view-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.55); background: rgba(255,255,255,0.10); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.80rem; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sah-terms-view-btn:hover { background: rgba(255,255,255,0.22); border-color: #fff; }
 .sah-terms-body { overflow: hidden; transition: max-height 0.38s ease, padding 0.25s ease; }
-.sah-terms-body.open { max-height: 420px; overflow-y: auto; padding: 20px 22px; }
+.sah-terms-body.open { max-height: min(58vh, 520px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-gutter: stable; padding: 20px 22px; }
 .sah-terms-body.closed { max-height: 0; padding: 0 22px; }
 .sah-terms-body h4 { font-size: 0.85rem; font-weight: 800; color: var(--dark); margin: 14px 0 5px; text-transform: uppercase; letter-spacing: 0.4px; }
 .sah-terms-body h4:first-child { margin-top: 0; }
@@ -313,8 +313,18 @@ const getPasswordStrength = (pw) => {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const planToTier = (param) => {
-  if (param?.includes('R149') || param?.includes('Plus+')) return 'pro';
+  const value = String(param || '').toLowerCase();
+  if (value.includes('r149') || value.includes('plus+') || value === 'pro') return 'pro';
   return 'free';
+};
+
+const getPlanByValue = (value) => {
+  const tier = planToTier(value);
+  return PLANS.find(plan => (
+    plan.param === value
+    || plan.id === value
+    || planToTier(plan.param) === tier
+  )) || PLANS[0];
 };
 
 const catToSlug = (cat) => {
@@ -410,7 +420,7 @@ const Registration = () => {
   const { login } = useAuth();
 
   const [step, setStep] = useState(1);
-  const [data, setData] = useState({ listingPlan: 'Free Listing – basic profile', terms: false });
+  const [data, setData] = useState({ listingPlan: PLANS[0].param, terms: false });
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -476,6 +486,34 @@ const Registration = () => {
   const set = (name, value) => {
     setData(p => ({ ...p, [name]: value }));
     setFieldErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const startPaidRegistrationPayment = async (plan, token) => {
+    const payment = await apiRequest('POST', '/api/payments/initialize', {
+      plan,
+      method: 'card',
+      returnUrl: `${window.location.origin}/payment/callback`,
+    }, token);
+
+    window.location.href = payment.authorizationUrl;
+  };
+
+  const continueExistingPaidRegistration = async (email, password, plan, saveProviderProfile = null) => {
+    const auth = await apiRequest('POST', '/api/auth/login', {
+      email,
+      password,
+    });
+
+    if (auth?.user?.role !== 'PROVIDER') {
+      throw new Error('This email is not registered as a provider account.');
+    }
+
+    login({ ...auth.user, token: auth.token });
+    showNotification?.('Continuing your Parental Plus+ payment...', 'info');
+    if (saveProviderProfile) {
+      await saveProviderProfile(auth.user.id);
+    }
+    await startPaidRegistrationPayment(plan, auth.token);
   };
 
   const toggleMulti = (name, value, checked) => {
@@ -746,6 +784,57 @@ const Registration = () => {
       listingPublic: true, publicToggle: true,
     };
 
+    const buildProviderFormData = (userId) => {
+      const formData = new FormData();
+      formData.append('providerData', JSON.stringify({
+        userId,
+        fullName: data.fullName,
+        accountType: data.accountType || 'Individual Provider',
+        bio: data.bio,
+        experience: parseInt(data.experience, 10) || 0,
+        primaryCategory: data.primaryCat,
+        secondaryCategories: data.secondaryCats || [],
+        serviceTitle: data.serviceTitle,
+        serviceDesc: data.serviceDesc,
+        subjects: data.subjects,
+        ageGroups: data.ageGroups || [],
+        deliveryMode: data.deliveryMode,
+        city: data.city,
+        province: data.province,
+        serviceAreaType,
+        radius: data.localRadiusNum ? parseInt(data.localRadiusNum, 10) : null,
+        pricingModel: data.pricingModel,
+        startingPrice: priceDisplay,
+        availabilityDays: (data.daysAvailable || []).map(d => d.slice(0, 3)),
+        availabilityNotes: data.timeSlots,
+        phone: fullPhone,
+        whatsapp: fullWhatsapp,
+        inquiryEmail: data.inquiryEmail,
+        website: data.website || null,
+        linkedin: data.linkedin || null,
+        instagram: data.instagram || null,
+        facebook: data.facebook || null,
+        tiktok: data.tiktok || null,
+        twitter: data.twitter || null,
+        degrees: qualDegree,
+        certifications: certsCombined,
+        certTextEntry: data.qualCerts || '',
+        memberships: qualMemberships,
+        clearanceText: data.clearanceText || null,
+        listingPlan: tier,
+        languages: data.languages || [],
+        profilePhoto: data.profilePhoto || null,
+      }));
+
+      certFiles.forEach((f, i) => formData.append(`certFile_${i}`, f.file));
+      clearanceFiles.forEach((f, i) => formData.append(`clearanceFile_${i}`, f.file));
+      return formData;
+    };
+
+    const saveRegistrationProviderProfile = (userId) => (
+      apiRequest('POST', '/api/providers', buildProviderFormData(userId))
+    );
+
     // Check localStorage for duplicate email first
     const existingUsers = JSON.parse(localStorage.getItem('sah_users') || '[]');
     const existingProviders = JSON.parse(localStorage.getItem('sah_providers') || '[]');
@@ -755,6 +844,16 @@ const Registration = () => {
       existingProviders.find(p => (p.email || '').toLowerCase() === emailLower);
 
     if (alreadyExists) {
+      if (tier !== 'free') {
+        try {
+          await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
+          return;
+        } catch (retryErr) {
+          setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
+          setSubmitting(false);
+          return;
+        }
+      }
       setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
       setSubmitting(false);
       return;
@@ -771,51 +870,7 @@ const Registration = () => {
       });
         const dbUserId = userData?.user?.id || userData?.userId || providerId;
 
-        const formData = new FormData();
-        formData.append('providerData', JSON.stringify({
-          userId: dbUserId,
-          fullName: data.fullName,
-          accountType: data.accountType || 'Individual Provider',
-          bio: data.bio,
-          experience: parseInt(data.experience) || 0,
-          primaryCategory: data.primaryCat,
-          secondaryCategories: data.secondaryCats || [],
-          serviceTitle: data.serviceTitle,
-          serviceDesc: data.serviceDesc,
-          subjects: data.subjects,
-          ageGroups: data.ageGroups || [],
-          deliveryMode: data.deliveryMode,
-          city: data.city,
-          province: data.province,
-          serviceAreaType,
-          radius: data.localRadiusNum ? parseInt(data.localRadiusNum) : null,
-          pricingModel: data.pricingModel,
-          startingPrice: priceDisplay,
-          availabilityDays: (data.daysAvailable || []).map(d => d.slice(0, 3)),
-          availabilityNotes: data.timeSlots,
-          phone: fullPhone,
-          whatsapp: fullWhatsapp,
-          inquiryEmail: data.inquiryEmail,
-          website: data.website || null,
-          linkedin: data.linkedin || null,
-          instagram: data.instagram || null,
-          facebook: data.facebook || null,
-          tiktok: data.tiktok || null,
-          twitter: data.twitter || null,
-          degrees: qualDegree,
-          certifications: certsCombined,
-          certTextEntry: data.qualCerts || '',
-          memberships: qualMemberships,
-          clearanceText: data.clearanceText || null,
-          listingPlan: tier,
-          languages: data.languages || [],
-          profilePhoto: data.profilePhoto || null,
-        }));
-
-        certFiles.forEach((f, i) => formData.append(`certFile_${i}`, f.file));
-        clearanceFiles.forEach((f, i) => formData.append(`clearanceFile_${i}`, f.file));
-
-        await apiRequest('POST', '/api/providers', formData);
+        await saveRegistrationProviderProfile(dbUserId);
 
         const activeTier = tier === 'free' ? 'free' : 'free';
         const localProvider = {
@@ -846,11 +901,7 @@ const Registration = () => {
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
         if (tier !== 'free') {
           showNotification?.('Profile created. Redirecting to payment...', 'info');
-          const payment = await apiRequest('POST', '/api/payments/initialize', {
-            plan: tier,
-            returnUrl: `${window.location.origin}/payment-demo`,
-          }, userData?.token);
-          window.location.href = payment.authorizationUrl;
+          await startPaidRegistrationPayment(tier, userData?.token);
           return;
         }
 
@@ -858,12 +909,22 @@ const Registration = () => {
         return;
     } catch (apiErr) {
       if (apiErr.status === 409) {
+        if (tier !== 'free') {
+          try {
+            await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
+            return;
+          } catch (retryErr) {
+            setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
+            setSubmitting(false);
+            return;
+          }
+        }
         setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
         setSubmitting(false);
         return;
       }
       if (tier !== 'free') {
-        setFieldErrors({ _submit: 'Parental Plus+ registration needs the backend payment service. Please confirm the backend is running, then try again.' });
+        setFieldErrors({ _submit: apiErr.message || 'Parental Plus+ registration needs the backend payment service. Please confirm the backend is running, then try again.' });
         setSubmitting(false);
         return;
       }
@@ -917,7 +978,7 @@ const Registration = () => {
   const renderStep1 = () => (
     <div className="sah-plan-grid" style={{ marginTop: 8 }}>
       {PLANS.map(plan => {
-        const selected = data.listingPlan === plan.param;
+        const selected = getPlanByValue(data.listingPlan)?.id === plan.id;
         return (
           <div key={plan.id} className={`sah-plan-card${selected ? ' selected' : ''}`}
             onClick={() => {
@@ -1491,7 +1552,7 @@ const Registration = () => {
           {[
             ['Name', data.fullName || '—'],
             ['Email', data.email || '—'],
-            ['Plan', PLANS.find(p => p.param === data.listingPlan)?.name || '—'],
+            ['Plan', getPlanByValue(data.listingPlan)?.name || '—'],
             ['Category', data.primaryCat || '—'],
             ['Location', data.city && data.province ? `${data.city}, ${data.province}` : '—'],
             ['Pricing', data.pricingModel || '—'],

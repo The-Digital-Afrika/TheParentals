@@ -69,12 +69,35 @@ function shouldUseLocalProfile(localProfile, remoteProfile) {
   if (localProfileIsNewer(localProfile, remoteProfile)) return true;
   return profileCompletenessScore(localProfile) > profileCompletenessScore(remoteProfile);
 }
+function isBlankProfileValue(value) {
+  if (value === null || value === undefined) return true;
+  if (typeof value === 'string') return value.trim() === '';
+  if (Array.isArray(value)) return value.length === 0;
+  return false;
+}
+function fillMissingProfileFields(remoteProfile, localProfile) {
+  if (!localProfile) return remoteProfile;
+  const merged = { ...remoteProfile };
+  Object.entries(localProfile).forEach(([key, value]) => {
+    if (!isBlankProfileValue(value) && isBlankProfileValue(merged[key])) {
+      merged[key] = value;
+    }
+  });
+  return merged;
+}
 function normalizeProviderForSave(profile) {
   const now = new Date().toISOString();
   const firstService = profile.services?.[0] || {};
   const id = profile.userId || profile.id || '';
   const contactEmail = profile.contactEmail || profile.inquiryEmail || profile.email || '';
   const displayName = profile.name || profile.fullName || profile.contactName || '';
+  const serviceTitle = profile.serviceTitle || firstService.title || '';
+  const serviceDesc = profile.serviceDesc || firstService.description || '';
+  const subjects = profile.subjects || firstService.subjects || profile.tags?.join(', ') || '';
+  const ageGroups = (profile.ageGroups && profile.ageGroups.length)
+    ? profile.ageGroups
+    : (firstService.ageGroups || []);
+  const deliveryMode = profile.deliveryMode || firstService.deliveryMode || '';
 
   return {
     ...profile,
@@ -85,11 +108,14 @@ function normalizeProviderForSave(profile) {
     email: profile.email || contactEmail,
     contactEmail,
     inquiryEmail: contactEmail,
-    serviceTitle: firstService.title || profile.serviceTitle || '',
-    serviceDesc: firstService.description || profile.serviceDesc || '',
-    subjects: firstService.subjects || profile.subjects || profile.tags?.join(', ') || '',
-    ageGroups: firstService.ageGroups || profile.ageGroups || [],
-    deliveryMode: firstService.deliveryMode || profile.deliveryMode || '',
+    serviceTitle,
+    serviceDesc,
+    subjects,
+    ageGroups,
+    deliveryMode,
+    services: profile.services?.length
+      ? profile.services
+      : [{ title: serviceTitle, description: serviceDesc, subjects, ageGroups, deliveryMode: deliveryMode || 'Online' }],
     social: profile.website || profile.social || '',
     image: profile.profilePhoto || profile.photo || profile.image || null,
     photo: profile.profilePhoto || profile.photo || profile.image || null,
@@ -694,12 +720,12 @@ const DASH_CSS = `
   .cd-terms-toggle { color:#fff; opacity:.78; font-size:.75rem; transition:transform .16s; }
   .cd-terms-toggle.open { transform:rotate(180deg); }
   .cd-terms-closed-note { padding:12px 16px; font-size:.76rem; color:#888; background:#fff; }
-  .cd-terms-modal-overlay { position:fixed; inset:0; background:rgba(20,29,38,.52); display:flex; align-items:center; justify-content:center; padding:18px; z-index:9999; }
-  .cd-terms-modal { width:min(560px,100%); background:#fff; border-radius:12px; box-shadow:0 22px 70px rgba(0,0,0,.22); border:1px solid rgba(0,0,0,.08); overflow:hidden; }
-  .cd-terms-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; background:#5a5a5a; color:#fff; }
+  .cd-terms-modal-overlay { position:fixed; inset:0; background:rgba(20,29,38,.52); display:flex; align-items:center; justify-content:center; padding:24px 16px; z-index:9999; overflow:hidden; }
+  .cd-terms-modal { width:min(680px,100%); max-height:calc(100vh - 48px); background:#fff; border-radius:12px; box-shadow:0 22px 70px rgba(0,0,0,.22); border:1px solid rgba(0,0,0,.08); overflow:hidden; display:flex; flex-direction:column; }
+  .cd-terms-modal-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; background:#5a5a5a; color:#fff; flex-shrink:0; }
   .cd-terms-modal-title { font-size:.9rem; font-weight:900; text-transform:uppercase; letter-spacing:.7px; display:flex; align-items:center; gap:8px; }
   .cd-terms-modal-close { width:30px; height:30px; border-radius:7px; border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-  .cd-terms-modal-body { padding:16px 18px; color:#444; font-size:.84rem; line-height:1.65; }
+  .cd-terms-modal-body { padding:16px 18px; color:#444; font-size:.84rem; line-height:1.65; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scrollbar-gutter:stable; }
   .cd-terms-modal-body ul { margin:10px 0 0; padding-left:18px; }
   .cd-terms-modal-body li { margin-bottom:7px; }
   .cd-terms-modal-body ol { margin:0; padding-left:20px; }
@@ -867,9 +893,25 @@ const ClientDashboard = () => {
             } catch {}
 
             const localMapped = storedBeforeApi ? mapDbProfileToLocal(storedBeforeApi) : null;
-            const finalProfile = shouldUseLocalProfile(localMapped, mapped)
-              ? { ...mapped, ...localMapped, id: cu.id, userId: cu.id }
-              : { ...mapped, id: cu.id, userId: cu.id };
+            const mergedProfile = shouldUseLocalProfile(localMapped, mapped)
+              ? fillMissingProfileFields(localMapped, mapped)
+              : fillMissingProfileFields(mapped, localMapped);
+            const localOnlyMedia = localMapped ? {
+              profilePhoto: mergedProfile.profilePhoto || localMapped.profilePhoto || null,
+              photo: mergedProfile.photo || localMapped.photo || null,
+              image: mergedProfile.image || localMapped.image || null,
+              certFilesAll: mergedProfile.certFilesAll?.length ? mergedProfile.certFilesAll : localMapped.certFilesAll,
+              certDocuments: mergedProfile.certDocuments?.length ? mergedProfile.certDocuments : localMapped.certDocuments,
+              clearanceFilesAll: mergedProfile.clearanceFilesAll?.length ? mergedProfile.clearanceFilesAll : localMapped.clearanceFilesAll,
+              clearanceDocuments: mergedProfile.clearanceDocuments?.length ? mergedProfile.clearanceDocuments : localMapped.clearanceDocuments,
+            } : {};
+            const finalProfile = {
+              ...mergedProfile,
+              ...localOnlyMedia,
+              id: cu.id,
+              userId: cu.id,
+              email: mergedProfile.email || cu.email || localMapped?.email || '',
+            };
 
             setProfileData(finalProfile);
             setPhotoPreview(finalProfile.profilePhoto || null);
@@ -1083,6 +1125,48 @@ const ClientDashboard = () => {
     }
   }, [profileData, saveProviderToBackend, showNotification]);
 
+  const saveAndNavigate = useCallback(async (targetPath) => {
+    setLoading(true);
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveSeqRef.current += 1;
+
+    const localProfile = normalizeProviderForSave({
+      ...profileData,
+      id: profileData.userId || profileData.id,
+      userId: profileData.userId || profileData.id,
+      social: profileData.website || profileData.social || '',
+      image: profileData.profilePhoto || profileData.photo || profileData.image || null,
+      photo: profileData.profilePhoto || profileData.photo || profileData.image || null,
+    });
+    saveProviderById(localProfile);
+    setProfileData(localProfile);
+    setPhotoPreview(localProfile.profilePhoto || localProfile.photo || localProfile.image || null);
+    setSnapshot(null);
+    setEditing(false);
+    setEditSection(null);
+    setQualFileName('');
+    setClearanceFileName('');
+
+    try {
+      const savedProfile = await saveProviderToBackend(localProfile);
+      setProfileData(savedProfile);
+      setPhotoPreview(savedProfile.profilePhoto || savedProfile.photo || savedProfile.image || null);
+      setAutosaveStatus('saved');
+    } catch (err) {
+      console.error('Save before navigation failed:', err);
+      setAutosaveStatus('local');
+      showNotification('Saved on this device. Backend sync will retry when it is reachable.', 'info');
+    } finally {
+      setLoading(false);
+      navigate(targetPath);
+    }
+  }, [profileData, saveProviderToBackend, navigate, showNotification]);
+
+  const openPublicView = useCallback(() => {
+    const profileId = profileData.userId || profileData.id;
+    return saveAndNavigate(profileId ? `/profile?id=${profileId}&from=dashboard` : '/profile?from=dashboard');
+  }, [profileData.userId, profileData.id, saveAndNavigate]);
+
   const saveMemberChanges = useCallback(async () => {
     setLoading(true);
     try {
@@ -1214,7 +1298,19 @@ const ClientDashboard = () => {
 
   /* ─── service helpers ─── */
   const addService    = () => { if (svcCount < maxServices) upd({ services: [...profileData.services, { title: '', ageGroups: [], deliveryMode: 'Online', description: '', subjects: '' }] }); };
-  const updService    = (i, s) => { const a = [...profileData.services]; a[i] = s; upd({ services: a }); };
+  const updService    = (i, s) => {
+    const a = [...profileData.services];
+    a[i] = s;
+    const patch = { services: a };
+    if (i === 0) {
+      patch.serviceTitle = s.title || '';
+      patch.serviceDesc = s.description || '';
+      patch.subjects = s.subjects || '';
+      patch.ageGroups = s.ageGroups || [];
+      patch.deliveryMode = s.deliveryMode || '';
+    }
+    upd(patch);
+  };
   const removeService = (i)    => { if (profileData.services.length > 1) upd({ services: profileData.services.filter((_, idx) => idx !== i) }); };
 
   /* ─── day toggle ─── */
@@ -1347,7 +1443,7 @@ const ClientDashboard = () => {
       const payment = await api.initializePayment({
         plan: checkoutPlan.id,
         method: checkoutMethod,
-        returnUrl: `${window.location.origin}/payment-demo`,
+        returnUrl: `${window.location.origin}/payment/callback`,
       }, token);
       const safePayment = payment.payment || payment;
       setActivePayment(safePayment);
@@ -1393,7 +1489,7 @@ const ClientDashboard = () => {
       const result = await api.getPaymentStatus(activePayment.reference, token);
       const payment = result.payment;
       setActivePayment(payment);
-      if (payment.status === 'SUCCESS') {
+      if (payment.status === 'PAID' || payment.status === 'SUCCESS') {
         syncPaidPlanInUi(payment);
         setCheckoutState('success');
       } else if (payment.status === 'FAILED') setCheckoutState('failed');
@@ -2396,7 +2492,7 @@ const ClientDashboard = () => {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: 900, color: '#6f8da6' }}>R{((payment.amount || 0) / 100).toFixed(2)}</div>
-                      <div style={{ display: 'inline-flex', marginTop: 4, padding: '3px 8px', borderRadius: 99, background: payment.status === 'success' ? '#e8f5e9' : '#fff3e0', color: payment.status === 'success' ? '#2e7d32' : '#856404', fontSize: '.68rem', fontWeight: 900, textTransform: 'uppercase' }}>
+                      <div style={{ display: 'inline-flex', marginTop: 4, padding: '3px 8px', borderRadius: 99, background: ['PAID', 'SUCCESS', 'success'].includes(payment.status) ? '#e8f5e9' : '#fff3e0', color: ['PAID', 'SUCCESS', 'success'].includes(payment.status) ? '#2e7d32' : '#856404', fontSize: '.68rem', fontWeight: 900, textTransform: 'uppercase' }}>
                         {payment.status}
                       </div>
                     </div>
@@ -3145,13 +3241,11 @@ const ClientDashboard = () => {
           </div>
           <div className="cd-hero-right">
             <button
+              type="button"
               className="cd-btn-ghost"
-              onClick={() => {
-                const profileId = profileData.userId || profileData.id;
-                navigate(profileId ? `/profile?id=${profileId}&from=dashboard` : '/profile?from=dashboard');
-              }}
+              onClick={openPublicView}
             >
-              <i className="fas fa-eye"></i> Public View
+              <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-eye'}`}></i> Public View
             </button>
             {editing && (
               <>
@@ -3173,7 +3267,14 @@ const ClientDashboard = () => {
       </section>
       {renderEnquiryAlert('provider')}
       <main className="cd-main">
-        <Link to="/#sah-providers" className="cd-directory-back">
+        <Link
+          to="/#sah-providers"
+          className="cd-directory-back"
+          onClick={(event) => {
+            event.preventDefault();
+            saveAndNavigate('/#sah-providers');
+          }}
+        >
           <i className="fas fa-arrow-left"></i> Back to Directory
         </Link>
         {renderInquiryCenter('provider')}

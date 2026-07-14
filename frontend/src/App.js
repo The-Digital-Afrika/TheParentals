@@ -27,6 +27,7 @@ function App() {
             <Route path="/register/user" element={<UserRegister />} />
             <Route path="/register/provider" element={<Registration />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/payment/callback" element={<PaymentDemo />} />
             <Route path="/payment-demo" element={<PaymentDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
