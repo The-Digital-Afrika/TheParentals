@@ -15,7 +15,7 @@
 }
 
 .sah-registration-hero .sah-hero-bg::after {
-  background: linear-gradient(100deg, rgba(90,90,90,0.87) 0%, rgba(110,110,110,0.76) 45%, rgba(70,70,70,0.52) 100%) !important;
+  background: rgba(24,35,48,0.68) !important;
 }
 
 .sah-registration-hero .sah-hero-inner {
@@ -69,7 +69,7 @@
 
 .sah-step-progress-fill {
   height: 8px;
-  background: var(--accent, #c9621a);
+  background: var(--accent, #6f8da6);
   border-radius: 100px;
   transition: width 0.3s ease;
 }
@@ -166,14 +166,14 @@
 }
 
 .sah-field label i {
-  color: var(--accent, #c9621a);
+  color: var(--accent, #6f8da6);
   width: 18px;
   font-size: 1rem;
   flex-shrink: 0;
 }
 
 .sah-required-star {
-  color: var(--accent, #c9621a);
+  color: var(--accent, #6f8da6);
   margin-left: 2px;
 }
 
@@ -226,7 +226,7 @@
 }
 
 .sah-toggle-pw:hover {
-  color: var(--accent, #c9621a);
+  color: var(--accent, #6f8da6);
 }
 
 /* Checkbox and Radio Groups - Professional Spacing */
@@ -265,7 +265,7 @@
 .sah-checkbox-group label input[type="radio"] {
   width: 18px;
   height: 18px;
-  accent-color: var(--accent, #c9621a);
+  accent-color: var(--accent, #6f8da6);
   flex-shrink: 0;
   cursor: pointer;
   margin: 0;
@@ -308,7 +308,7 @@
 .sah-terms-checkbox input {
   width: 22px;
   height: 22px;
-  accent-color: var(--accent, #c9621a);
+  accent-color: var(--accent, #6f8da6);
   margin: 0;
   cursor: pointer;
   flex-shrink: 0;
@@ -332,7 +332,7 @@
 }
 
 .sah-terms-link {
-  color: var(--accent, #c9621a);
+  color: var(--accent, #6f8da6);
   font-weight: 600;
   text-decoration: underline;
   font-size: clamp(0.95rem, 2vw, 1.1rem);
@@ -376,7 +376,7 @@
 /* Validation Alert */
 .sah-validation-alert {
   background: #fee9e9;
-  border-left: 5px solid var(--accent, #c9621a);
+  border-left: 5px solid var(--accent, #6f8da6);
   padding: clamp(16px, 3vw, 18px) clamp(18px, 3vw, 22px);
   border-radius: var(--radius, 8px);
   margin-bottom: clamp(24px, 4vw, 32px);
@@ -384,7 +384,7 @@
   align-items: flex-start;
   gap: 14px;
   font-weight: 600;
-  color: #a84e12;
+  color: #557691;
   font-size: clamp(0.9rem, 1.5vw, 1rem);
   font-family: 'DM Sans', sans-serif;
   width: 100%;
@@ -393,7 +393,7 @@
 
 .sah-validation-alert i {
   font-size: 1.3rem;
-  color: var(--accent, #c9621a);
+  color: var(--accent, #6f8da6);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -431,7 +431,7 @@
 /* Orange buttons for Next and Submit */
 .sah-btn-next,
 .sah-btn-submit {
-  background: var(--accent, #c9621a) !important;
+  background: var(--accent, #6f8da6) !important;
   color: #fff !important;
   box-shadow: var(--shadow-sm, 0 1px 4px rgba(0,0,0,0.06));
   margin-left: auto;
@@ -439,7 +439,7 @@
 
 .sah-btn-next:hover,
 .sah-btn-submit:hover {
-  background: var(--accent-dark, #a84e12) !important;
+  background: var(--accent-dark, #557691) !important;
 }
 
 .sah-btn-prev {

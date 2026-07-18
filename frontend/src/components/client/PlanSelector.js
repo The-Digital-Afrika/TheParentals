@@ -3,23 +3,30 @@ import { PLAN_LIMITS } from '../../utils/constants';
 
 const PlanSelector = ({ currentPlan, onSelectPlan }) => {
   const plans = [
-    { key: 'free', name: 'Community Member', desc: 'Basic profile — always free', price: 'R0', features: [
-      'Basic profile information',
-      '1 service listing',
-      'Contact form only'
-    ]},
-    { key: 'pro', name: 'Trusted Provider', desc: 'Full profile + direct contact details', price: 'R149', features: [
-      'Everything in Community',
-      'Up to 5 services',
-      'Direct contact details',
-      'Phone & WhatsApp visible'
-    ]},
-    { key: 'featured', name: 'Featured Partner', desc: 'Homepage placement + analytics', price: 'R399', features: [
-      'Everything in Trusted',
-      'Homepage featured slot',
-      'Priority in search results',
-      'Basic analytics'
-    ]}
+    {
+      key: 'free',
+      name: 'Community Member',
+      desc: 'Basic profile - always free',
+      price: 'R0',
+      features: [
+        'Basic profile information',
+        '1 service listing',
+        'Contact via Parental\'s form',
+      ],
+    },
+    {
+      key: 'pro',
+      name: 'Parental Plus+',
+      desc: 'Discounted to R149/month for the first 12 months',
+      price: 'R149',
+      features: [
+        'Everything in Community',
+        'Up to 3 services',
+        'Direct contact details',
+        'Phone, WhatsApp, website and pricing visible',
+        'Newsletter, social post and native article',
+      ],
+    },
   ];
 
   return (
@@ -29,7 +36,7 @@ const PlanSelector = ({ currentPlan, onSelectPlan }) => {
         const limits = PLAN_LIMITS[plan.key];
 
         return (
-          <div 
+          <div
             key={plan.key}
             className={`plan-card ${isSelected ? 'selected' : ''}`}
             onClick={() => onSelectPlan(plan.key)}

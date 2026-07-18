@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
+import { apiRequest } from '../services/api';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -16,16 +17,16 @@ const injectHead = () => {
   document.head.appendChild(fa);
 };
 
-const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #f0dcc8; --dark: #3a3a3a; --mid: #555; --muted: #888; --card-gray: #d6d0c8; --card-white: #ede9e3; --border: rgba(0,0,0,0.10); --header-h: 68px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
+const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #d9efff; --accent-solid: #ff8c42; --dark: #333330; --mid: #55514b; --muted: #837b70; --card-gray: #d9d2c6; --card-white: #f6f2ec; --border: rgba(0,0,0,0.10); --header-h: 140px; --shadow-md: 0 4px 20px rgba(0,0,0,0.09); --shadow-lg: 0 16px 48px rgba(0,0,0,0.14); --radius: 8px; --radius-lg: 12px; }
 .sah-reg-wrap * { box-sizing: border-box; margin: 0; padding: 0; }
 .sah-reg-wrap { font-family: 'DM Sans', sans-serif; background: var(--card-white); min-height: 100vh; -webkit-font-smoothing: antialiased; color: var(--dark); }
-.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: #5a5a5a; box-shadow: 0 2px 12px rgba(0,0,0,0.22); }
+.sah-rhdr { position: sticky; top: 0; z-index: 200; height: var(--header-h); background: #6f8da6; box-shadow: 0 2px 12px rgba(18,45,82,0.28); }
 .sah-rhdr-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
-.sah-rhdr-left { display: flex; align-items: center; }
-.sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 6px 0; text-decoration: none; white-space: nowrap; }
+.sah-rhdr-left { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; }
+.sah-rhdr-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: rgba(255,255,255,0.88); font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 0; text-decoration: none; white-space: nowrap; }
 .sah-rhdr-back:hover { color: #fff; }
-.sah-rhdr-div { width: 1px; height: 28px; background: rgba(255,255,255,0.28); margin: 0 16px; }
-.sah-rhdr-brand { text-decoration: none; }
+.sah-rhdr-brand { text-decoration: none; display: flex; align-items: center; }
+.sah-rhdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 .sah-rhdr-brand-name { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.02rem; color: #fff; display: block; }
 .sah-rhdr-brand-tag { font-size: 0.66rem; color: rgba(255,255,255,0.68); font-weight: 500; letter-spacing: 0.45px; display: block; }
 .sah-rhdr-right { display: flex; gap: 10px; align-items: center; }
@@ -33,7 +34,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-rhdr-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.10); }
 .sah-reg-hero { position: relative; overflow: hidden; min-height: 220px; display: flex; align-items: center; }
 .sah-reg-hero-bg { position: absolute; inset: 0; z-index: 0; background-image: url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80'); background-size: cover; background-position: center 35%; }
-.sah-reg-hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(10,10,10,0.88) 0%, rgba(30,30,30,0.82) 50%, rgba(10,10,10,0.78) 100%); }
+.sah-reg-hero-bg::after { content: ''; position: absolute; inset: 0; background: rgba(24,35,48,0.68); }
 .sah-reg-hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1400px; margin: 0 auto; padding: 48px 32px; }
 .sah-reg-hero-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: #fff; margin-bottom: 28px; line-height: 1.1; }
 .sah-reg-hero-title em { font-style: italic; color: var(--accent-light); }
@@ -41,20 +42,20 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-step-trail::-webkit-scrollbar { display: none; }
 .sah-trail-item { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
 .sah-trail-dot { display: flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 50px; font-size: 0.76rem; font-weight: 700; white-space: nowrap; border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.07); transition: all 0.2s; cursor: default; }
-.sah-trail-dot.active { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.28); }
+.sah-trail-dot.active { background: var(--accent-solid); color: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.28); }
 .sah-trail-dot.done { background: rgba(255,255,255,0.18); color: rgba(255,255,255,0.80); border-color: rgba(255,255,255,0.35); }
 .sah-trail-dot .sah-tn { font-size: 0.68rem; opacity: 0.75; margin-right: 2px; }
 .sah-trail-arrow { color: rgba(255,255,255,0.25); font-size: 0.62rem; margin: 0 6px; flex-shrink: 0; }
 .sah-reg-panel { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
 .sah-step-card { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); margin-top: 28px; overflow: visible; }
-.sah-step-card-head { background: #5a5a5a; padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.sah-step-card-head { background: #6f8da6; padding: 24px 36px 18px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .sah-step-card-head h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
 .sah-step-card-head p { font-size: 0.85rem; color: rgba(255,255,255,0.65); margin-top: 3px; }
 .sah-step-card-body { padding: 32px 36px 28px; overflow: visible; border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
-.sah-plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.sah-plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 760px; margin: 0 auto 28px; }
 .sah-plan-card { border: 2px solid rgba(0,0,0,0.10); border-radius: var(--radius-lg); background: var(--card-white); cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
 .sah-plan-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.sah-plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.18), var(--shadow-md); }
+.sah-plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.18), var(--shadow-md); }
 .sah-plan-card-head { padding: 18px 20px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; background: var(--card-white); }
 .sah-plan-card.selected .sah-plan-card-head { background: #f5f0ea; border-bottom: 2px solid var(--accent); }
 .sah-plan-card-name { font-weight: 800; font-size: 1rem; color: #1a1a1a; }
@@ -69,16 +70,16 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-plan-features li.no { color: #888; }
 .sah-ico-yes { color: #16a34a; font-size: 0.7rem; }
 .sah-ico-no { color: #ccc; font-size: 0.7rem; }
-.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
-.sah-plan-select-btn:hover { background: var(--accent-dark); }
-.sah-plan-select-btn.selected { background: #3a3a3a; }
+.sah-plan-select-btn { width: 100%; padding: 10px; border: none; border-radius: var(--radius); background: var(--accent-solid); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.15s; display: flex; align-items: center; justify-content: center; gap: 7px; }
+.sah-plan-select-btn:hover { filter: saturate(1.08) brightness(0.94); }
+.sah-plan-select-btn.selected { background: var(--accent); }
 .sah-terms-box { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
-.sah-terms-box-head { background: #5a5a5a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
+.sah-terms-box-head { background: #6f8da6; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; }
 .sah-terms-box-head-title { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 800; color: #fff; }
 .sah-terms-view-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.55); background: rgba(255,255,255,0.10); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 0.80rem; font-weight: 700; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .sah-terms-view-btn:hover { background: rgba(255,255,255,0.22); border-color: #fff; }
 .sah-terms-body { overflow: hidden; transition: max-height 0.38s ease, padding 0.25s ease; }
-.sah-terms-body.open { max-height: 420px; overflow-y: auto; padding: 20px 22px; }
+.sah-terms-body.open { max-height: min(58vh, 520px); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-gutter: stable; padding: 20px 22px; }
 .sah-terms-body.closed { max-height: 0; padding: 0 22px; }
 .sah-terms-body h4 { font-size: 0.85rem; font-weight: 800; color: var(--dark); margin: 14px 0 5px; text-transform: uppercase; letter-spacing: 0.4px; }
 .sah-terms-body h4:first-child { margin-top: 0; }
@@ -86,7 +87,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-terms-body ul { padding-left: 18px; margin-bottom: 10px; }
 .sah-terms-body ul li { font-size: 0.85rem; color: var(--mid); line-height: 1.7; margin-bottom: 4px; }
 .sah-terms-row { background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 12px; font-size: 0.88rem; font-weight: 500; color: var(--mid); cursor: pointer; }
-.sah-terms-row.checked { border-color: var(--accent); background: rgba(201,98,26,0.05); }
+.sah-terms-row.checked { border-color: var(--accent); background: rgba(85,118,145,0.05); }
 .sah-terms-row.err-border { border-color: #dc2626; background: #fff8f8; }
 .sah-terms-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 .sah-terms-row a { color: var(--accent); font-weight: 700; text-decoration: none; }
@@ -99,7 +100,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-req { color: var(--accent); font-size: 1rem; font-style: normal; }
 .sah-field input, .sah-field select, .sah-field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); background: var(--card-white); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--dark); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; appearance: none; }
 .sah-field textarea { resize: vertical; min-height: 90px; }
-.sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.14); }
+.sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
 .sah-field input.err, .sah-field select.err, .sah-field textarea.err { border-color: #dc2626; background: #fff8f8; }
 .sah-field input[type="file"] { padding: 8px 12px; font-size: 0.83rem; cursor: pointer; background: var(--card-white); }
 .sah-field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
@@ -109,7 +110,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-terms-err { color: #dc2626; font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 8px; padding: 6px 10px; background: #fff0f0; border-radius: 5px; border-left: 3px solid #dc2626; }
 .sah-group-err { color: #dc2626; font-size: 0.76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; margin-top: 6px; padding: 5px 10px; background: #fff0f0; border-radius: 5px; border-left: 3px solid #dc2626; animation: sah-err-in 0.18s ease; }
 .sah-prefix-wrap { display: flex; align-items: stretch; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); overflow: hidden; background: var(--card-white); transition: border-color 0.15s, box-shadow 0.15s; }
-.sah-prefix-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(201,98,26,0.14); }
+.sah-prefix-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
 .sah-prefix-wrap.err { border-color: #dc2626; background: #fff8f8; }
 .sah-prefix { background: rgba(0,0,0,0.06); border-right: 1.5px solid rgba(0,0,0,0.10); padding: 11px 12px; font-size: 0.92rem; font-weight: 700; color: var(--mid); white-space: nowrap; display: flex; align-items: center; }
 .sah-prefix-wrap input { border: none !important; box-shadow: none !important; border-radius: 0 !important; flex: 1; }
@@ -128,14 +129,14 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-check-group label:hover:not(.disabled-opt) { border-color: var(--accent); color: var(--accent); }
 .sah-check-group label.disabled-opt { opacity: 0.4; cursor: not-allowed; }
 .sah-check-group input[type="checkbox"], .sah-check-group input[type="radio"] { width: auto; padding: 0; border: none; background: none; box-shadow: none; accent-color: var(--accent); transform: scale(1.1); }
-.sah-check-group label:has(input:checked) { border-color: var(--accent); background: rgba(201,98,26,0.08); color: var(--accent); }
+.sah-check-group label:has(input:checked) { border-color: var(--accent); background: rgba(85,118,145,0.08); color: var(--accent); }
 .sah-day-quickpick { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .sah-day-quickpick-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card-white); font-size: 0.82rem; font-weight: 700; color: var(--mid); cursor: pointer; transition: all 0.14s; font-family: 'DM Sans', sans-serif; }
 .sah-day-quickpick-btn:hover { border-color: var(--accent); color: var(--accent); }
-.sah-day-quickpick-btn.active { border-color: var(--accent); background: rgba(201,98,26,0.10); color: var(--accent); }
+.sah-day-quickpick-btn.active { border-color: var(--accent); background: rgba(85,118,145,0.10); color: var(--accent); }
 .sah-secondary-toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card-white); font-size: 0.84rem; font-weight: 600; color: var(--mid); cursor: pointer; transition: all 0.14s; user-select: none; }
 .sah-secondary-toggle:hover { border-color: var(--accent); color: var(--accent); }
-.sah-secondary-toggle.active { border-color: var(--accent); background: rgba(201,98,26,0.08); color: var(--accent); }
+.sah-secondary-toggle.active { border-color: var(--accent); background: rgba(85,118,145,0.08); color: var(--accent); }
 .sah-secondary-toggle input[type="checkbox"] { width: auto; padding: 0; border: none; background: none; box-shadow: none; accent-color: var(--accent); transform: scale(1.1); }
 .sah-secondary-cats-box { margin-top: 10px; padding: 14px 16px; background: var(--card-white); border: 1.5px solid var(--accent); border-radius: var(--radius); }
 .sah-file-upload-zone { border: 2px dashed rgba(0,0,0,0.15); border-radius: var(--radius); padding: 16px; background: rgba(255,255,255,0.6); cursor: pointer; transition: border-color 0.15s; }
@@ -159,7 +160,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-add-others-btn:hover { border-color: var(--accent); color: var(--accent); }
 .sah-add-others-dropdown { position: absolute; top: calc(100% + 6px); left: 0; z-index: 500; background: var(--card-white); border: 1.5px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md); min-width: 200px; overflow: hidden; }
 .sah-add-others-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 0.85rem; font-weight: 600; color: var(--mid); cursor: pointer; transition: background 0.12s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
-.sah-add-others-option:hover { background: rgba(201,98,26,0.07); color: var(--accent); }
+.sah-add-others-option:hover { background: rgba(85,118,145,0.07); color: var(--accent); }
 .sah-add-others-option i { color: var(--accent); width: 16px; text-align: center; }
 .sah-added-socials { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 .sah-form-nav-wrap { background: var(--card-gray); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); margin-top: 20px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -168,12 +169,12 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 .sah-nav-counter { text-align: center; font-size: 0.8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .sah-nav-counter strong { color: var(--accent); font-size: 1rem; }
 .sah-nav-progress { height: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; margin-top: 6px; overflow: hidden; }
-.sah-nav-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(201,98,26,0.45); }
-.sah-nav-next:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
+.sah-nav-progress-fill { height: 100%; background: var(--accent-solid); border-radius: 2px; transition: width 0.3s; }
+.sah-nav-next { display: inline-flex; align-items: center; gap: 8px; padding: 10px 28px; border-radius: 50px; border: none; background: var(--accent-solid); color: #fff; font-weight: 700; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: filter 0.15s, transform 0.15s; box-shadow: 0 6px 20px -4px rgba(85,118,145,0.45); }
+.sah-nav-next:hover:not(:disabled) { filter: saturate(1.08) brightness(0.94); transform: translateY(-1px); }
 .sah-nav-next:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
-.sah-nav-submit { background: #3a3a3a; box-shadow: 0 6px 20px -4px rgba(0,0,0,0.3); }
-.sah-nav-submit:hover:not(:disabled) { background: #1e1e1e; }
+.sah-nav-submit { background: var(--accent); box-shadow: 0 6px 20px -4px rgba(233,75,19,0.42); }
+.sah-nav-submit:hover:not(:disabled) { background: var(--accent-dark); }
 .sah-spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: sah-spin 0.7s linear infinite; }
 @keyframes sah-spin { to { transform: rotate(360deg); } }
 @media (max-width: 900px) {
@@ -191,7 +192,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
   .sah-reg-hero-inner { padding: 28px 16px; }
   .sah-rhdr-inner { padding: 0 16px; }
   .sah-rhdr-right { display: none; }
-  .sah-rhdr-brand-tag { display: none; }
+  .sah-rhdr-logo { width: 150px; height: 96px; max-width: 42vw; }
   .sah-form-nav-wrap { flex-wrap: wrap; padding: 14px 16px; gap: 10px; }
   .sah-nav-counter { order: 3; width: 100%; }
   .sah-terms-box-head { flex-wrap: wrap; gap: 8px; }
@@ -207,8 +208,8 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
 }
 @media (max-width: 480px) {
   .sah-rhdr-inner { padding: 0 12px; }
-  .sah-rhdr-back span { display: none; }
-  .sah-rhdr-brand-name { font-size: 0.88rem; }
+  .sah-rhdr-back { font-size: 0.72rem; gap: 6px; }
+  .sah-rhdr-logo { width: 132px; height: 88px; max-width: 40vw; }
   .sah-reg-panel { padding: 0 10px 60px; }
   .sah-step-card-body { padding: 14px 12px; }
   .sah-step-card-head { padding: 14px 14px 10px; }
@@ -222,8 +223,7 @@ const CSS = `:root{ --accent: #c9621a; --accent-dark: #a84e12; --accent-light: #
   .sah-file-upload-zone { padding: 12px; }
 }`; 
 // ── Config ────────────────────────────────────────────────────────────────────
-const API_URL = 'http://localhost:5000/api';
-const MAX_TOTAL_UPLOAD_MB = 100;
+const MAX_TOTAL_UPLOAD_MB = 10;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
 const STEPS = [
@@ -241,49 +241,34 @@ const TOTAL = STEPS.length;
 
 const PLANS = [
   {
-    id: 'free', name: 'Community Member', desc: 'Basic profile — always free', price: 'R0',
-    param: 'Free Listing – basic profile',
+    id: 'free', name: 'Community Member', desc: 'Basic visibility for parent-focused providers', price: 'R0',
+    param: 'Free Listing - basic profile',
     features: [
-      { t: 'Public profile listing', y: true },
-      { t: '1 service category', y: true },
-      { t: 'Basic contact form', y: true },
+      { t: 'Basic profile listing', y: true },
+      { t: 'Appears in search results', y: true },
+      { t: 'Contact via Parental\'s form', y: true },
+      { t: 'No pricing or website links', y: false },
       { t: 'Direct contact details visible', y: false },
-      { t: 'Featured placement', y: false },
     ],
-    cta: 'Get Started Free',
+    cta: 'Get Started for Free',
   },
   {
-    id: 'pro', name: 'Trusted Provider', desc: 'Full profile + direct contact details', price: 'R149',
-    param: 'Professional Listing – R149/month (full contact, direct enquiries)',
+    id: 'pro', name: 'Parental Plus+', desc: 'Discounted to R149/month for the first 12 months', price: 'R149',
+    param: 'Parental Plus+ - R149/month introductory offer',
     highlight: true,
     features: [
-      { t: 'Everything in Community', y: true },
-      { t: 'Direct phone & email visible', y: true },
-      { t: 'Up to 3 service categories', y: true },
-      { t: 'Verified badge on profile', y: true },
-      { t: 'Priority in search results', y: true },
+      { t: 'Full provider profile', y: true },
+      { t: 'Direct phone, email, WhatsApp & website', y: true },
+      { t: 'Pricing, availability and reviews', y: true },
+      { t: 'Priority placement in results', y: true },
+      { t: 'Up to 3 services listed', y: true },
+      { t: 'Monthly newsletter inclusion', y: true },
+      { t: '1 Facebook & Instagram post', y: true },
+      { t: '1 native article: 800 words + image', y: true },
     ],
-    cta: 'Start Trusted Plan',
-  },
-  {
-    id: 'featured', name: 'Deluxe Package', desc: '3-month campaign · maximum exposure', price: 'R399',
-    param: 'Deluxe Package – R399/month (3-month campaign, max exposure)',
-    features: [
-      { t: '24x Billboard banners', y: true },
-      { t: '24x Leaderboard banners', y: true },
-      { t: '24x Skyscrapers / side panels', y: true },
-      { t: '1x Business listing', y: true },
-      { t: '6x Newsletter banner ads', y: true },
-      { t: '6x Facebook post / reel', y: true },
-      { t: '6x Instagram posts / reels', y: true },
-      { t: '4x Newsletter ad posting', y: true },
-      { t: '2x Full page ad in PDF per magazine', y: true },
-      { t: '1x Native article per month', y: true },
-    ],
-    cta: 'Get the Deluxe Package',
+    cta: 'Start Parental Plus+',
   },
 ];
-
 const PRICING_UNIT_MAP = { 'Hourly': '/hr', 'Per package': '/package', 'Per term': '/term', 'Custom quote': '' };
 const TIME_SLOT_REGEX = /^(\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})(\s*,\s*\d{1,2}:\d{2}\s*[-–]\s*\d{1,2}:\d{2})*$/;
 const ALL_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -298,19 +283,18 @@ const EXTRA_SOCIALS = [
 ];
 
 const ALL_CATEGORIES = [
-  'Tutor', 'Therapist', 'Curriculum Provider',
-  'Online / Hybrid School', 'Educational Consultant', 'Extracurricular / Enrichment',
+  'Education & Tutoring', 'Child Wellness & Therapy', 'Learning Resources',
+  'Activities & Enrichment', 'Healthcare', 'Family Shops', 'Everyday Family Services',
 ];
 
 const SECONDARY_CAT_MAP = {
-  'Tutor': 'Tutor',
-  'Therapist': 'Therapist',
-  'Curriculum': 'Curriculum Provider',
-  'School': 'Online / Hybrid School',
-  'Consultant': 'Educational Consultant',
-  'Enrichment': 'Extracurricular / Enrichment',
+  'Tutor': 'Education & Tutoring',
+  'Therapist': 'Child Wellness & Therapy',
+  'Curriculum': 'Learning Resources',
+  'School': 'Activities & Enrichment',
+  'Consultant': 'Everyday Family Services',
+  'Enrichment': 'Activities & Enrichment',
 };
-
 // ── Password strength helper ──────────────────────────────────────────────────
 const getPasswordStrength = (pw) => {
   if (!pw) return { score: 0, label: '', color: '', pct: 0 };
@@ -329,20 +313,28 @@ const getPasswordStrength = (pw) => {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const planToTier = (param) => {
-  if (param?.includes('R399') || param?.includes('Deluxe')) return 'featured';
-  if (param?.includes('R149') || param?.includes('Professional')) return 'pro';
+  const value = String(param || '').toLowerCase();
+  if (value.includes('r149') || value.includes('plus+') || value === 'pro') return 'pro';
   return 'free';
+};
+
+const getPlanByValue = (value) => {
+  const tier = planToTier(value);
+  return PLANS.find(plan => (
+    plan.param === value
+    || plan.id === value
+    || planToTier(plan.param) === tier
+  )) || PLANS[0];
 };
 
 const catToSlug = (cat) => {
   const m = {
-    'Tutor': 'tutor', 'Therapist': 'therapist', 'Curriculum Provider': 'curriculum',
-    'Online / Hybrid School': 'school', 'Educational Consultant': 'consultant',
-    'Extracurricular / Enrichment': 'extracurricular',
+    'Education & Tutoring': 'education', 'Child Wellness & Therapy': 'wellness', 'Learning Resources': 'education',
+    'Activities & Enrichment': 'activities', 'Healthcare': 'healthcare', 'Family Shops': 'shopping',
+    'Everyday Family Services': 'family',
   };
-  return m[cat] || 'tutor';
+  return m[cat] || 'family';
 };
-
 const formatBytes = (bytes) => {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
@@ -355,7 +347,7 @@ const FieldErr = ({ msg }) => msg
 
 // ── saveToLocalStorage — all values passed explicitly, no closure bugs ────────
 // ── KEY FIX: certFilesAll and clearanceFilesAll now carry full base64 data ───
-function saveToLocalStorage({ userId, email, fullName, tier, password, newProvider }) {
+function saveToLocalStorage({ userId, email, fullName, tier, password, newProvider, token }) {
   try {
     // sah_users
     const users = JSON.parse(localStorage.getItem('sah_users') || '[]');
@@ -367,6 +359,9 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
         accountType: 'provider',
         name: fullName,
         password: password || '',
+        profilePhoto: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
+        photo: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
+        image: newProvider.profilePhoto || newProvider.photo || newProvider.image || null,
         registered: new Date().toISOString(),
         lastLogin: new Date().toISOString(),
       });
@@ -380,6 +375,11 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
       localStorage.setItem('sah_providers', JSON.stringify(providers));
     }
 
+    const providerPhoto = newProvider.profilePhoto || newProvider.photo || newProvider.image || null;
+    if (providerPhoto) {
+      localStorage.setItem(`sah_photo_${userId}`, providerPhoto);
+    }
+
     // sah_auth_logs
     const authLogs = JSON.parse(localStorage.getItem('sah_auth_logs') || '[]');
     authLogs.unshift({
@@ -389,10 +389,19 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
     localStorage.setItem('sah_auth_logs', JSON.stringify(authLogs.slice(0, 500)));
 
     // session
-    const sessionUser = { role: 'client', email: email.toLowerCase(), id: userId, name: fullName, plan: tier };
+    const sessionUser = {
+      role: 'client',
+      email: email.toLowerCase(),
+      id: userId,
+      name: fullName,
+      plan: tier,
+      profilePhoto: providerPhoto,
+      photo: providerPhoto,
+      image: providerPhoto,
+    };
     localStorage.setItem('sah_current_user', JSON.stringify(sessionUser));
     localStorage.setItem('sah_user', JSON.stringify(sessionUser));
-    localStorage.setItem('sah_token', 'local_' + userId);
+    localStorage.setItem('sah_token', token || ('local_' + userId));
 
     return sessionUser;
   } catch (e) {
@@ -411,7 +420,7 @@ const Registration = () => {
   const { login } = useAuth();
 
   const [step, setStep] = useState(1);
-  const [data, setData] = useState({ listingPlan: 'Free Listing – basic profile', terms: false });
+  const [data, setData] = useState({ listingPlan: PLANS[0].param, terms: false });
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPw, setShowPw] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -477,6 +486,34 @@ const Registration = () => {
   const set = (name, value) => {
     setData(p => ({ ...p, [name]: value }));
     setFieldErrors(prev => ({ ...prev, [name]: '' }));
+  };
+
+  const startPaidRegistrationPayment = async (plan, token) => {
+    const payment = await apiRequest('POST', '/api/payments/initialize', {
+      plan,
+      method: 'card',
+      returnUrl: `${window.location.origin}/payment/callback`,
+    }, token);
+
+    window.location.href = payment.authorizationUrl;
+  };
+
+  const continueExistingPaidRegistration = async (email, password, plan, saveProviderProfile = null) => {
+    const auth = await apiRequest('POST', '/api/auth/login', {
+      email,
+      password,
+    });
+
+    if (auth?.user?.role !== 'PROVIDER') {
+      throw new Error('This email is not registered as a provider account.');
+    }
+
+    login({ ...auth.user, token: auth.token });
+    showNotification?.('Continuing your Parental Plus+ payment...', 'info');
+    if (saveProviderProfile) {
+      await saveProviderProfile(auth.user.id);
+    }
+    await startPaidRegistrationPayment(plan, auth.token);
   };
 
   const toggleMulti = (name, value, checked) => {
@@ -741,11 +778,62 @@ const Registration = () => {
       linkedin: data.linkedin || '', instagram: data.instagram || '',
       facebook: data.facebook || '', tiktok: data.tiktok || '',
       twitter: data.twitter || '', youtube: data.youtube || '',
-      image: data.profilePhoto || null, photo: data.profilePhoto || null,
+      image: data.profilePhoto || null, photo: data.profilePhoto || null, profilePhoto: data.profilePhoto || null,
       rating: null, reviewCount: 0,
       reviews: { average: 0, count: 0, items: [] },
       listingPublic: true, publicToggle: true,
     };
+
+    const buildProviderFormData = (userId) => {
+      const formData = new FormData();
+      formData.append('providerData', JSON.stringify({
+        userId,
+        fullName: data.fullName,
+        accountType: data.accountType || 'Individual Provider',
+        bio: data.bio,
+        experience: parseInt(data.experience, 10) || 0,
+        primaryCategory: data.primaryCat,
+        secondaryCategories: data.secondaryCats || [],
+        serviceTitle: data.serviceTitle,
+        serviceDesc: data.serviceDesc,
+        subjects: data.subjects,
+        ageGroups: data.ageGroups || [],
+        deliveryMode: data.deliveryMode,
+        city: data.city,
+        province: data.province,
+        serviceAreaType,
+        radius: data.localRadiusNum ? parseInt(data.localRadiusNum, 10) : null,
+        pricingModel: data.pricingModel,
+        startingPrice: priceDisplay,
+        availabilityDays: (data.daysAvailable || []).map(d => d.slice(0, 3)),
+        availabilityNotes: data.timeSlots,
+        phone: fullPhone,
+        whatsapp: fullWhatsapp,
+        inquiryEmail: data.inquiryEmail,
+        website: data.website || null,
+        linkedin: data.linkedin || null,
+        instagram: data.instagram || null,
+        facebook: data.facebook || null,
+        tiktok: data.tiktok || null,
+        twitter: data.twitter || null,
+        degrees: qualDegree,
+        certifications: certsCombined,
+        certTextEntry: data.qualCerts || '',
+        memberships: qualMemberships,
+        clearanceText: data.clearanceText || null,
+        listingPlan: tier,
+        languages: data.languages || [],
+        profilePhoto: data.profilePhoto || null,
+      }));
+
+      certFiles.forEach((f, i) => formData.append(`certFile_${i}`, f.file));
+      clearanceFiles.forEach((f, i) => formData.append(`clearanceFile_${i}`, f.file));
+      return formData;
+    };
+
+    const saveRegistrationProviderProfile = (userId) => (
+      apiRequest('POST', '/api/providers', buildProviderFormData(userId))
+    );
 
     // Check localStorage for duplicate email first
     const existingUsers = JSON.parse(localStorage.getItem('sah_users') || '[]');
@@ -756,6 +844,16 @@ const Registration = () => {
       existingProviders.find(p => (p.email || '').toLowerCase() === emailLower);
 
     if (alreadyExists) {
+      if (tier !== 'free') {
+        try {
+          await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
+          return;
+        } catch (retryErr) {
+          setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
+          setSubmitting(false);
+          return;
+        }
+      }
       setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
       setSubmitting(false);
       return;
@@ -763,94 +861,74 @@ const Registration = () => {
 
     // ── Try real API ─────────────────────────────────────────────────────────
     try {
-      const registerResponse = await fetch(`${API_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: emailLower,
-          password: data.password,
-          role: 'PROVIDER',
-          name: data.fullName,
-          accountType: data.accountType || 'Individual Provider',
-        }),
+      const userData = await apiRequest('POST', '/api/auth/register', {
+        email: emailLower,
+        password: data.password,
+        role: 'PROVIDER',
+        name: data.fullName,
+        accountType: data.accountType || 'Individual Provider',
       });
-
-      if (registerResponse.status === 409) {
-        console.warn('409 from API — falling through to localStorage-only registration');
-      } else if (!registerResponse.ok) {
-        const errData = await registerResponse.json().catch(() => ({}));
-        console.warn('Register API error:', errData.message);
-      } else {
-        const userData = await registerResponse.json().catch(() => ({}));
         const dbUserId = userData?.user?.id || userData?.userId || providerId;
 
-        const formData = new FormData();
-        formData.append('providerData', JSON.stringify({
+        await saveRegistrationProviderProfile(dbUserId);
+
+        const activeTier = tier === 'free' ? 'free' : 'free';
+        const localProvider = {
+          ...newProvider,
+          id: dbUserId,
           userId: dbUserId,
-          fullName: data.fullName,
-          accountType: data.accountType || 'Individual Provider',
-          bio: data.bio,
-          experience: parseInt(data.experience) || 0,
-          primaryCategory: data.primaryCat,
-          secondaryCategories: data.secondaryCats || [],
-          serviceTitle: data.serviceTitle,
-          serviceDesc: data.serviceDesc,
-          subjects: data.subjects,
-          ageGroups: data.ageGroups || [],
-          deliveryMode: data.deliveryMode,
-          city: data.city,
-          province: data.province,
-          serviceAreaType,
-          radius: data.localRadiusNum ? parseInt(data.localRadiusNum) : null,
-          pricingModel: data.pricingModel,
-          startingPrice: priceDisplay,
-          availabilityDays: (data.daysAvailable || []).map(d => d.slice(0, 3)),
-          availabilityNotes: data.timeSlots,
-          phone: fullPhone,
-          whatsapp: fullWhatsapp,
-          inquiryEmail: data.inquiryEmail,
-          website: data.website || null,
-          linkedin: data.linkedin || null,
-          instagram: data.instagram || null,
-          facebook: data.facebook || null,
-          tiktok: data.tiktok || null,
-          twitter: data.twitter || null,
-          degrees: qualDegree,
-          certifications: certsCombined,
-          certTextEntry: data.qualCerts || '',
-          memberships: qualMemberships,
-          clearanceText: data.clearanceText || null,
-          listingPlan: tier,
-          languages: data.languages || [],
-        }));
-
-        certFiles.forEach((f, i) => formData.append(`certFile_${i}`, f.file));
-        clearanceFiles.forEach((f, i) => formData.append(`clearanceFile_${i}`, f.file));
-
-        const providerRes = await fetch(`${API_URL}/providers`, { method: 'POST', body: formData });
-        if (!providerRes.ok) {
-          console.warn('Provider API failed — will use localStorage');
-        }
+          plan: activeTier,
+          listingPlan: activeTier,
+          tier: activeTier,
+          requestedPlan: tier === 'free' ? null : tier,
+          billingStatus: tier === 'free' ? 'inactive' : 'pending',
+        };
 
         const sessionUser = saveToLocalStorage({
           userId: dbUserId,
           email: emailLower,
           fullName: data.fullName,
-          tier,
+          tier: activeTier,
           password: data.password,
-          newProvider: { ...newProvider, id: dbUserId },
+          newProvider: localProvider,
+          token: userData?.token,
         });
 
         if (sessionUser) {
-          login(sessionUser);
+          login({ ...sessionUser, token: userData?.token });
         }
 
         showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
-        setTimeout(() => navigate('/client-dashboard'), 300);
+        if (tier !== 'free') {
+          showNotification?.('Profile created. Redirecting to payment...', 'info');
+          await startPaidRegistrationPayment(tier, userData?.token);
+          return;
+        }
+
+        setTimeout(() => navigate('/provider-dashboard'), 300);
+        return;
+    } catch (apiErr) {
+      if (apiErr.status === 409) {
+        if (tier !== 'free') {
+          try {
+            await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
+            return;
+          } catch (retryErr) {
+            setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
+            setSubmitting(false);
+            return;
+          }
+        }
+        setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
+        setSubmitting(false);
         return;
       }
-    } catch (apiErr) {
-      console.warn('API unreachable, using localStorage fallback:', apiErr.message);
+      if (tier !== 'free') {
+        setFieldErrors({ _submit: apiErr.message || 'Parental Plus+ registration needs the backend payment service. Please confirm the backend is running, then try again.' });
+        setSubmitting(false);
+        return;
+      }
+      console.warn('Provider registration API failed, using localStorage fallback:', apiErr.message);
     }
 
     // ── localStorage-only fallback ───────────────────────────────────────────
@@ -859,9 +937,16 @@ const Registration = () => {
         userId: providerId,
         email: emailLower,
         fullName: data.fullName,
-        tier,
+        tier: tier === 'free' ? 'free' : 'free',
         password: data.password,
-        newProvider,
+        newProvider: {
+          ...newProvider,
+          plan: tier === 'free' ? 'free' : 'free',
+          listingPlan: tier === 'free' ? 'free' : 'free',
+          tier: tier === 'free' ? 'free' : 'free',
+          requestedPlan: tier === 'free' ? null : tier,
+          billingStatus: tier === 'free' ? 'inactive' : 'payment_required',
+        },
       });
 
       if (sessionUser) {
@@ -869,7 +954,7 @@ const Registration = () => {
       }
 
       showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
-      setTimeout(() => navigate('/client-dashboard'), 300);
+      setTimeout(() => navigate('/provider-dashboard'), 300);
     } catch (localErr) {
       console.error('localStorage fallback failed:', localErr);
       setFieldErrors({ _submit: 'Registration failed. Please try again.' });
@@ -893,7 +978,7 @@ const Registration = () => {
   const renderStep1 = () => (
     <div className="sah-plan-grid" style={{ marginTop: 8 }}>
       {PLANS.map(plan => {
-        const selected = data.listingPlan === plan.param;
+        const selected = getPlanByValue(data.listingPlan)?.id === plan.id;
         return (
           <div key={plan.id} className={`sah-plan-card${selected ? ' selected' : ''}`}
             onClick={() => {
@@ -1416,7 +1501,7 @@ const Registration = () => {
         <div className="sah-terms-box-head" onClick={() => setTermsOpen(o => !o)}>
           <div className="sah-terms-box-head-title">
             <i className="fas fa-file-contract" />
-            SA Homeschooling Services Directory — Terms & Community Guidelines
+            Parental's Directory — Terms & Community Guidelines
           </div>
           <button type="button" className="sah-terms-view-btn"
             onClick={e => { e.stopPropagation(); setTermsOpen(o => !o); }}>
@@ -1429,9 +1514,9 @@ const Registration = () => {
           <h4>1. Eligibility & Accuracy</h4>
           <p>By registering as a service provider, you confirm that all information provided is accurate, current, and complete. You must be at least 18 years of age or represent a legally registered organisation.</p>
           <h4>2. Listing Standards</h4>
-          <p>Your listing must represent genuine educational or support services relevant to the homeschooling community. Listings that are misleading, fraudulent, or offensive will be removed without notice.</p>
+          <p>Your listing must represent genuine products, services or professional support relevant to parents and families. Listings that are misleading, fraudulent, or offensive will be removed without notice.</p>
           <h4>3. Qualifications & Credentials</h4>
-          <p>Any qualifications, certifications, police clearances, or memberships listed must be legitimate and verifiable upon request. SA Homeschooling reserves the right to request proof of credentials at any time.</p>
+          <p>Any qualifications, certifications, police clearances, or memberships listed must be legitimate and verifiable upon request. Parental's reserves the right to request proof of credentials at any time.</p>
           <h4>4. Conduct & Community Standards</h4>
           <ul>
             <li>Treat all families and platform users with respect.</li>
@@ -1441,11 +1526,11 @@ const Registration = () => {
           <h4>5. Privacy & Data Use</h4>
           <p>Information you provide will be stored and used to create and display your public provider profile. Contact information will be shared with families according to your selected plan. We do not sell personal data to third parties.</p>
           <h4>6. Profile Approval</h4>
-          <p>All new profiles are subject to admin review before going live. SA Homeschooling reserves the right to reject or remove any listing that does not meet our community standards.</p>
+          <p>All new profiles are subject to admin review before going live. Parental's reserves the right to reject or remove any listing that does not meet our community standards.</p>
           <h4>7. Paid Plans & Billing</h4>
           <p>Paid listing plans are billed monthly. Cancellation can be requested at any time with effect from the next billing cycle. Refunds are not provided for partial months.</p>
           <h4>8. Liability</h4>
-          <p>SA Homeschooling acts as a directory platform and is not responsible for the quality, safety, or outcome of services provided by listed providers. Families are encouraged to conduct their own due diligence.</p>
+          <p>Parental's acts as a directory platform and is not responsible for the quality, safety, or outcome of services provided by listed businesses or providers. Families are encouraged to conduct their own due diligence.</p>
           <h4>9. Amendments</h4>
           <p>These terms may be updated periodically. Continued use of the platform constitutes acceptance of the updated terms.</p>
           <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--muted)' }}>Last updated: January 2025</p>
@@ -1467,7 +1552,7 @@ const Registration = () => {
           {[
             ['Name', data.fullName || '—'],
             ['Email', data.email || '—'],
-            ['Plan', PLANS.find(p => p.param === data.listingPlan)?.name || '—'],
+            ['Plan', getPlanByValue(data.listingPlan)?.name || '—'],
             ['Category', data.primaryCat || '—'],
             ['Location', data.city && data.province ? `${data.city}, ${data.province}` : '—'],
             ['Pricing', data.pricingModel || '—'],
@@ -1508,13 +1593,8 @@ const Registration = () => {
       <header className="sah-rhdr">
         <div className="sah-rhdr-inner">
           <div className="sah-rhdr-left">
-            <button className="sah-rhdr-back" onClick={() => navigate('/')}>
-              <i className="fas fa-arrow-left" /> Back to Directory
-            </button>
-            <div className="sah-rhdr-div" />
             <Link to="/" className="sah-rhdr-brand">
-              <span className="sah-rhdr-brand-name">SA Homeschooling</span>
-              <span className="sah-rhdr-brand-tag">Education Services Directory</span>
+              <img className="sah-rhdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
           </div>
           <div className="sah-rhdr-right">
@@ -1526,7 +1606,10 @@ const Registration = () => {
       <section className="sah-reg-hero">
         <div className="sah-reg-hero-bg" />
         <div className="sah-reg-hero-inner">
-          <h1 className="sah-reg-hero-title">Become a <em>Trusted Provider</em></h1>
+          <button className="sah-rhdr-back" onClick={() => navigate('/')} style={{ marginBottom: 18 }}>
+            <i className="fas fa-arrow-left" /> Back to Directory
+          </button>
+          <h1 className="sah-reg-hero-title">List on <em>Parental's</em></h1>
           <div className="sah-step-trail">
             {STEPS.map((s, i) => {
               const n = i + 1;
@@ -1593,3 +1676,5 @@ const Registration = () => {
 };
 
 export default Registration;
+
+

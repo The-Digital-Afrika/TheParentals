@@ -8,7 +8,9 @@ import './App.css';
 import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import ClientDashboard from './pages/ClientDashboard';
+import ProviderDashboard from './pages/ProviderDashboard';
 import Profile from './pages/Profile';
+import PaymentDemo from './pages/PaymentDemo';
 
 function App() {
   return (
@@ -19,11 +21,14 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/client-dashboard" element={<ClientDashboard />} />
+            <Route path="/provider-dashboard" element={<ProviderDashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Registration />} />
             <Route path="/register/user" element={<UserRegister />} />
             <Route path="/register/provider" element={<Registration />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/payment/callback" element={<PaymentDemo />} />
+            <Route path="/payment-demo" element={<PaymentDemo />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>

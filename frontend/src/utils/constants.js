@@ -1,8 +1,8 @@
 // frontend/src/utils/constants.js
 export const PLAN_LIMITS = {
   free: { maxServices: 1, price: 0, name: 'Community Member' },
-  pro: { maxServices: 5, price: 149, name: 'Trusted Provider' },
-  featured: { maxServices: 10, price: 399, name: 'Featured Partner' }
+  pro: { maxServices: 3, price: 149, name: 'Parental Plus+' },
+  featured: { maxServices: 3, price: 149, name: 'Parental Plus+' }
 };
 
 export const LANGUAGES = [

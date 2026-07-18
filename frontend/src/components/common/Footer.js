@@ -4,15 +4,20 @@ import { Link } from 'react-router-dom';
 /* ── Inject footer CSS once — exact match to HomePage ───────────────────── */
 const FOOTER_CSS = `
   :root {
-    --ft-accent: #c9621a;
-    --ft-accent-dark: #a84e12;
+    --ft-accent: #8fb8d8;
+    --ft-accent-dark: #557691;
+    --ft-accent-solid: #ff8c42;
   }
 
   .sah-footer {
-    background: #0e0e0e;
-    color: rgba(255,255,255,0.55);
-    padding: 60px 0 32px;
+    background: rgba(111,141,166,0.9);
+    color: rgba(255,255,255,0.92);
+    padding: 28px 0 14px;
     font-family: 'DM Sans', sans-serif;
+    border-top: 1px solid rgba(255,255,255,0.32);
+    box-shadow: 0 -14px 40px rgba(24,35,48,0.14);
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
   }
   .sah-footer *, .sah-footer *::before, .sah-footer *::after {
     box-sizing: border-box;
@@ -30,28 +35,40 @@ const FOOTER_CSS = `
   .sah-footer-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 44px;
+    gap: 22px;
+    margin-bottom: 16px;
   }
 
   /* Brand column */
+  .sah-footer-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .sah-footer-brand-mark img {
+    display: block;
+    width: 190px;
+    max-width: 42vw;
+    height: auto;
+    filter: drop-shadow(0 5px 12px rgba(0,0,0,0.22));
+  }
   .sah-footer-logo {
     font-family: 'Playfair Display', serif;
     font-size: 1.05rem;
     font-weight: 800;
     color: #fff;
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 7px;
   }
   .sah-footer-brand p {
     font-size: 0.85rem;
-    line-height: 1.75;
+    line-height: 1.5;
     max-width: 260px;
-    color: rgba(255,255,255,0.55);
+    color: rgba(255,255,255,0.82);
   }
 
   /* Newsletter */
-  .sah-footer-newsletter { margin-top: 20px; max-width: 280px; }
+  .sah-footer-newsletter { margin-top: 10px; max-width: 280px; }
   .sah-footer-newsletter-row {
     display: flex;
     border-radius: 6px;
@@ -71,14 +88,14 @@ const FOOTER_CSS = `
   .sah-footer-newsletter input::placeholder { color: rgba(255,255,255,0.35); }
   .sah-footer-newsletter button {
     padding: 10px 14px;
-    background: var(--ft-accent);
+    background: #ff8c42;
     color: #fff;
     border: none;
     font-weight: 700;
     font-size: 0.8rem;
-    transition: background 0.15s;
+    transition: filter 0.15s;
   }
-  .sah-footer-newsletter button:hover { background: var(--ft-accent-dark); }
+  .sah-footer-newsletter button:hover { filter: saturate(1.08) brightness(0.94); }
   .sah-nl-feedback {
     margin-top: 6px;
     font-size: 0.78rem;
@@ -88,24 +105,27 @@ const FOOTER_CSS = `
   .sah-nl-feedback.error { color: #fca5a5; }
 
   /* Link columns */
+  .sah-footer-col {
+    padding-top: 28px;
+  }
   .sah-footer-col h4 {
     font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 14px;
+    color: #ffffff;
+    margin-bottom: 9px;
   }
   .sah-footer-col ul {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 5px;
     padding: 0;
     margin: 0;
   }
   .sah-footer-col ul li a {
-    color: rgba(255,255,255,0.55);
+    color: rgba(255,255,255,0.82);
     font-size: 0.875rem;
     transition: color 0.15s;
   }
@@ -114,11 +134,11 @@ const FOOTER_CSS = `
   /* Trust strip */
   .sah-footer-trust {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     align-items: center;
-    padding: 16px 0;
-    margin-bottom: 20px;
-    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 9px 0;
+    margin-bottom: 8px;
+    border-top: 1px solid rgba(255,255,255,0.22);
     flex-wrap: wrap;
   }
   .sah-footer-trust-item {
@@ -126,24 +146,24 @@ const FOOTER_CSS = `
     align-items: center;
     gap: 7px;
     font-size: 0.78rem;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.82);
   }
   .sah-footer-trust-item i { color: var(--ft-accent); font-size: 0.82rem; }
 
   /* Bottom bar */
   .sah-footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.07);
-    padding-top: 22px;
+    border-top: 1px solid rgba(255,255,255,0.22);
+    padding-top: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
   }
-  .sah-footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.35); }
+  .sah-footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.82); }
   .sah-footer-bottom-links { display: flex; gap: 20px; font-size: 0.8rem; }
   .sah-footer-bottom-links a {
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.82);
     transition: color 0.15s;
   }
   .sah-footer-bottom-links a:hover { color: #fff; }
@@ -153,22 +173,24 @@ const FOOTER_CSS = `
   .sah-footer-soc {
     width: 34px; height: 34px;
     border-radius: 5px;
-    background: rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.16);
     display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.86);
     font-size: 0.84rem;
     transition: all 0.15s;
   }
-  .sah-footer-soc:hover { background: var(--ft-accent); color: #fff; }
+  .sah-footer-soc:hover { background: #ff8c42; color: #fff; }
 
   /* Responsive */
   @media (max-width: 1100px) {
-    .sah-footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .sah-footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+    .sah-footer-col { padding-top: 0; }
   }
   @media (max-width: 640px) {
-    .sah-footer { padding: 44px 0 24px; }
+    .sah-footer { padding: 24px 0 14px; }
     .sah-footer .sah-container { padding: 0 20px; }
-    .sah-footer-grid { grid-template-columns: 1fr; gap: 28px; }
+    .sah-footer-grid { grid-template-columns: 1fr; gap: 18px; }
+    .sah-footer-col { padding-top: 0; }
     .sah-footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
     .sah-footer-bottom-links { flex-wrap: wrap; gap: 12px; }
     .sah-footer-trust { flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -223,10 +245,13 @@ const Footer = () => {
 
           {/* Brand + newsletter */}
           <div className="sah-footer-brand">
-            <Link to="/" className="sah-footer-logo">SA Homeschooling Directory</Link>
+            <Link to="/" className="sah-footer-brand-mark" aria-label="Parentals home">
+              <img src="/parentals-footer-logo.png" alt="Parentals" />
+            </Link>
+            <Link to="/" className="sah-footer-logo">Parental's</Link>
             <p>
-              Connecting South African homeschooling families with verified tutors,
-              therapists, curriculum providers and education specialists nationwide.
+              Helping South African families discover trusted products, services and
+              professionals for every stage of parenting.
             </p>
             <div className="sah-footer-newsletter">
               <div className="sah-footer-newsletter-row">
@@ -250,10 +275,10 @@ const Footer = () => {
           <div className="sah-footer-col">
             <h4>For Families</h4>
             <ul>
-              <li><a href="/#sah-providers">Find a Tutor</a></li>
-              <li><a href="/#sah-providers">Browse Curriculum</a></li>
-              <li><a href="/#sah-providers">Therapists</a></li>
-              <li><a href="/#sah-providers">Online Schools</a></li>
+              <li><a href="/#sah-providers">Education</a></li>
+              <li><a href="/#sah-providers">Wellness</a></li>
+              <li><a href="/#sah-providers">Activities</a></li>
+              <li><a href="/#sah-providers">Family Shops</a></li>
             </ul>
           </div>
 
@@ -261,19 +286,19 @@ const Footer = () => {
           <div className="sah-footer-col">
             <h4>For Providers</h4>
             <ul>
-              <li><a href="/#sah-list">List a Service</a></li>
-              <li><a href="/#sah-list">Pricing Plans</a></li>
+              <li><a href="/#sah-list">Create a Listing</a></li>
+              <li><a href="/#sah-list">Parental Plus+</a></li>
               <li><Link to="/login">Provider Login</Link></li>
               <li><a href="/#sah-how">Verification Process</a></li>
             </ul>
           </div>
 
-          {/* SA Homeschooling */}
+          {/* Parental's */}
           <div className="sah-footer-col">
-            <h4>SA Homeschooling</h4>
+            <h4>Parental's</h4>
             <ul>
               <li><a href="https://sahomeschooling.com" target="_blank" rel="noreferrer">Magazine</a></li>
-              <li><Link to="/about">About the Directory</Link></li>
+              <li><Link to="/about">About Parental's</Link></li>
               <li><Link to="/contact">Contact Us</Link></li>
               <li>
                 <a href="https://sahomeschooling.com/privacy-policy-for-sa-homeschooling-beyond/" target="_blank" rel="noreferrer">
@@ -287,9 +312,9 @@ const Footer = () => {
         {/* ── Trust strip + office ── */}
         <div className="sah-footer-trust">
           {[
-            ['fa-shield-alt', 'All providers manually verified'],
+            ['fa-shield-alt', 'Listings reviewed with parents in mind'],
             ['fa-lock',       'Secure & private enquiries'],
-            ['fa-star',       '4.9 average provider rating'],
+            ['fa-star',       'Curated, relevant results'],
           ].map(([ic, txt]) => (
             <div key={txt} className="sah-footer-trust-item">
               <i className={`fas ${ic}`} /> {txt}
@@ -306,7 +331,7 @@ const Footer = () => {
 
         {/* ── Bottom bar ── */}
         <div className="sah-footer-bottom">
-          <p>&copy; 2025 SA Homeschooling Directory. All rights reserved.</p>
+          <p>&copy; 2025 Parental's. All rights reserved.</p>
 
           <div className="sah-footer-bottom-links">
             <a href="https://sahomeschooling.com/privacy-policy-for-sa-homeschooling-beyond/" target="_blank" rel="noreferrer">

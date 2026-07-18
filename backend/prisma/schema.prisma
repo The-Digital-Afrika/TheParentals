@@ -31,6 +31,7 @@ model User {
   updatedAt   DateTime  @updatedAt
 
   providerProfile ProviderProfile?
+  payments        PaymentTransaction[]
 }
 
 model ProviderProfile {
@@ -69,6 +70,13 @@ model ProviderProfile {
   tiktok              String?
   status              ProviderStatus @default(PENDING)
   listingPlan         String         @default("free")
+  requestedPlan       String?
+  billingStatus       String         @default("inactive")
+  paystackCustomerCode String?
+  paystackSubscriptionCode String?
+  paystackEmailToken  String?
+  subscriptionStartedAt DateTime?
+  nextBillingAt       DateTime?
   publicDisplay       Boolean        @default(false)
   certifications      String?
   degrees             String?
@@ -89,6 +97,45 @@ model ProviderProfile {
 
   reviews       Review[]
   featuredSlots FeaturedSlot[]
+  payments      PaymentTransaction[]
+}
+
+model PaymentTransaction {
+  id                String           @id @default(uuid())
+  reference         String           @unique
+  internalReference String?          @unique
+  providerReference String?          @unique
+  userId            String
+  user              User             @relation(fields: [userId], references: [id])
+  providerId        String?
+  provider          ProviderProfile? @relation(fields: [providerId], references: [id])
+  plan              String
+  amount            Int
+  currency          String           @default("ZAR")
+  status            String           @default("INITIALIZED")
+  channel           String           @default("paystack")
+  paymentMethod     String?
+  providerName      String           @default("paystack")
+  authorizationUrl  String?
+  accessCode        String?
+  paystackId        String?
+  customerCode      String?
+  subscriptionCode  String?
+  emailToken        String?
+  paidAt            DateTime?
+  verifiedAt        DateTime?
+  expiresAt         DateTime?
+  failureReason     String?
+  metadata          Json?
+  instructions      Json?
+  rawResponse       Json?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([status])
+  @@index([paymentMethod])
 }
 
 model Review {

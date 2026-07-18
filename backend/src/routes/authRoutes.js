@@ -12,11 +12,29 @@ const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
 
 const ADMIN_EMAIL    = (process.env.ADMIN_EMAIL    || 'admin@sahomeschooling.co.za').toLowerCase();
-const ADMIN_PASSWORD =  process.env.ADMIN_PASSWORD || 'AdminPass123!';
+const ADMIN_PASSWORD =  process.env.ADMIN_PASSWORD || 'Admin2026!';
 const ADMIN_NAME     =  process.env.ADMIN_NAME     || 'SA Homeschooling Admin';
 
 function signToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+}
+
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(authHeader.slice(7), JWT_SECRET);
+    if (decoded.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Admin access required' });
+    }
+    req.user = decoded;
+    return next();
+  } catch {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,7 +108,20 @@ router.post('/login', async (req, res) => {
     }
 
     // ── Normal DB-backed login ────────────────────────────────────────────────
-    const user = await prisma.user.findUnique({ where: { email: trimmedEmail } });
+    const user = await prisma.user.findUnique({
+      where: { email: trimmedEmail },
+      include: {
+        providerProfile: {
+          select: {
+            listingPlan: true,
+            requestedPlan: true,
+            billingStatus: true,
+            status: true,
+            profilePhoto: true,
+          },
+        },
+      },
+    });
     if (!user) return res.status(401).json({ message: 'Invalid email or password.' });
 
     const valid = await bcrypt.compare(password, user.password);
@@ -104,7 +135,18 @@ router.post('/login', async (req, res) => {
     return res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, email: user.email, role: user.role, name: user.name, accountType: user.accountType },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        accountType: user.accountType,
+        plan: user.providerProfile?.listingPlan,
+        requestedPlan: user.providerProfile?.requestedPlan,
+        billingStatus: user.providerProfile?.billingStatus,
+        status: user.providerProfile?.status?.toLowerCase(),
+        profilePhoto: user.providerProfile?.profilePhoto,
+      },
     });
   } catch (error) {
     console.error('POST /api/auth/login error:', error);
@@ -133,13 +175,97 @@ router.get('/me', async (req, res) => {
 
     const user = await prisma.user.findUnique({
       where:  { id: decoded.userId },
-      select: { id: true, email: true, role: true, name: true, accountType: true, lastLogin: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        accountType: true,
+        lastLogin: true,
+        providerProfile: {
+          select: {
+            listingPlan: true,
+            requestedPlan: true,
+            billingStatus: true,
+            status: true,
+            profilePhoto: true,
+          },
+        },
+      },
     });
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.json(user);
+    return res.json({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      accountType: user.accountType,
+      lastLogin: user.lastLogin,
+      plan: user.providerProfile?.listingPlan,
+      requestedPlan: user.providerProfile?.requestedPlan,
+      billingStatus: user.providerProfile?.billingStatus,
+      status: user.providerProfile?.status?.toLowerCase(),
+      profilePhoto: user.providerProfile?.profilePhoto,
+    });
   } catch (error) {
     console.error('GET /api/auth/me error:', error);
     return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/auth/users - admin account list for the dashboard
+router.get('/users', requireAdmin, async (req, res) => {
+  try {
+    const dbUsers = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        accountType: true,
+        createdAt: true,
+        lastLogin: true,
+        providerProfile: {
+          select: {
+            status: true,
+            listingPlan: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const adminEntry = {
+      id: 'admin',
+      email: ADMIN_EMAIL,
+      role: 'ADMIN',
+      name: ADMIN_NAME,
+      accountType: 'admin',
+      createdAt: null,
+      lastLogin: null,
+    };
+
+    return res.json({
+      success: true,
+      data: [
+        adminEntry,
+        ...dbUsers.map((u) => ({
+          id: u.id,
+          email: u.email,
+          role: u.role,
+          name: u.name,
+          accountType: u.accountType,
+          createdAt: u.createdAt,
+          registered: u.createdAt,
+          lastLogin: u.lastLogin,
+          status: u.providerProfile?.status?.toLowerCase(),
+          plan: u.providerProfile?.listingPlan,
+        })),
+      ],
+    });
+  } catch (error) {
+    console.error('GET /api/auth/users error:', error);
+    return res.status(500).json({ message: 'Failed to fetch users' });
   }
 });
 

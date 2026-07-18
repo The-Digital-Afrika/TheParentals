@@ -23,8 +23,8 @@ export const escapeHtml = (str) => {
 export const getPlanLimits = (plan) => {
   const limits = {
     free: { maxServices: 1, maxTags: 10 },
-    pro: { maxServices: 5, maxTags: 20 },
-    featured: { maxServices: 10, maxTags: 30 }
+    pro: { maxServices: 3, maxTags: 20 },
+    featured: { maxServices: 3, maxTags: 20 }
   };
   return limits[plan] || limits.free;
 };
@@ -32,15 +32,15 @@ export const getPlanLimits = (plan) => {
 export const formatPrice = (price, plan) => {
   if (plan === 'free') return 'R0';
   if (plan === 'pro') return 'R149';
-  if (plan === 'featured') return 'R399';
+  if (plan === 'featured') return 'R149';
   return price;
 };
 
 export const getPlanName = (plan) => {
   const names = {
     free: 'Community Member',
-    pro: 'Trusted Provider',
-    featured: 'Featured Partner'
+    pro: 'Parental Plus+',
+    featured: 'Parental Plus+'
   };
   return names[plan] || 'Community Member';
 };

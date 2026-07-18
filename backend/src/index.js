@@ -8,10 +8,12 @@ const providerRoutes     = require('./routes/providerRoutes');
 const reviewRoutes       = require('./routes/reviewRoutes');
 const featuredSlotRoutes = require('./routes/featuredSlotRoutes');
 const statsRoutes        = require('./routes/statsRoutes');
+const paymentRoutes      = require('./routes/paymentRoutes');
 
 const app = express();
 
 app.use(cors());
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' })); // allow base64 profile photos
 
 // ── Health check (used by Registration.js to detect if API is online) ──
@@ -25,6 +27,7 @@ app.use('/api/providers',      providerRoutes);
 app.use('/api/reviews',        reviewRoutes);
 app.use('/api/featured-slots', featuredSlotRoutes);
 app.use('/api/stats',          statsRoutes);
+app.use('/api/payments',       paymentRoutes);
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use((req, res) => {
@@ -52,4 +55,7 @@ app.listen(port, () => {
   console.log(`   POST /api/providers/:id/reject  (ADMIN)`);
   console.log(`   GET  /api/stats                (ADMIN)`);
   console.log(`   GET  /api/reviews              (ADMIN)\n`);
+  console.log(`   POST /api/payments/initialize  (PROVIDER)`);
+  console.log(`   GET  /api/payments/verify/:ref (PROVIDER)`);
+  console.log(`   POST /api/payments/webhook     (Paystack)\n`);
 });

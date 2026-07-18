@@ -5,12 +5,14 @@ import { useNotification } from '../../contexts/NotificationContext';
 
 const HEADER_CSS = `
   :root {
-    --hdr-bg:       #5a5a5a;
-    --hdr-bg-mob:   #4a4a4a;
-    --hdr-accent:   #f97316;
-    --hdr-accent-dk:#ea580c;
-    --hdr-accent-lt:#fed7aa;
-    --hdr-h:        68px;
+    --hdr-bg:       #3f3f3c;
+    --hdr-bg-mob:   #343431;
+    --hdr-accent:   #8fb8d8;
+    --hdr-accent-dk:#557691;
+    --hdr-accent-lt:#d9efff;
+    --hdr-accent-solid:#ff8c42;
+    --hdr-blue-glass:rgba(111,141,166,0.78);
+    --hdr-h:        96px;
   }
   .sah-hdr, .sah-hdr *, .sah-hdr *::before, .sah-hdr *::after,
   .sah-hdr-mobile, .sah-hdr-mobile *, .sah-hdr-mobile *::before, .sah-hdr-mobile *::after {
@@ -18,37 +20,54 @@ const HEADER_CSS = `
   }
   .sah-hdr {
     position: sticky; top: 0; z-index: 1000;
-    height: var(--hdr-h); background: var(--hdr-bg);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+    height: var(--hdr-h); background: var(--hdr-blue-glass);
+    background-image: none;
+    box-shadow: 0 12px 34px rgba(24,35,48,0.18);
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
     font-family: 'DM Sans', sans-serif;
     color: #ffffff;
+    overflow: hidden;
+  }
+  .sah-hdr::before {
+    content: ''; position: absolute; inset: 0;
+    background: transparent; pointer-events: none; z-index: 0;
   }
   .sah-hdr-inner {
     max-width: 1280px; margin: 0 auto; padding: 0 32px;
     height: 100%; display: flex; align-items: center; justify-content: space-between;
-    gap: 16px;
+    gap: 16px; position: relative; z-index: 1;
   }
   /* Left - Back button + brand together */
   .sah-hdr-left {
-    display: flex; align-items: center; flex-shrink: 0; min-width: 0;
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    flex-shrink: 0; min-width: 0; gap: 2px;
   }
   .sah-hdr-back {
     display: inline-flex; align-items: center; gap: 8px;
     background: none; border: none; color: rgba(255,255,255,0.90);
-    font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; padding: 6px 0; transition: color 0.15s;
+    font-size: 0.76rem; font-weight: 700; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; padding: 0; transition: color 0.15s;
     text-decoration: none; white-space: nowrap;
   }
-  .sah-hdr-back i { font-size: 0.78rem; }
+  .sah-hdr-back i { font-size: 0.68rem; }
   .sah-hdr-back:hover { color: #fff; }
-  .sah-hdr-back-div {
-    width: 1px; height: 28px;
-    background: rgba(255,255,255,0.28); margin: 0 16px; flex-shrink: 0;
-  }
   /* Brand — lives in left section next to back button */
   .sah-hdr-brand {
     display: flex; align-items: center; gap: 12px;
     text-decoration: none; flex-shrink: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .sah-hdr-logo {
+    display: block; width: 210px; max-width: 28vw; height: 56px;
+    object-fit: contain; object-position: left center;
+    filter: drop-shadow(0 4px 10px rgba(24,35,48,0.22));
   }
   .sah-hdr-brand-text {
     display: flex; flex-direction: column; line-height: 1.15;
@@ -94,13 +113,13 @@ const HEADER_CSS = `
   }
   .sah-hdr-solid {
     padding: 7px 18px; border-radius: 6px;
-    background: var(--hdr-accent); color: #fff;
+    background: #ff8c42; color: #fff;
     font-weight: 700; font-size: 0.86rem; border: none; cursor: pointer;
     transition: background 0.15s; font-family: 'DM Sans', sans-serif;
     text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
     white-space: nowrap;
   }
-  .sah-hdr-solid:hover { background: var(--hdr-accent-dk); }
+  .sah-hdr-solid:hover { filter: saturate(1.08) brightness(0.94); }
   /* Hamburger */
   .sah-hdr-ham {
     display: none; flex-direction: column; justify-content: center;
@@ -118,7 +137,10 @@ const HEADER_CSS = `
   /* Mobile drawer */
   .sah-hdr-mobile {
     position: fixed; top: var(--hdr-h); left: 0; right: 0; z-index: 999;
-    background: var(--hdr-bg-mob); max-height: 0; overflow: hidden;
+    background: rgba(111,141,166,0.92); max-height: 0; overflow: hidden;
+    background-image: none;
+    backdrop-filter: blur(18px) saturate(1.12);
+    -webkit-backdrop-filter: blur(18px) saturate(1.12);
     transition: max-height 0.28s ease, box-shadow 0.28s;
     display: flex; flex-direction: column;
   }
@@ -151,10 +173,10 @@ const HEADER_CSS = `
     background: transparent !important; color: #fff !important;
   }
   .sah-mob-solid {
-    background: var(--hdr-accent) !important; color: #fff !important;
+    background: #ff8c42 !important; color: #fff !important;
     border: none !important;
   }
-  .sah-mob-solid:hover { background: var(--hdr-accent-dk) !important; }
+  .sah-mob-solid:hover { filter: saturate(1.08) brightness(0.94); }
   /* Responsive */
   @media (max-width: 960px) { .sah-hdr-nav { display: none; } }
   @media (max-width: 760px) {
@@ -164,17 +186,12 @@ const HEADER_CSS = `
   }
   @media (max-width: 480px) {
     .sah-hdr-inner { padding: 0 16px; }
-    .sah-hdr-back span { display: none; }
-    .sah-hdr-brand-name { font-size: 0.9rem; }
-    .sah-hdr-brand-tag { font-size: 0.62rem; }
+    .sah-hdr-logo { width: 140px; height: 92px; max-width: 42vw; }
   }
 
   @media(max-width:480px){
   .sah-hdr-inner { padding: 0 12px; gap: 8px; }
-  .sah-hdr-brand-name { font-size: 0.82rem; }
-  .sah-hdr-brand-tag { display: none; }
-  .sah-hdr-back span { display: none; }
-  .sah-hdr-back-div { margin: 0 8px; }
+  .sah-hdr-logo { width: 132px; height: 88px; max-width: 40vw; }
   .sah-hdr-ctas { display: none; }
   .sah-hdr-ham { display: flex; }
 }
@@ -201,7 +218,7 @@ function injectCSS() {
   }
 }
 
-const Header = () => {
+const Header = ({ userType = 'guest' } = {}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, logout } = useAuth();
   const { showNotification } = useNotification();
@@ -213,7 +230,12 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    try { localStorage.removeItem('sah_current_user'); } catch {}
+    try {
+      localStorage.removeItem('sah_current_user');
+      localStorage.removeItem('sah_user');
+      localStorage.removeItem('sah_token');
+      window.dispatchEvent(new Event('sah-auth-change'));
+    } catch {}
     showNotification('Logged out successfully', 'success');
     setMobileOpen(false);
     navigate('/');
@@ -223,32 +245,28 @@ const Header = () => {
   try { currentUser = JSON.parse(localStorage.getItem('sah_current_user')); } catch {}
 
   const isLoggedIn = !!user || !!currentUser;
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'admin';
+  const accountForPath = currentUser || user;
+  const roleForPath = String(accountForPath?.role || '').toLowerCase();
+  const accountTypeForPath = String(accountForPath?.accountType || '').toLowerCase();
+  const isProvider = ['provider', 'client', 'provideraccount'].includes(roleForPath) || accountTypeForPath.includes('provider');
   const isHomepage = location.pathname === '/';
-  const showBackButton = !isHomepage;
+  const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
   const closeMob = () => setMobileOpen(false);
+
+  // Where to send the logged-in user when they click their name
+  const dashboardPath = isAdmin ? '/admin-dashboard' : (isProvider ? '/provider-dashboard' : '/client-dashboard');
+  const displayName = currentUser?.name ? currentUser.name.split(' ')[0] : (user?.name ? user.name.split(' ')[0] : 'Account');
 
   return (
     <>
       <header className="sah-hdr">
         <div className="sah-hdr-inner">
 
-          {/* LEFT: Back button + Brand side by side */}
+          {/* LEFT: Brand */}
           <div className="sah-hdr-left">
-            {showBackButton && (
-              <>
-                <button className="sah-hdr-back" onClick={() => navigate('/')}>
-                  <i className="fas fa-arrow-left" />
-                  <span>Back to Directory</span>
-                </button>
-                <div className="sah-hdr-back-div" />
-              </>
-            )}
             <Link to="/" className="sah-hdr-brand">
-              <div className="sah-hdr-brand-text">
-                <span className="sah-hdr-brand-name">SA Homeschooling</span>
-                <span className="sah-hdr-brand-tag">Education Services Directory</span>
-              </div>
+              <img className="sah-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
             </Link>
           </div>
 
@@ -258,22 +276,24 @@ const Header = () => {
               <nav className="sah-hdr-nav" aria-label="Main navigation">
                 <a href="/#sah-providers">Find Services</a>
                 <a href="/#sah-how">How It Works</a>
-                <a href="/#sah-list">View Packages</a>
+                <a href="/#sah-list">Parental Plus+</a>
                 <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer">
                   Magazine <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.58rem' }} />
                 </a>
                 {isLoggedIn && isAdmin && <Link to="/admin-dashboard">Admin</Link>}
-                {isLoggedIn && !isAdmin && <Link to="/client-dashboard">Dashboard</Link>}
+                {isLoggedIn && !isAdmin && <Link to={dashboardPath}>Dashboard</Link>}
               </nav>
             )}
 
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
-                  <Link to="/login" className="sah-hdr-ghost">
-                    <i className="fas fa-user-circle" />
-                    {currentUser?.name ? currentUser.name.split(' ')[0] : 'Login'}
-                  </Link>
+                  {!isAdmin && (
+                    <Link to={dashboardPath} className="sah-hdr-ghost">
+                      <i className="fas fa-user-circle" />
+                      {displayName}
+                    </Link>
+                  )}
                   <button className="sah-hdr-solid" onClick={handleLogout}>
                     <i className="fas fa-sign-out-alt" /> Log Out
                   </button>
@@ -303,7 +323,7 @@ const Header = () => {
         <Link to="/" onClick={closeMob}><i className="fas fa-home" /> Home</Link>
         <a href="/#sah-providers" onClick={closeMob}><i className="fas fa-search" /> Find Services</a>
         <a href="/#sah-how" onClick={closeMob}><i className="fas fa-info-circle" /> How It Works</a>
-        <a href="/#sah-list" onClick={closeMob}><i className="fas fa-layer-group" /> View Packages</a>
+        <a href="/#sah-list" onClick={closeMob}><i className="fas fa-layer-group" /> Parental Plus+</a>
         <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer" onClick={closeMob}>
           <i className="fas fa-newspaper" /> Magazine
         </a>
@@ -311,7 +331,7 @@ const Header = () => {
           <Link to="/admin-dashboard" onClick={closeMob}><i className="fas fa-shield-halved" /> Admin</Link>
         )}
         {isLoggedIn && !isAdmin && (
-          <Link to="/client-dashboard" onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
+          <Link to={dashboardPath} onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
         )}
         {isLoggedIn ? (
           <button className="mob-link" onClick={handleLogout}>

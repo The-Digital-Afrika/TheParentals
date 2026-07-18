@@ -79,7 +79,9 @@ export const auth = {
   
   logout: () => {
     localStorage.removeItem('sah_user');
+    localStorage.removeItem('sah_current_user');
     localStorage.removeItem('sah_token');
+    window.dispatchEvent(new Event('sah-auth-change'));
     return { success: true };
   }
 };

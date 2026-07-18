@@ -9,13 +9,86 @@ const multer  = require('multer');
 // ── multer: keep files in memory so we can convert to base64 ──────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits:  { fileSize: 100 * 1024 * 1024 }, // 100 MB
+  limits:  { fileSize: 10 * 1024 * 1024 }, // Keep database-backed uploads small.
 });
+const uploadAny = upload.any();
+
+function handleProviderUpload(req, res, next) {
+  uploadAny(req, res, (error) => {
+    if (!error) return next();
+
+    const message = error.code === 'LIMIT_FILE_SIZE'
+      ? 'Each uploaded file must be 10MB or smaller.'
+      : error.message || 'Could not process uploaded files.';
+
+    return res.status(400).json({ message });
+  });
+}
 
 // ── Helper: Buffer → base64 data-URL ─────────────────────────────────────────
 function toDataUrl(buffer, mimetype) {
   if (!buffer) return null;
   return `data:${mimetype};base64,${buffer.toString('base64')}`;
+}
+
+function mapProvider(profile) {
+  const status = (profile.status || 'PENDING').toLowerCase();
+  const tier = profile.listingPlan || 'free';
+
+  return {
+    ...profile,
+    id: profile.userId,
+    profileId: profile.id,
+    userId: profile.userId,
+    name: profile.fullName,
+    email: profile.user?.email || profile.inquiryEmail || '',
+    contactEmail: profile.inquiryEmail || profile.user?.email || '',
+    status,
+    plan: tier,
+    tier,
+    listingPlan: tier,
+    requestedPlan: profile.requestedPlan,
+    billingStatus: profile.billingStatus || 'inactive',
+    paystackSubscriptionCode: profile.paystackSubscriptionCode,
+    nextBillingAt: profile.nextBillingAt,
+    registered: profile.createdAt,
+    lastLogin: profile.user?.lastLogin,
+    category: profile.primaryCategory,
+    delivery: profile.deliveryMode,
+    location: [profile.city, profile.province].filter(Boolean).join(', '),
+    image: profile.profilePhoto,
+    photo: profile.profilePhoto,
+    publicToggle: profile.publicDisplay,
+    listingPublic: profile.publicDisplay,
+    updatedAt: profile.updatedAt,
+    createdAt: profile.createdAt,
+  };
+}
+
+function normalizeStatus(status) {
+  const value = String(status || '').toUpperCase();
+  return ['PENDING', 'APPROVED', 'REJECTED'].includes(value) ? value : null;
+}
+
+function toOptionalInt(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+async function updateProviderStatus(userId, statusValue, res) {
+  const status = normalizeStatus(statusValue);
+  if (!status) {
+    return res.status(400).json({ message: 'Invalid status value' });
+  }
+
+  const profile = await prisma.providerProfile.update({
+    where: { userId },
+    data:  { status, publicDisplay: status === 'APPROVED' },
+    include: { user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } } },
+  });
+
+  return res.json({ message: `Provider ${status.toLowerCase()}`, profile: mapProvider(profile) });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -28,7 +101,7 @@ function toDataUrl(buffer, mimetype) {
 //
 //  Falls back to plain JSON body if Content-Type is application/json
 // ─────────────────────────────────────────────────────────────────────────────
-router.post('/', upload.any(), async (req, res) => {
+router.post('/', handleProviderUpload, async (req, res) => {
   try {
     // 1. Parse the JSON blob
     let d = {};
@@ -112,11 +185,13 @@ router.post('/', upload.any(), async (req, res) => {
       return [];
     };
 
+    const requestedPaidPlan = ['pro', 'featured'].includes(listingPlan) ? listingPlan : null;
+
     const profileData = {
       fullName,
       accountType:          accountType         || 'Individual Provider',
       bio:                  bio                 || null,
-      experience:           experience != null  ? parseInt(experience) : null,
+      experience:           toOptionalInt(experience),
       languages:            toArr(languages),
       primaryCategory:      primaryCategory     || null,
       secondaryCategories:  toArr(secondaryCategories),
@@ -128,7 +203,7 @@ router.post('/', upload.any(), async (req, res) => {
       city:                 city                || null,
       province:             province            || null,
       serviceAreaType:      serviceAreaType     || 'national',
-      radius:               radius != null      ? parseInt(radius) : null,
+      radius:               toOptionalInt(radius),
       pricingModel:         pricingModel        || null,
       startingPrice:        startingPrice       || null,
       availabilityDays:     toArr(availabilityDays),
@@ -146,7 +221,9 @@ router.post('/', upload.any(), async (req, res) => {
       certifications:       effectiveCerts,
       memberships:          memberships         || null,
       clearance:            clearanceText || clearance || null,
-      listingPlan,
+      listingPlan: 'free',
+      requestedPlan: requestedPaidPlan,
+      billingStatus: requestedPaidPlan ? 'pending' : 'inactive',
       status:               'PENDING',
       publicDisplay:        false,
       // Files — only set if we have actual data
@@ -185,7 +262,7 @@ router.get('/', async (req, res) => {
       },
       orderBy: { createdAt: 'desc' },
     });
-    return res.json(providers);
+    return res.json(providers.map(mapProvider));
   } catch (error) {
     console.error('GET /api/providers error:', error);
     return res.status(500).json({ message: 'Server error fetching providers' });
@@ -205,7 +282,7 @@ router.get('/:userId', async (req, res) => {
       },
     });
     if (!profile) return res.status(404).json({ message: 'Provider profile not found' });
-    return res.json(profile);
+    return res.json(mapProvider(profile));
   } catch (error) {
     console.error('GET /api/providers/:userId error:', error);
     return res.status(500).json({ message: 'Server error' });
@@ -215,7 +292,7 @@ router.get('/:userId', async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 //  PATCH /api/providers/:userId  — update profile (client dashboard save)
 // ─────────────────────────────────────────────────────────────────────────────
-router.patch('/:userId', upload.any(), async (req, res) => {
+router.patch('/:userId', handleProviderUpload, async (req, res) => {
   try {
     let updates = {};
     if (req.body.providerData) {
@@ -226,8 +303,8 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     }
 
     const files        = req.files || [];
-    const newCert      = files.find(f => f.fieldname.startsWith('certFile_'));
-    const newClearance = files.find(f => f.fieldname.startsWith('clearanceFile_'));
+    const newCert      = files.find(f => f.fieldname.startsWith('certFile'));
+    const newClearance = files.find(f => f.fieldname.startsWith('clearanceFile'));
 
     // Build safe update object (only known schema fields)
     const ALLOWED = new Set([
@@ -236,7 +313,7 @@ router.patch('/:userId', upload.any(), async (req, res) => {
       'deliveryMode','city','province','serviceAreaType','radius','pricingModel',
       'startingPrice','availabilityDays','availabilityNotes','phone','whatsapp',
       'inquiryEmail','website','facebook','instagram','linkedin','tiktok','twitter',
-      'degrees','certifications','memberships','clearance','listingPlan','status',
+      'degrees','certifications','memberships','clearance','status',
       'publicDisplay','profilePhoto','certFile','certFileName','certFileType',
       'clearanceFile','clearanceFileName','clearanceFileType',
     ]);
@@ -244,8 +321,15 @@ router.patch('/:userId', upload.any(), async (req, res) => {
     const data = {};
     Object.entries(updates).forEach(([k, v]) => { if (ALLOWED.has(k)) data[k] = v; });
 
-    if (data.experience) data.experience = parseInt(data.experience);
-    if (data.radius)     data.radius     = parseInt(data.radius);
+    if (Object.prototype.hasOwnProperty.call(data, 'experience')) {
+      data.experience = toOptionalInt(data.experience);
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'radius')) {
+      data.radius = toOptionalInt(data.radius);
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'publicDisplay')) {
+      data.publicDisplay = data.publicDisplay === true || data.publicDisplay === 'true';
+    }
 
     if (newCert) {
       data.certFile     = toDataUrl(newCert.buffer, newCert.mimetype);
@@ -258,11 +342,39 @@ router.patch('/:userId', upload.any(), async (req, res) => {
       data.clearanceFileType = newClearance.mimetype;
     }
 
-    const profile = await prisma.providerProfile.update({
-      where: { userId: req.params.userId },
-      data,
-    });
-    return res.json({ message: 'Profile updated', profile });
+    let profile;
+    try {
+      profile = await prisma.providerProfile.update({
+        where: { userId: req.params.userId },
+        data,
+        include: {
+          user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
+          reviews: true,
+        },
+      });
+    } catch (error) {
+      if (error.code !== 'P2025') throw error;
+
+      const user = await prisma.user.findUnique({ where: { id: req.params.userId } });
+      if (!user) throw error;
+
+      profile = await prisma.providerProfile.create({
+        data: {
+          userId: req.params.userId,
+          fullName: data.fullName || user.name || user.email,
+          accountType: data.accountType || user.accountType || 'Individual Provider',
+          status: 'PENDING',
+          listingPlan: 'free',
+          publicDisplay: false,
+          ...data,
+        },
+        include: {
+          user: { select: { email: true, name: true, role: true, createdAt: true, lastLogin: true } },
+          reviews: true,
+        },
+      });
+    }
+    return res.json({ message: 'Profile updated', profile: mapProvider(profile) });
   } catch (error) {
     console.error('PATCH /api/providers/:userId error:', error);
     return res.status(500).json({ message: 'Server error updating profile', error: error.message });
@@ -274,17 +386,28 @@ router.patch('/:userId', upload.any(), async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 router.patch('/:userId/status', async (req, res) => {
   try {
-    const { status } = req.body;
-    if (!['PENDING', 'APPROVED', 'REJECTED'].includes(status))
-      return res.status(400).json({ message: 'Invalid status value' });
-
-    const profile = await prisma.providerProfile.update({
-      where: { userId: req.params.userId },
-      data:  { status, publicDisplay: status === 'APPROVED' },
-    });
-    return res.json({ message: `Provider ${status.toLowerCase()}`, profile });
+    return updateProviderStatus(req.params.userId, req.body.status, res);
   } catch (error) {
     console.error('PATCH /api/providers/:userId/status error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Legacy admin URLs kept for older frontend service calls.
+router.post('/:userId/approve', async (req, res) => {
+  try {
+    return updateProviderStatus(req.params.userId, 'APPROVED', res);
+  } catch (error) {
+    console.error('POST /api/providers/:userId/approve error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+router.post('/:userId/reject', async (req, res) => {
+  try {
+    return updateProviderStatus(req.params.userId, 'REJECTED', res);
+  } catch (error) {
+    console.error('POST /api/providers/:userId/reject error:', error);
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 });

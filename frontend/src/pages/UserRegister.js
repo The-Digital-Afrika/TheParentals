@@ -18,9 +18,10 @@ const injectHead = () => {
 
 const CSS = `
   :root {
-    --acc:#c9621a; --acc-d:#a84e12; --acc-l:#f0dcc8;
-    --dark:#3a3a3a; --mid:#555; --muted:#888;
-    --card:#ede9e3; --white:#fff;
+    --acc:#6f8da6; --acc-d:#557691; --acc-l:#d9efff;
+    --acc-solid:#ff8c42;
+    --dark:#333330; --mid:#55514b; --muted:#837b70;
+    --card:#f6f2ec; --white:#fff;
     --border:rgba(0,0,0,0.10);
     --shadow:0 16px 48px rgba(0,0,0,0.13);
     --r:8px; --r-lg:14px;
@@ -28,24 +29,26 @@ const CSS = `
   .ur-wrap { font-family:'DM Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; background:var(--card); -webkit-font-smoothing:antialiased; }
   .ur-wrap * { box-sizing:border-box; margin:0; padding:0; }
 
-  .ur-hdr { height:64px; background:#5a5a5a; display:flex; align-items:center; padding:0 32px; gap:16px; box-shadow:0 2px 12px rgba(0,0,0,0.22); }
-  .ur-hdr-back { display:inline-flex; align-items:center; gap:7px; color:rgba(255,255,255,0.85); font-size:0.85rem; font-weight:600; background:none; border:none; cursor:pointer; font-family:inherit; }
-  .ur-hdr-back:hover { color:#fff; }
-  .ur-hdr-div { width:1px; height:26px; background:rgba(255,255,255,0.25); }
-  .ur-hdr-brand { font-family:'Playfair Display',serif; font-weight:800; font-size:1rem; color:#fff; text-decoration:none; }
+  .ur-hdr { height:140px; background:#6f8da6; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:0 32px; gap:2px; box-shadow:0 2px 12px rgba(18,45,82,0.28); }
+  .ur-back-link { display:inline-flex; align-items:center; gap:7px; align-self:flex-start; color:var(--acc-d); font-size:0.82rem; font-weight:800; background:none; border:none; cursor:pointer; font-family:inherit; text-decoration:none; margin-bottom:14px; transition:color 0.15s, transform 0.15s; }
+  .ur-back-link:hover { color:var(--dark); transform:translateX(-2px); }
+  .ur-back-link i { font-size:0.72rem; }
+  .ur-hdr-brand { color:#fff; text-decoration:none; display:flex; align-items:center; }
+  .ur-hdr-logo { display:block; width:230px; max-width:28vw; height:124px; object-fit:contain; object-position:left center; filter:drop-shadow(0 3px 12px rgba(255,138,31,0.26)); }
 
   .ur-hero { position:relative; overflow:hidden; min-height:180px; display:flex; align-items:center; }
   .ur-hero-bg { position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1400&auto=format&fit=crop&q=80'); background-size:cover; background-position:center; }
-  .ur-hero-bg::after { content:''; position:absolute; inset:0; background:linear-gradient(100deg,rgba(10,10,10,0.88) 0%,rgba(30,30,30,0.80) 100%); }
+  .ur-hero-bg::after { content:''; position:absolute; inset:0; background:rgba(24,35,48,0.68); }
   .ur-hero-inner { position:relative; z-index:2; padding:40px 32px; width:100%; max-width:700px; margin:0 auto; text-align:center; }
   .ur-hero-inner h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; }
   .ur-hero-inner h1 em { font-style:italic; color:var(--acc-l); }
   .ur-hero-inner p { font-size:0.88rem; color:rgba(255,255,255,0.72); margin-top:8px; line-height:1.65; }
 
   .ur-body { flex:1; display:flex; align-items:flex-start; justify-content:center; padding:36px 24px 64px; }
+  .ur-body-inner { width:100%; max-width:840px; display:flex; flex-direction:column; align-items:stretch; }
 
   .ur-card { background:var(--white); border-radius:var(--r-lg); box-shadow:var(--shadow); width:100%; max-width:840px; overflow:hidden; }
-  .ur-card-head { background:#5a5a5a; padding:24px 36px 18px; }
+  .ur-card-head { background:#6f8da6; padding:24px 36px 18px; }
   .ur-card-head h2 { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; color:#fff; }
   .ur-card-head p { font-size:0.82rem; color:rgba(255,255,255,0.65); margin-top:3px; }
   .ur-card-body { padding:28px 36px 36px; }
@@ -57,7 +60,7 @@ const CSS = `
   .ur-field label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--mid); display:flex; align-items:center; gap:5px; }
   .ur-field label i { color:var(--acc); font-size:0.65rem; }
   .ur-field input { padding:11px 14px; border:1.5px solid var(--border); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.92rem; color:var(--dark); outline:none; background:var(--card); transition:border-color 0.15s,box-shadow 0.15s; width:100%; }
-  .ur-field input:focus { border-color:var(--acc); box-shadow:0 0 0 3px rgba(201,98,26,0.14); }
+  .ur-field input:focus { border-color:var(--acc); box-shadow:0 0 0 3px rgba(85,118,145,0.14); }
   .ur-field input.err { border-color:#dc2626; background:#fff8f8; }
   .ur-field-err { color:#dc2626; font-size:0.74rem; font-weight:600; padding:4px 9px; background:#fff0f0; border-radius:5px; border-left:3px solid #dc2626; display:flex; align-items:center; gap:5px; }
   .ur-field-hint { font-size:0.73rem; color:var(--muted); display:flex; align-items:center; gap:4px; margin-top:2px; }
@@ -68,15 +71,15 @@ const CSS = `
   .ur-pw-eye { position:absolute; right:11px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:0.88rem; padding:3px; }
   .ur-pw-eye:hover { color:var(--acc); }
 
-  .ur-perks { display:flex; flex-direction:column; gap:10px; background:rgba(201,98,26,0.06); border:1px solid rgba(201,98,26,0.18); border-radius:var(--r); padding:16px 18px; margin-bottom:18px; }
+  .ur-perks { display:flex; flex-direction:column; gap:10px; background:rgba(85,118,145,0.06); border:1px solid rgba(85,118,145,0.18); border-radius:var(--r); padding:16px 18px; margin-bottom:18px; }
   .ur-perks-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:800; color:var(--dark); margin-bottom:2px; }
   .ur-perk { display:flex; align-items:center; gap:9px; font-size:0.84rem; color:var(--mid); }
   .ur-perk i { color:var(--acc); font-size:0.76rem; width:14px; text-align:center; flex-shrink:0; }
 
   .ur-privacy { background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.07); border-radius:var(--r); padding:12px 15px; font-size:0.79rem; color:var(--muted); line-height:1.65; }
 
-  .ur-submit { width:100%; padding:13px; background:var(--acc); color:#fff; border:none; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:background 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
-  .ur-submit:hover:not(:disabled) { background:var(--acc-d); }
+  .ur-submit { width:100%; padding:13px; background:var(--acc-solid); color:#fff; border:none; border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:filter 0.15s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:4px; }
+  .ur-submit:hover:not(:disabled) { filter:saturate(1.08) brightness(0.94); }
   .ur-submit:disabled { opacity:0.65; cursor:not-allowed; }
 
   .ur-divider { display:flex; align-items:center; gap:12px; margin:18px 0 14px; }
@@ -101,8 +104,10 @@ const CSS = `
     .ur-col-sep { display:none; }
     .ur-card-body { padding:22px 20px 28px; }
     .ur-hdr { padding:0 16px; }
+    .ur-hdr-logo { width:132px; height:88px; max-width:40vw; }
     .ur-hero-inner { padding:32px 16px; }
     .ur-body { padding:24px 14px 48px; }
+    .ur-back-link { margin-bottom:12px; font-size:0.78rem; }
   }
 `;
 
@@ -279,11 +284,9 @@ const UserRegister = () => {
     <div className="ur-wrap">
 
       <header className="ur-hdr">
-        <button className="ur-hdr-back" onClick={() => navigate('/')}>
-          <i className="fas fa-arrow-left" /> Back to Directory
-        </button>
-        <div className="ur-hdr-div" />
-        <Link to="/" className="ur-hdr-brand">SA Homeschooling</Link>
+        <Link to="/" className="ur-hdr-brand">
+          <img className="ur-hdr-logo" src="/parentals-logo-header.png" alt="Parentals" />
+        </Link>
       </header>
 
       <div className="ur-hero">
@@ -291,20 +294,25 @@ const UserRegister = () => {
         <div className="ur-hero-inner">
           <h1>Create Your <em>Free Account</em></h1>
           <p>
-            Join thousands of South Africans discovering verified tutors, therapists,
-            curriculum providers and enrichment services — all in one trusted directory.
+            Join South African families discovering trusted products, services,
+            providers and everyday support — all in one parent-first directory.
           </p>
         </div>
       </div>
 
       <div className="ur-body">
-        <div className="ur-card">
+        <div className="ur-body-inner">
+          <button className="ur-back-link" onClick={() => navigate('/')}>
+            <i className="fas fa-arrow-left" /> Directory
+          </button>
+
+          <div className="ur-card">
           <div className="ur-card-head">
             <h2>
               <i className="fas fa-user-plus" style={{ marginRight: 9, color: 'var(--acc-l)', fontSize: '1.1rem' }} />
               Register Your Account
             </h2>
-            <p>Free access — browse all verified provider profiles instantly</p>
+            <p>Free access — browse trusted parent-focused listings instantly</p>
           </div>
 
           <div className="ur-card-body">
@@ -434,12 +442,12 @@ const UserRegister = () => {
                 <div className="ur-perks">
                   <div className="ur-perks-title">Why create an account?</div>
                   {[
-                    ['fa-search',    'Browse & search all verified service providers'],
-                    ['fa-envelope',  'Send direct enquiries to tutors and therapists'],
+                    ['fa-search',    'Browse & search trusted products and services'],
+                    ['fa-envelope',  'Send direct enquiries to businesses and providers'],
                     ['fa-heart',     'Save and compare your favourite listings'],
-                    ['fa-bell',      'Get notified when new providers join your area'],
+                    ['fa-bell',      'Get notified when new listings join your area'],
                     ['fa-star',      'Leave reviews and help other users choose'],
-                    ['fa-shield-alt','All providers are manually verified for trust'],
+                    ['fa-shield-alt','Listings are reviewed with parents in mind'],
                   ].map(([ic, txt]) => (
                     <div key={txt} className="ur-perk">
                       <i className={`fas ${ic}`} /> {txt}
@@ -457,6 +465,7 @@ const UserRegister = () => {
             </div>
           </div>
         </div>
+        </div>
       </div>
 
     </div>
@@ -464,3 +473,4 @@ const UserRegister = () => {
 };
 
 export default UserRegister;
+

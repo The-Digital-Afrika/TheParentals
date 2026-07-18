@@ -9,6 +9,7 @@ import Modal from '../components/common/Modal';
 import ReviewCard from '../components/admin/ReviewCard';
 import { reviewsMock } from '../utils/constants';
 import { escapeHtml } from '../utils/helpers';
+import { api } from '../services/api';
 import '../assets/css/dashboard.css';
 
 /* ── localStorage helpers ────────────────────────────────── */
@@ -47,11 +48,46 @@ function saveFeaturedSlots(slots) {
 }
 const MAX_FEATURED_SLOTS = 4;
 
+function normalizeProviderForAdmin(p) {
+  const status = String(p.status || 'pending').toLowerCase();
+  const tier = p.tier || p.plan || p.listingPlan || 'free';
+  return {
+    ...p,
+    id: p.userId || p.id,
+    profileId: p.profileId || p.id,
+    userId: p.userId || p.id,
+    name: p.name || p.fullName || p.user?.name || '',
+    email: p.email || p.user?.email || p.inquiryEmail || '',
+    contactEmail: p.contactEmail || p.inquiryEmail || p.user?.email || '',
+    status,
+    plan: tier,
+    tier,
+    listingPlan: tier,
+    registered: p.registered || p.createdAt || p.user?.createdAt || '',
+    lastLogin: p.lastLogin || p.user?.lastLogin || '',
+    category: p.category || p.primaryCategory || '',
+    location: p.location || [p.city, p.province].filter(Boolean).join(', '),
+    image: p.image || p.profilePhoto || null,
+    photo: p.photo || p.profilePhoto || null,
+    publicToggle: Boolean(p.publicToggle ?? p.publicDisplay),
+  };
+}
+
+function normalizeUserForAdmin(u) {
+  return {
+    ...u,
+    role: u.role || 'USER',
+    registered: u.registered || u.createdAt || '',
+    status: u.status ? String(u.status).toLowerCase() : u.status,
+    plan: u.plan || u.listingPlan,
+  };
+}
+
 /* ── Package pricing config — must match Registration.js exactly ── */
 const PACKAGE_CONFIG = {
   community: { label: 'Community',         tier: 'free',     price: 0,    color: '#6b7280', bg: '#f9fafb', badge: 'community' },
-  trusted:   { label: 'Trusted Provider',  tier: 'pro',      price: 149,  color: '#1d4ed8', bg: '#eff6ff', badge: 'pro'       },
-  deluxe:    { label: 'Deluxe Provider',   tier: 'featured', price: 399,  color: '#d97706', bg: '#fffbeb', badge: 'featured'  },
+  trusted:   { label: 'Parental Plus+',    tier: 'pro',      price: 149,  color: '#1d4ed8', bg: '#eff6ff', badge: 'pro'       },
+  deluxe:    { label: 'Parental Plus+',    tier: 'featured', price: 149,  color: '#d97706', bg: '#fffbeb', badge: 'featured'  },
 };
 
 /* ── Date helpers ── */
@@ -114,9 +150,9 @@ function getClearanceFiles(provider) {
 const ADMIN_CSS = `
   .admin-stats { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
   .stat-filter-card { flex:1; min-width:140px; padding:12px 16px; background:#fff; border:2px solid #e5e0d8; border-radius:10px; cursor:pointer; transition:all 0.15s; display:flex; flex-direction:column; gap:6px; }
-  .stat-filter-card:hover { border-color:#c9621a; transform:translateY(-2px); box-shadow:0 4px 12px rgba(201,98,26,0.15); }
-  .stat-filter-card.active { border-color:#c9621a; background:#fff8f2; box-shadow:0 0 0 3px rgba(201,98,26,0.1); }
-  .stat-filter-value { font-size:1.6rem; font-weight:800; color:#c9621a; font-family:'Playfair Display',serif; }
+  .stat-filter-card:hover { border-color:#6f8da6; transform:translateY(-2px); box-shadow:0 4px 12px rgba(85,118,145,0.15); }
+  .stat-filter-card.active { border-color:#6f8da6; background:#f3f9ff; box-shadow:0 0 0 3px rgba(85,118,145,0.1); }
+  .stat-filter-value { font-size:1.6rem; font-weight:800; color:#6f8da6; font-family:'Playfair Display',serif; }
   .stat-filter-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#888; }
 
   /* ── Scrollable list container ── */
@@ -126,13 +162,13 @@ const ADMIN_CSS = `
     overflow-x: hidden;
     border-radius: 10px;
     scrollbar-width: thin;
-    scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-color: #6f8da6 #f5f0e8;
     padding-right: 2px;
   }
   .adm-scroll-list::-webkit-scrollbar { width: 6px; }
   .adm-scroll-list::-webkit-scrollbar-track { background: #f5f0e8; border-radius: 6px; }
-  .adm-scroll-list::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 6px; }
-  .adm-scroll-list::-webkit-scrollbar-thumb:hover { background: #a84e12; }
+  .adm-scroll-list::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 6px; }
+  .adm-scroll-list::-webkit-scrollbar-thumb:hover { background: #557691; }
 
   /* ── Pending list scroll ── */
   .adm-pending-scroll {
@@ -140,12 +176,12 @@ const ADMIN_CSS = `
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-color: #6f8da6 #f5f0e8;
     padding-right: 2px;
   }
   .adm-pending-scroll::-webkit-scrollbar { width: 6px; }
   .adm-pending-scroll::-webkit-scrollbar-track { background: #f5f0e8; border-radius: 6px; }
-  .adm-pending-scroll::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 6px; }
+  .adm-pending-scroll::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 6px; }
 
   /* ── Users list scroll ── */
   .adm-users-scroll {
@@ -153,12 +189,12 @@ const ADMIN_CSS = `
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-color: #6f8da6 #f5f0e8;
     padding-right: 2px;
   }
   .adm-users-scroll::-webkit-scrollbar { width: 6px; }
   .adm-users-scroll::-webkit-scrollbar-track { background: #f5f0e8; border-radius: 6px; }
-  .adm-users-scroll::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 6px; }
+  .adm-users-scroll::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 6px; }
 
   /* ── Revenue table scroll ── */
   .adm-revenue-scroll {
@@ -167,23 +203,23 @@ const ADMIN_CSS = `
     overflow-x: auto;
     border-radius: 10px;
     scrollbar-width: thin;
-    scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-color: #6f8da6 #f5f0e8;
   }
   .adm-revenue-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
   .adm-revenue-scroll::-webkit-scrollbar-track { background: #f5f0e8; border-radius: 6px; }
-  .adm-revenue-scroll::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 6px; }
-  .adm-revenue-scroll::-webkit-scrollbar-thumb:hover { background: #a84e12; }
+  .adm-revenue-scroll::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 6px; }
+  .adm-revenue-scroll::-webkit-scrollbar-thumb:hover { background: #557691; }
 
   /* ── Auth logs scroll ── */
   .adm-logs-scroll {
     max-height: calc(4 * 52px);
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-color: #6f8da6 #f5f0e8;
   }
   .adm-logs-scroll::-webkit-scrollbar { width: 6px; }
   .adm-logs-scroll::-webkit-scrollbar-track { background: #f5f0e8; }
-  .adm-logs-scroll::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 6px; }
+  .adm-logs-scroll::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 6px; }
 
   /* ── Scroll hint ── */
   .adm-scroll-hint {
@@ -199,17 +235,17 @@ const ADMIN_CSS = `
 
   .adm-expand-row { border:1px solid #e5e0d8; border-radius:12px; overflow:hidden; margin-bottom:12px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.05); transition:box-shadow 0.15s; }
   .adm-expand-row:hover { box-shadow:0 3px 12px rgba(0,0,0,0.10); }
-  .adm-expand-row.expanded { border-color:#c9621a; box-shadow:0 4px 20px rgba(201,98,26,0.12); }
+  .adm-expand-row.expanded { border-color:#6f8da6; box-shadow:0 4px 20px rgba(85,118,145,0.12); }
   .adm-row-header { display:flex; align-items:center; gap:14px; padding:14px 18px; cursor:pointer; background:#faf9f7; transition:background 0.12s; user-select:none; }
   .adm-row-header:hover { background:#f5f0e8; }
   .adm-expand-row.expanded .adm-row-header { background:#fff3e8; border-bottom:1px solid #f0d4b8; }
   .adm-avatar { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; font-weight:800; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); overflow:hidden; }
   .adm-avatar img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
-  .adm-avatar.no-photo { background:linear-gradient(135deg,#c9621a,#e07a35); }
-  .adm-avatar.user-av     { background:linear-gradient(135deg,#6366f1,#818cf8); }
-  .adm-avatar.parent-av   { background:linear-gradient(135deg,#0891b2,#22d3ee); }
-  .adm-avatar.provider-av { background:linear-gradient(135deg,#c9621a,#e07a35); }
-  .adm-avatar.admin-av    { background:linear-gradient(135deg,#1a1a1a,#555); }
+  .adm-avatar.no-photo { background:#6f8da6; }
+  .adm-avatar.user-av     { background:#8fb8d8; }
+  .adm-avatar.parent-av   { background:#8fb8d8; }
+  .adm-avatar.provider-av { background:#6f8da6; }
+  .adm-avatar.admin-av    { background:#182330; }
   .adm-row-info { flex:1; min-width:0; }
   .adm-row-name { font-size:0.92rem; font-weight:700; color:#1a1a1a; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .adm-row-meta { font-size:0.75rem; color:#888; margin-top:2px; }
@@ -222,7 +258,7 @@ const ADMIN_CSS = `
   .adm-badge.user     { background:#ede9fe; color:#5b21b6; }
   .adm-badge.parent   { background:#cffafe; color:#0e7490; }
   .adm-expand-icon { color:#aaa; font-size:0.8rem; transition:transform 0.2s; flex-shrink:0; }
-  .adm-expand-row.expanded .adm-expand-icon { transform:rotate(180deg); color:#c9621a; }
+  .adm-expand-row.expanded .adm-expand-icon { transform:rotate(180deg); color:#6f8da6; }
   .adm-row-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
   .adm-btn-approve { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:7px; cursor:pointer; font-size:0.8rem; font-weight:700; border:none; font-family:inherit; background:#d1fae5; color:#065f46; transition:all 0.15s; }
   .adm-btn-approve:hover { background:#a7f3d0; }
@@ -235,53 +271,53 @@ const ADMIN_CSS = `
   .adm-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-bottom:1px solid #f0ece5; }
   .adm-detail-section { padding:18px 20px; border-right:1px solid #f0ece5; }
   .adm-detail-section:last-child { border-right:none; }
-  .adm-detail-section-title { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; color:#c9621a; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .adm-detail-section-title { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; color:#6f8da6; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
   .adm-detail-field { margin-bottom:10px; }
   .adm-detail-label { font-size:0.66rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#aaa; margin-bottom:3px; }
   .adm-detail-val { font-size:0.83rem; color:#1a1a1a; font-weight:500; word-break:break-word; }
   .adm-detail-val.empty { color:#bbb; font-style:italic; }
   .adm-detail-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
-  .adm-detail-tag { padding:2px 10px; border-radius:20px; font-size:0.72rem; font-weight:600; background:#fef3e8; color:#c9621a; border:1px solid #f0c89a; }
+  .adm-detail-tag { padding:2px 10px; border-radius:20px; font-size:0.72rem; font-weight:600; background:#edf7ff; color:#6f8da6; border:1px solid #b7d5ea; }
   .adm-detail-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; background:#faf9f7; flex-wrap:wrap; gap:12px; }
   .adm-detail-footer-note { font-size:0.75rem; color:#888; display:flex; align-items:center; gap:6px; }
 
   /* ── File preview in admin panel ── */
   .adm-file-section { padding:16px 20px; border-top:1px solid #f0ece5; }
-  .adm-file-section-title { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; color:#c9621a; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .adm-file-section-title { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.9px; color:#6f8da6; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
   .adm-file-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .adm-file-card { border:1.5px solid #e5e0d8; border-radius:10px; overflow:hidden; background:#faf9f7; }
   .adm-file-card-head { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#fff3e8; border-bottom:1px solid #f0d4b8; }
-  .adm-file-card-head i { color:#c9621a; font-size:0.82rem; flex-shrink:0; }
+  .adm-file-card-head i { color:#6f8da6; font-size:0.82rem; flex-shrink:0; }
   .adm-file-card-name { font-size:0.75rem; font-weight:700; color:#1a1a1a; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .adm-file-card-body { padding:10px 12px; }
   .adm-file-img { width:100%; max-height:160px; object-fit:contain; border-radius:5px; border:1px solid #e5e0d8; background:#fff; display:block; }
-  .adm-file-pdf-note { display:flex; align-items:center; gap:7px; padding:8px 10px; background:#fef3e8; border-radius:5px; font-size:0.76rem; color:#92400e; font-weight:600; }
+  .adm-file-pdf-note { display:flex; align-items:center; gap:7px; padding:8px 10px; background:#edf7ff; border-radius:5px; font-size:0.76rem; color:#92400e; font-weight:600; }
   .adm-file-none { padding:16px; text-align:center; color:#bbb; font-size:0.78rem; font-style:italic; }
-  .adm-file-dl { display:inline-flex; align-items:center; gap:5px; margin-top:8px; padding:6px 12px; border-radius:5px; background:#c9621a; color:#fff; font-size:0.74rem; font-weight:700; cursor:pointer; border:none; font-family:inherit; transition:background 0.14s; }
-  .adm-file-dl:hover { background:#a84e12; }
-  .adm-photo-big { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #c9621a; display:block; margin:0 auto 8px; box-shadow:0 3px 12px rgba(201,98,26,0.3); }
-  .adm-photo-placeholder { width:80px; height:80px; border-radius:50%; background:linear-gradient(135deg,#c9621a,#e07a35); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.8rem; font-weight:800; margin:0 auto 8px; }
+  .adm-file-dl { display:inline-flex; align-items:center; gap:5px; margin-top:8px; padding:6px 12px; border-radius:5px; background:#6f8da6; color:#fff; font-size:0.74rem; font-weight:700; cursor:pointer; border:none; font-family:inherit; transition:background 0.14s; }
+  .adm-file-dl:hover { background:#557691; }
+  .adm-photo-big { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #6f8da6; display:block; margin:0 auto 8px; box-shadow:0 3px 12px rgba(85,118,145,0.3); }
+  .adm-photo-placeholder { width:80px; height:80px; border-radius:50%; background:#6f8da6; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.8rem; font-weight:800; margin:0 auto 8px; }
 
   /* ── Multi-doc list ── */
   .adm-doc-list { display:flex; flex-direction:column; gap:8px; }
   .adm-doc-list-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border:1.5px solid #e5e0d8; border-radius:8px; background:#fff; }
   .adm-doc-list-icon { width:28px; height:28px; border-radius:6px; background:#fff3e8; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .adm-doc-list-icon i { color:#c9621a; font-size:0.78rem; }
+  .adm-doc-list-icon i { color:#6f8da6; font-size:0.78rem; }
   .adm-doc-list-info { flex:1; min-width:0; }
   .adm-doc-list-name { font-size:0.76rem; font-weight:700; color:#1a1a1a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .adm-doc-list-sub { font-size:0.67rem; color:#aaa; margin-top:1px; }
-  .adm-doc-list-dl { padding:4px 9px; border-radius:5px; background:#c9621a; color:#fff; font-size:0.68rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; transition:background 0.14s; flex-shrink:0; }
-  .adm-doc-list-dl:hover { background:#a84e12; }
+  .adm-doc-list-dl { padding:4px 9px; border-radius:5px; background:#6f8da6; color:#fff; font-size:0.68rem; font-weight:700; border:none; cursor:pointer; font-family:inherit; transition:background 0.14s; flex-shrink:0; }
+  .adm-doc-list-dl:hover { background:#557691; }
   .adm-doc-none { padding:12px; text-align:center; color:#bbb; font-size:0.76rem; font-style:italic; }
 
   /* ── Listings ── */
   .adm-listing-row { display:flex; align-items:center; gap:14px; padding:13px 18px; border:1px solid #e5e0d8; border-radius:10px; background:#fff; margin-bottom:10px; box-shadow:0 1px 4px rgba(0,0,0,0.04); transition:box-shadow 0.15s, border-color 0.15s; }
-  .adm-listing-row:hover { box-shadow:0 3px 10px rgba(0,0,0,0.08); border-color:#c9621a; }
-  .adm-listing-row.selected { border-color:#c9621a; background:#fff8f2; box-shadow:0 0 0 3px rgba(201,98,26,0.12); }
+  .adm-listing-row:hover { box-shadow:0 3px 10px rgba(0,0,0,0.08); border-color:#6f8da6; }
+  .adm-listing-row.selected { border-color:#6f8da6; background:#f3f9ff; box-shadow:0 0 0 3px rgba(85,118,145,0.12); }
   .adm-promote-btn { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:6px; cursor:pointer; font-size:0.77rem; font-weight:700; border:none; font-family:inherit; background:#dbeafe; color:#1e40af; transition:all 0.15s; }
   .adm-promote-btn:hover { background:#bfdbfe; }
-  .adm-demote-btn  { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:6px; cursor:pointer; font-size:0.77rem; font-weight:700; border:none; font-family:inherit; background:#f3f4f6; color:#4b5563; transition:all 0.15s; }
-  .adm-demote-btn:hover  { background:#e5e7eb; }
+  .adm-demote-btn  { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:6px; cursor:pointer; font-size:0.77rem; font-weight:700; border:none; font-family:inherit; background:#6f8da6; color:#fff; transition:all 0.15s; }
+  .adm-demote-btn:hover  { background:#557691; }
   .adm-badge-opt { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:5px; cursor:pointer; font-size:0.72rem; font-weight:700; transition:all 0.14s; border:1.5px solid transparent; }
   .adm-badge-opt.community { background:#f9fafb; color:#6b7280; border-color:#e5e7eb; }
   .adm-badge-opt.community.selected { background:#e5e7eb; color:#374151; border-color:#9ca3af; }
@@ -311,7 +347,7 @@ const ADMIN_CSS = `
     max-height: calc(100vh - 40px);
     background: #fff;
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(201,98,26,0.15);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(85,118,145,0.15);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -326,7 +362,7 @@ const ADMIN_CSS = `
     align-items: center;
     gap: 14px;
     padding: 20px 20px 16px;
-    background: linear-gradient(135deg, #fff3e8 0%, #fff8f2 100%);
+    background: #fff0e6;
     border-bottom: 1px solid #f0d4b8;
     flex-shrink: 0;
   }
@@ -334,8 +370,8 @@ const ADMIN_CSS = `
     width: 56px; height: 56px; border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
     color: #fff; font-size: 1.4rem; font-weight: 800; flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(201,98,26,0.35); overflow: hidden;
-    background: linear-gradient(135deg,#c9621a,#e07a35);
+    box-shadow: 0 4px 14px rgba(85,118,145,0.35); overflow: hidden;
+    background: #6f8da6;
   }
   .adm-float-avatar img { width:100%; height:100%; object-fit:cover; border-radius:14px; }
   .adm-float-header-info { flex: 1; min-width: 0; }
@@ -350,16 +386,16 @@ const ADMIN_CSS = `
   .adm-float-close:hover { background: #fee2e2; color: #991b1b; }
   .adm-float-body {
     flex: 1; overflow-y: auto; padding: 0;
-    scrollbar-width: thin; scrollbar-color: #c9621a #f5f0e8;
+    scrollbar-width: thin; scrollbar-color: #6f8da6 #f5f0e8;
   }
   .adm-float-body::-webkit-scrollbar { width: 5px; }
   .adm-float-body::-webkit-scrollbar-track { background: #f5f0e8; }
-  .adm-float-body::-webkit-scrollbar-thumb { background: #c9621a; border-radius: 4px; }
+  .adm-float-body::-webkit-scrollbar-thumb { background: #6f8da6; border-radius: 4px; }
   .adm-float-section { padding: 16px 20px; border-bottom: 1px solid #f5f0e8; }
   .adm-float-section:last-child { border-bottom: none; }
   .adm-float-section-title {
     font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 0.9px; color: #c9621a; margin-bottom: 12px;
+    letter-spacing: 0.9px; color: #6f8da6; margin-bottom: 12px;
     display: flex; align-items: center; gap: 6px;
   }
   .adm-float-field { margin-bottom: 9px; }
@@ -367,17 +403,17 @@ const ADMIN_CSS = `
   .adm-float-field-val { font-size: 0.82rem; color: #1a1a1a; font-weight: 500; word-break: break-word; line-height: 1.4; }
   .adm-float-field-val.empty { color: #ccc; font-style: italic; font-weight: 400; }
   .adm-float-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
-  .adm-float-tag { padding: 2px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: #fef3e8; color: #c9621a; border: 1px solid #f0c89a; }
-  .adm-float-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #c9621a; display: block; margin: 0 auto 10px; box-shadow: 0 3px 12px rgba(201,98,26,0.25); }
-  .adm-float-photo-placeholder { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg,#c9621a,#e07a35); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.6rem; font-weight: 800; margin: 0 auto 10px; }
+  .adm-float-tag { padding: 2px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; background: #edf7ff; color: #6f8da6; border: 1px solid #b7d5ea; }
+  .adm-float-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #6f8da6; display: block; margin: 0 auto 10px; box-shadow: 0 3px 12px rgba(85,118,145,0.25); }
+  .adm-float-photo-placeholder { width: 70px; height: 70px; border-radius: 50%; background: #6f8da6; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.6rem; font-weight: 800; margin: 0 auto 10px; }
   .adm-float-doc-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1.5px solid #e5e0d8; border-radius: 8px; margin-bottom: 8px; background: #faf9f7; }
   .adm-float-doc-icon { width: 30px; height: 30px; border-radius: 7px; background: #fff3e8; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .adm-float-doc-icon i { color: #c9621a; font-size: 0.8rem; }
+  .adm-float-doc-icon i { color: #6f8da6; font-size: 0.8rem; }
   .adm-float-doc-info { flex: 1; min-width: 0; }
   .adm-float-doc-name { font-size: 0.78rem; font-weight: 700; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .adm-float-doc-sub { font-size: 0.68rem; color: #aaa; }
-  .adm-float-doc-dl { padding: 5px 10px; border-radius: 5px; background: #c9621a; color: #fff; font-size: 0.7rem; font-weight: 700; border: none; cursor: pointer; font-family: inherit; transition: background 0.14s; flex-shrink: 0; }
-  .adm-float-doc-dl:hover { background: #a84e12; }
+  .adm-float-doc-dl { padding: 5px 10px; border-radius: 5px; background: #6f8da6; color: #fff; font-size: 0.7rem; font-weight: 700; border: none; cursor: pointer; font-family: inherit; transition: background 0.14s; flex-shrink: 0; }
+  .adm-float-doc-dl:hover { background: #557691; }
   .adm-float-footer {
     padding: 14px 20px; background: #faf9f7; border-top: 1px solid #f0ece5;
     display: flex; gap: 8px; flex-shrink: 0;
@@ -388,11 +424,11 @@ const ADMIN_CSS = `
   /* ── Featured slots ── */
   .adm-featured-slots-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
   .adm-slot-card { border:2px solid #e5e0d8; border-radius:12px; overflow:hidden; background:#fff; transition:all 0.15s; }
-  .adm-slot-card.filled { border-color:#c9621a; }
+  .adm-slot-card.filled { border-color:#6f8da6; }
   .adm-slot-card-head { padding:14px 16px; background:#faf9f7; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #f0ece5; }
   .adm-slot-card.filled .adm-slot-card-head { background:#fff3e8; }
   .adm-slot-num { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:#aaa; }
-  .adm-slot-card.filled .adm-slot-num { color:#c9621a; }
+  .adm-slot-card.filled .adm-slot-num { color:#6f8da6; }
   .adm-slot-status { font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; background:#f3f4f6; color:#9ca3af; }
   .adm-slot-card.filled .adm-slot-status { background:#fef3c7; color:#92400e; }
   .adm-slot-body { padding:14px 16px; }
@@ -415,8 +451,8 @@ const ADMIN_CSS = `
   .adm-user-meta  { font-size:0.73rem; color:#888; margin-top:2px; display:flex; gap:12px; flex-wrap:wrap; }
   .adm-role-tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
   .adm-role-tab { padding:6px 16px; border-radius:20px; font-size:0.78rem; font-weight:700; border:1.5px solid #e5e0d8; background:#fff; color:#888; cursor:pointer; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
-  .adm-role-tab:hover { border-color:#c9621a; color:#c9621a; }
-  .adm-role-tab.active { background:#c9621a; border-color:#c9621a; color:#fff; }
+  .adm-role-tab:hover { border-color:#6f8da6; color:#6f8da6; }
+  .adm-role-tab.active { background:#6f8da6; border-color:#6f8da6; color:#fff; }
   .adm-role-tab .adm-role-tab-count { border-radius:10px; padding:0 6px; font-size:0.68rem; background:rgba(255,255,255,0.25); }
   .adm-role-tab:not(.active) .adm-role-tab-count { background:#f0ece5; color:#888; }
 
@@ -437,7 +473,7 @@ const ADMIN_CSS = `
   /* ── Search/filter ── */
   .adm-search-row { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
   .adm-search-input { flex:1; min-width:180px; padding:9px 14px; border:1.5px solid rgba(0,0,0,0.10); border-radius:7px; font-family:inherit; font-size:0.85rem; color:#333; outline:none; background:#fff; transition:border-color 0.15s; }
-  .adm-search-input:focus { border-color:#c9621a; }
+  .adm-search-input:focus { border-color:#6f8da6; }
   .adm-filter-select { padding:9px 14px; border:1.5px solid rgba(0,0,0,0.10); border-radius:7px; font-family:inherit; font-size:0.85rem; color:#555; background:#fff; outline:none; cursor:pointer; }
   .adm-err-banner { background:#fff0f0; border:1.5px solid #f5b3b3; border-radius:8px; padding:12px 18px; color:#a00c2c; font-size:0.85rem; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 
@@ -445,21 +481,21 @@ const ADMIN_CSS = `
   .modal-field { margin-bottom:0.75rem; }
   .modal-field label { display:block; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#888; margin-bottom:3px; }
   .modal-field .value { font-size:0.88rem; color:#1a1a1a; font-weight:500; }
-  .modal-section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#c9621a; padding-top:0.75rem; margin:1.25rem 0 0.75rem; border-top:1px solid #e5e0d8; }
+  .modal-section-title { font-size:0.85rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#6f8da6; padding-top:0.75rem; margin:1.25rem 0 0.75rem; border-top:1px solid #e5e0d8; }
   .modal-file-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:8px; }
   .modal-file-card { border:1.5px solid #e5e0d8; border-radius:8px; overflow:hidden; }
   .modal-file-head { display:flex; align-items:center; gap:7px; padding:7px 10px; background:#fff3e8; border-bottom:1px solid #f0d4b8; }
-  .modal-file-head i { color:#c9621a; font-size:0.8rem; }
+  .modal-file-head i { color:#6f8da6; font-size:0.8rem; }
   .modal-file-head span { font-size:0.73rem; font-weight:700; color:#1a1a1a; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
   .modal-file-body { padding:8px 10px; }
   .modal-file-img { width:100%; max-height:140px; object-fit:contain; border-radius:4px; display:block; }
-  .modal-file-pdf { display:flex; align-items:center; gap:6px; padding:8px; background:#fef3e8; border-radius:4px; font-size:0.74rem; color:#92400e; font-weight:600; }
+  .modal-file-pdf { display:flex; align-items:center; gap:6px; padding:8px; background:#edf7ff; border-radius:4px; font-size:0.74rem; color:#92400e; font-weight:600; }
   .modal-file-none { padding:12px; text-align:center; color:#bbb; font-size:0.76rem; font-style:italic; }
-  .modal-file-dl { display:inline-flex; align-items:center; gap:5px; margin-top:7px; padding:5px 10px; border-radius:4px; background:#c9621a; color:#fff; font-size:0.72rem; font-weight:700; cursor:pointer; border:none; font-family:inherit; }
-  .modal-file-dl:hover { background:#a84e12; }
+  .modal-file-dl { display:inline-flex; align-items:center; gap:5px; margin-top:7px; padding:5px 10px; border-radius:4px; background:#6f8da6; color:#fff; font-size:0.72rem; font-weight:700; cursor:pointer; border:none; font-family:inherit; }
+  .modal-file-dl:hover { background:#557691; }
   .modal-photo-wrap { text-align:center; margin-bottom:12px; }
-  .modal-photo { width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid #c9621a; display:inline-block; }
-  .modal-photo-placeholder { width:90px; height:90px; border-radius:50%; background:linear-gradient(135deg,#c9621a,#e07a35); display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:2rem; font-weight:800; }
+  .modal-photo { width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid #6f8da6; display:inline-block; }
+  .modal-photo-placeholder { width:90px; height:90px; border-radius:50%; background:#6f8da6; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:2rem; font-weight:800; }
 
   /* ── Package Sales / Revenue ── */
   .adm-pkg-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
@@ -474,7 +510,7 @@ const ADMIN_CSS = `
   .adm-pkg-stat-val { font-size:0.88rem; font-weight:800; color:#1a1a1a; }
   .adm-revenue-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:16px 0; border-top:2px solid #f0ece5; margin-top:4px; }
   .adm-rev-box { text-align:center; padding:14px; background:#faf9f7; border-radius:10px; border:1px solid #e5e0d8; }
-  .adm-rev-box-val { font-size:1.5rem; font-weight:800; color:#c9621a; font-family:'Playfair Display',serif; }
+  .adm-rev-box-val { font-size:1.5rem; font-weight:800; color:#6f8da6; font-family:'Playfair Display',serif; }
   .adm-rev-box-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#888; margin-top:4px; }
 
   /* ── Revenue table ── */
@@ -487,12 +523,12 @@ const ADMIN_CSS = `
   /* ── Signup time filter ── */
   .adm-time-tabs { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
   .adm-time-tab { padding:5px 14px; border-radius:20px; font-size:0.76rem; font-weight:700; border:1.5px solid #e5e0d8; background:#fff; color:#888; cursor:pointer; transition:all 0.15s; display:inline-flex; align-items:center; gap:5px; }
-  .adm-time-tab:hover { border-color:#c9621a; color:#c9621a; }
-  .adm-time-tab.active { background:#c9621a; border-color:#c9621a; color:#fff; }
+  .adm-time-tab:hover { border-color:#6f8da6; color:#6f8da6; }
+  .adm-time-tab.active { background:#6f8da6; border-color:#6f8da6; color:#fff; }
   .adm-time-summary { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
   .adm-time-stat { padding:10px 16px; border-radius:10px; background:#faf9f7; border:1.5px solid #e5e0d8; display:flex; flex-direction:column; gap:3px; min-width:110px; cursor:pointer; transition:all 0.15s; }
-  .adm-time-stat:hover { border-color:#c9621a; }
-  .adm-time-stat-val { font-size:1.3rem; font-weight:800; color:#c9621a; font-family:'Playfair Display',serif; }
+  .adm-time-stat:hover { border-color:#6f8da6; }
+  .adm-time-stat-val { font-size:1.3rem; font-weight:800; color:#6f8da6; font-family:'Playfair Display',serif; }
   .adm-time-stat-label { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#888; }
 
   @media (max-width:900px) { .adm-featured-slots-grid { grid-template-columns:1fr 1fr; } .adm-file-grid { grid-template-columns:1fr 1fr; } .modal-file-grid { grid-template-columns:1fr 1fr; } .adm-pkg-grid { grid-template-columns:1fr; } .adm-revenue-summary { grid-template-columns:1fr 1fr; } }
@@ -741,7 +777,7 @@ const ExpandablePendingRow = ({ provider, onApprove, onReject }) => {
 
             {/* Profile photo row */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#c9621a', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.8px', color: '#6f8da6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <i className="fas fa-camera"></i> Profile Photo
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -794,7 +830,7 @@ const ExpandablePendingRow = ({ provider, onApprove, onReject }) => {
 
           <div className="adm-detail-footer">
             <div className="adm-detail-footer-note">
-              <i className="fas fa-info-circle" style={{ color: '#c9621a' }}></i>
+              <i className="fas fa-info-circle" style={{ color: '#6f8da6' }}></i>
               Admin review on {new Date().toLocaleDateString('en-ZA')}
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -833,7 +869,7 @@ const InlineFeaturedSlotCard = ({ slot, onRemove, onRotate }) => {
           <>
             <div className="adm-slot-provider-name">{slot.provider}</div>
             <div className="adm-slot-meta">
-              <i className="fas fa-clock" style={{ marginRight: 4, color: '#c9621a' }} />
+              <i className="fas fa-clock" style={{ marginRight: 4, color: '#6f8da6' }} />
               {slot.daysRemaining > 0 ? `${slot.daysRemaining} days remaining` : 'Duration ended'}
               {slot.addedDaysAgo > 0 && ` · added ${slot.addedDaysAgo}d ago`}
             </div>
@@ -1138,27 +1174,84 @@ const AdminDashboard = () => {
   }, []);
 
   useEffect(() => {
-    const loadedProviders = getStoredProviders();
-    setProviders(loadedProviders);
-    setFeaturedSlots(getFeaturedSlots());
-    const storedUsers = getStoredUsers();
-    const providerUsers = loadedProviders.map(p => ({
-      id: p.id, email: p.email || p.contactEmail || '', name: p.name || '',
-      role: 'PROVIDER', registered: p.registered || '', lastLogin: p.lastLogin || p.registered || '',
-      status: p.status || 'pending', plan: p.plan || p.listingPlan || p.tier || 'free',
-    }));
-    const seen = new Set();
-    const merged = [
-      ...storedUsers.map(u => ({ ...u, role: u.role || 'USER', accountType: u.accountType || 'parent' })),
-      ...providerUsers,
-    ].filter(u => {
-      const k = (u.email || u.id || '').toLowerCase();
-      if (!k || seen.has(k)) return false;
-      seen.add(k); return true;
-    });
-    setRegisteredUsers(merged);
-    setAuthLogs(getAuthLogs());
-  }, []);
+    const token = user?.token || localStorage.getItem('sah_token');
+
+    const loadLocal = () => {
+      const loadedProviders = getStoredProviders().map(normalizeProviderForAdmin);
+      setProviders(loadedProviders);
+      setFeaturedSlots(getFeaturedSlots());
+      const storedUsers = getStoredUsers();
+      const providerUsers = loadedProviders.map(p => ({
+        id: p.id, email: p.email || p.contactEmail || '', name: p.name || '',
+        role: 'PROVIDER', registered: p.registered || '', lastLogin: p.lastLogin || p.registered || '',
+        status: p.status || 'pending', plan: p.plan || p.listingPlan || p.tier || 'free',
+      }));
+      const seen = new Set();
+      const merged = [
+        ...storedUsers.map(u => ({ ...u, role: u.role || 'USER', accountType: u.accountType || 'parent' })),
+        ...providerUsers,
+      ].filter(u => {
+        const k = (u.email || u.id || '').toLowerCase();
+        if (!k || seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+      setRegisteredUsers(merged.map(normalizeUserForAdmin));
+      setAuthLogs(getAuthLogs());
+    };
+
+    const loadApi = async () => {
+      try {
+        const [providerRows, userRows, reviewRows, slotRows] = await Promise.all([
+          api.getProviders(),
+          token ? api.getUsers(token) : Promise.resolve(null),
+          token ? api.getReviews(token).catch(() => null) : Promise.resolve(null),
+          token ? api.getFeaturedSlots(token).catch(() => null) : Promise.resolve(null),
+        ]);
+
+        const apiProviders = (Array.isArray(providerRows) ? providerRows : providerRows?.data || []).map(normalizeProviderForAdmin);
+        setProviders(apiProviders);
+        saveStoredProviders(apiProviders);
+
+        if (userRows?.data) setRegisteredUsers(userRows.data.map(normalizeUserForAdmin));
+        else {
+          const providerUsers = apiProviders.map(p => ({
+            id: p.id,
+            email: p.email || p.contactEmail || '',
+            name: p.name || '',
+            role: 'PROVIDER',
+            registered: p.registered || '',
+            lastLogin: p.lastLogin || '',
+            status: p.status,
+            plan: p.plan,
+          }));
+          setRegisteredUsers(providerUsers);
+        }
+
+        const apiReviews = reviewRows?.data || reviewRows;
+        if (Array.isArray(apiReviews)) setReviews(apiReviews);
+
+        const apiSlots = slotRows?.data || slotRows;
+        if (Array.isArray(apiSlots)) {
+          setFeaturedSlots(apiSlots.map((s, idx) => ({
+            id: s.id || idx + 1,
+            provider: s.provider?.fullName || s.providerName || null,
+            providerId: s.providerId || null,
+            addedDaysAgo: 0,
+            daysRemaining: s.expiresAt ? Math.max(0, Math.ceil((new Date(s.expiresAt) - new Date()) / (1000 * 60 * 60 * 24))) : 0,
+          })));
+        } else {
+          setFeaturedSlots(getFeaturedSlots());
+        }
+
+        setAuthLogs(getAuthLogs());
+      } catch (error) {
+        console.warn('Admin API load failed, using localStorage fallback:', error.message);
+        loadLocal();
+      }
+    };
+
+    loadApi();
+  }, [user]);
 
   const pendingProviders  = providers.filter(p => p.status === 'pending');
   const approvedProviders = providers.filter(p => p.status === 'approved');
@@ -1194,13 +1287,51 @@ const AdminDashboard = () => {
     totalAccounts:   registeredUsers.length,
   };
 
-  const handleApprove = (id) => {
+  const handleApprove = async (id) => {
+    const p = providers.find(x => x.id === id || x.userId === id);
+    const token = user?.token || localStorage.getItem('sah_token');
+    try {
+      if (token && !String(token).startsWith('local_')) {
+        const result = await api.updateProviderStatus(p?.userId || id, 'APPROVED', token);
+        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'approved' });
+        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
+        setProviders(updated); saveStoredProviders(updated);
+      } else {
+        const updated = providers.map(item => item.id === id ? { ...item, status: 'approved', publicToggle: true } : item);
+        setProviders(updated); saveStoredProviders(updated);
+      }
+      showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
+    } catch (error) {
+      showNotification(error.message || 'Could not approve provider.', 'error');
+    }
+  };
+
+  const handleApproveLocalOnly = (id) => {
     const updated = providers.map(p => p.id === id ? { ...p, status: 'approved' } : p);
     setProviders(updated); saveStoredProviders(updated);
     const p = providers.find(x => x.id === id);
     showNotification(`✅ ${p?.name || 'Provider'} approved and is now live.`, 'success');
   };
-  const handleReject = (id) => {
+  const handleReject = async (id) => {
+    const p = providers.find(x => x.id === id || x.userId === id);
+    const token = user?.token || localStorage.getItem('sah_token');
+    try {
+      if (token && !String(token).startsWith('local_')) {
+        const result = await api.updateProviderStatus(p?.userId || id, 'REJECTED', token);
+        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'rejected' });
+        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
+        setProviders(updated); saveStoredProviders(updated);
+      } else {
+        const updated = providers.map(item => item.id === id ? { ...item, status: 'rejected', publicToggle: false } : item);
+        setProviders(updated); saveStoredProviders(updated);
+      }
+      showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
+    } catch (error) {
+      showNotification(error.message || 'Could not reject provider.', 'error');
+    }
+  };
+
+  const handleRejectLocalOnly = (id) => {
     const updated = providers.map(p => p.id === id ? { ...p, status: 'rejected' } : p);
     setProviders(updated); saveStoredProviders(updated);
     const p = providers.find(x => x.id === id);
@@ -1620,7 +1751,7 @@ const AdminDashboard = () => {
                         </div>
                         <div className="adm-pkg-stat">
                           <span className="adm-pkg-stat-label">Revenue generated</span>
-                          <span className="adm-pkg-stat-val" style={{ color: cfg.price > 0 ? '#c9621a' : '#aaa' }}>
+                          <span className="adm-pkg-stat-val" style={{ color: cfg.price > 0 ? '#6f8da6' : '#aaa' }}>
                             {cfg.price === 0 ? '—' : fmtZAR(revenue)}
                           </span>
                         </div>
@@ -1656,8 +1787,7 @@ const AdminDashboard = () => {
                   value={revenueSearch} onChange={e => setRevenueSearch(e.target.value)} />
                 <select className="adm-filter-select" value={revenuePkgFilter} onChange={e => setRevenuePkgFilter(e.target.value)}>
                   <option value="ALL">All Paid Packages</option>
-                  <option value="trusted">Trusted Provider</option>
-                  <option value="deluxe">Deluxe Provider</option>
+                  <option value="trusted">Parental Plus+ Intro</option>
                 </select>
               </div>
               {revenueProviders.length === 0 ? (
@@ -1700,7 +1830,7 @@ const AdminDashboard = () => {
                                   {cfg.label}
                                 </span>
                               </td>
-                              <td style={{ fontWeight: 800, color: '#c9621a' }}>{fmtZAR(cfg.price)}</td>
+                              <td style={{ fontWeight: 800, color: '#6f8da6' }}>{fmtZAR(cfg.price)}</td>
                               <td><span className={`adm-badge ${p.status}`}>{p.status}</span></td>
                               <td style={{ color: '#888', fontSize: '0.78rem' }}>{fmtShortDate(p.registered)}</td>
                             </tr>
@@ -1888,3 +2018,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
