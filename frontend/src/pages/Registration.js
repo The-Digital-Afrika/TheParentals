@@ -227,14 +227,9 @@ const MAX_TOTAL_UPLOAD_MB = 10;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
 const STEPS = [
-  { title: 'Select Plan', label: 'Select Plan', desc: 'Choose a listing plan for your profile', icon: 'fa-layer-group' },
-  { title: 'Account Setup', label: 'Account', desc: 'Create your provider account credentials', icon: 'fa-user-circle' },
+  { title: 'Plan & Account', label: 'Account', desc: 'Choose your plan and create your login', icon: 'fa-user-circle' },
   { title: 'Identity & Trust', label: 'Identity', desc: 'Build trust with your qualifications and bio', icon: 'fa-id-card' },
-  { title: 'Services Offered', label: 'Services', desc: 'Tell families what you offer', icon: 'fa-briefcase' },
-  { title: 'Location & Reach', label: 'Location', desc: 'Where can you serve families?', icon: 'fa-map-marker-alt' },
-  { title: 'Pricing & Availability', label: 'Pricing', desc: 'Set your rates and schedule', icon: 'fa-calendar-alt' },
-  { title: 'Contact Details', label: 'Contact', desc: 'How families can reach you', icon: 'fa-phone' },
-  { title: 'Terms & Conditions', label: 'Terms', desc: 'Review and agree to our terms before creating your profile', icon: 'fa-file-contract' },
+  { title: 'Terms & Create Account', label: 'Finish', desc: 'Confirm the terms and create your account', icon: 'fa-file-contract' },
 ];
 
 const TOTAL = STEPS.length;
@@ -466,10 +461,6 @@ const Registration = () => {
     if (topRef.current) topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setFieldErrors({});
     setTimeSlotErr('');
-    if (step === 2) {
-      setData(p => ({ ...p, email: '', password: '' }));
-      setShowPw(false);
-    }
   }, [step]);
 
   // ── Close social dropdown on outside click ──
@@ -615,7 +606,7 @@ const Registration = () => {
   // ── Validation ──
   const validateStep = () => {
     const errs = {};
-    if (step === 2) {
+    if (step === 1) {
       if (!data.fullName?.trim()) errs.fullName = 'Please enter your full name or business name.';
       if (!data.email?.trim() || !/^\S+@\S+\.\S+$/.test(data.email)) errs.email = 'Enter a valid email address (e.g. name@example.com).';
       if (!data.password || data.password.length < 8) {
@@ -626,35 +617,11 @@ const Registration = () => {
       }
       if (!data.accountType) errs.accountType = 'Please select whether you are an individual or organisation.';
     }
-    if (step === 3) {
+    if (step === 2) {
       if (!data.bio?.trim()) errs.bio = 'Please write a short bio.';
       if (!data.experience && data.experience !== 0) errs.experience = 'Please enter your years of experience.';
     }
-    if (step === 4) {
-      if (!data.primaryCat) errs.primaryCat = 'Please select your primary service category.';
-      if (!data.serviceTitle?.trim()) errs.serviceTitle = 'Please enter a title for your service.';
-      if (!data.serviceDesc?.trim()) errs.serviceDesc = 'Please describe the services you offer.';
-      if (!data.subjects?.trim()) errs.subjects = 'Please list the subjects or specialisations you offer.';
-      if (!data.ageGroups?.length) errs.ageGroups = 'Please select at least one age group.';
-      if (!data.deliveryMode) errs.deliveryMode = 'Please select how you deliver your services.';
-    }
-    if (step === 5) {
-      if (!data.city?.trim()) errs.city = 'Please enter your city.';
-      if (!data.province) errs.province = 'Please select your province.';
-      if (!data.serviceAreas?.length) errs.serviceAreas = 'Please select at least one service area.';
-    }
-    if (step === 6) {
-      if (!data.pricingModel) errs.pricingModel = 'Please select how you charge for your services.';
-      if (!data.daysAvailable?.length) errs.daysAvailable = 'Please select at least one day.';
-      if (!data.timeSlots?.trim()) errs.timeSlots = 'Please enter your available time slots.';
-      else if (!TIME_SLOT_REGEX.test(data.timeSlots.trim())) errs.timeSlots = 'Use the format HH:MM - HH:MM.';
-    }
-    if (step === 7) {
-      if (!data.phoneLocal?.trim()) errs.phoneLocal = 'Please enter your phone number.';
-      else if (data.phoneLocal.replace(/\D/g, '').length !== 9) errs.phoneLocal = 'Enter exactly 9 digits after +27.';
-      if (!data.inquiryEmail?.trim() || !/^\S+@\S+\.\S+$/.test(data.inquiryEmail)) errs.inquiryEmail = 'Please enter a valid email for enquiries.';
-    }
-    if (step === 8) {
+    if (step === 3) {
       if (!data.terms) errs.terms = 'Please tick the box to agree to the Terms and Community Guidelines before creating your profile.';
     }
     return errs;
@@ -984,7 +951,6 @@ const Registration = () => {
             onClick={() => {
               set('listingPlan', plan.param);
               setFieldErrors({});
-              setStep(2);
             }}>
             <div className="sah-plan-card-head">
               <div>
@@ -1014,7 +980,6 @@ const Registration = () => {
                   e.stopPropagation();
                   set('listingPlan', plan.param);
                   setFieldErrors({});
-                  setStep(2);
                 }}>
                 {selected ? <><i className="fas fa-check" /> Selected</> : plan.cta}
               </button>
@@ -1584,7 +1549,15 @@ const Registration = () => {
     </>
   );
 
-  const RENDERERS = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6, renderStep7, renderStep8];
+  const renderPlanAndAccount = () => (
+    <>
+      {renderStep1()}
+      <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
+      {renderStep2()}
+    </>
+  );
+
+  const RENDERERS = [renderPlanAndAccount, renderStep3, renderStep8];
 
   const pct = Math.round((step / TOTAL) * 100);
 
@@ -1649,9 +1622,10 @@ const Registration = () => {
           </div>
         </div>
 
-        {step > 1 && (
-          <div className="sah-form-nav-wrap">
-            <button className="sah-nav-prev" onClick={prev}><i className="fas fa-arrow-left" /> Previous</button>
+        <div className="sah-form-nav-wrap">
+            {step > 1
+              ? <button className="sah-nav-prev" onClick={prev}><i className="fas fa-arrow-left" /> Previous</button>
+              : <div aria-hidden="true" />}
             <div className="sah-nav-counter">
               <strong>{step}</strong> of {TOTAL} steps
               <div className="sah-nav-progress">
@@ -1661,7 +1635,7 @@ const Registration = () => {
             <button
               className={`sah-nav-next${step === TOTAL ? ' sah-nav-submit' : ''}`}
               onClick={next}
-              disabled={submitting || (step === 3 && overLimit)}
+              disabled={submitting || (step === 2 && overLimit)}
             >
               {submitting ? <span className="sah-spinner" /> : null}
               {step < TOTAL
@@ -1669,12 +1643,9 @@ const Registration = () => {
                 : <><i className="fas fa-check-circle" /> <span>{submitting ? 'Creating Profile…' : 'Create My Profile'}</span></>}
             </button>
           </div>
-        )}
       </div>
     </div>
   );
 };
 
 export default Registration;
-
-

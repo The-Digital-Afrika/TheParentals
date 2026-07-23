@@ -512,6 +512,12 @@ const DASH_CSS = `
   .cd-tab-btn:hover { background:#f47b2b; color:#fff; }
   .cd-tab-btn.active { background:#e96f1f; color:#fff; font-weight:800; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
+  .cd-completion-card{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 20px;margin:0 0 18px;background:#f0f7fb;border:1px solid #c8dce9;border-radius:10px;}
+  .cd-completion-copy{display:flex;align-items:flex-start;gap:12px;}
+  .cd-completion-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:#6f8da6;color:#fff;}
+  .cd-completion-card h2{font-size:.98rem;margin:0 0 3px;color:#243746;}
+  .cd-completion-card p{font-size:.78rem;color:#617584;margin:0;}
+  .cd-completion-action{border:0;border-radius:7px;padding:9px 14px;background:#ff8c42;color:#fff;font:700 .78rem inherit;white-space:nowrap;cursor:pointer;}
   .cd-alert-wrap { max-width:1280px; margin:0 auto; padding:12px 32px 0; display:flex; justify-content:flex-end; }
   .cd-enquiry-bell { position:relative; width:44px; height:44px; border-radius:12px; border:1.5px solid #dbe8f1; background:#fff; color:#6f8da6; box-shadow:0 6px 18px rgba(111,141,166,.12); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:all .15s; }
   .cd-enquiry-bell:hover { border-color:#6f8da6; transform:translateY(-1px); box-shadow:0 10px 24px rgba(111,141,166,.16); }
@@ -750,7 +756,7 @@ const DASH_CSS = `
   .cd-docs-section-title { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#aaa; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
   .cd-docs-empty { font-size:0.8rem; color:#bbb; font-style:italic; padding:8px 0; }
   @media(max-width:1024px) { .cd-layout { grid-template-columns:1fr; } .cd-plan-grid { grid-template-columns:1fr; } }
-  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-alert-wrap { padding:12px 14px 0; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:0 14px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } }
+  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-alert-wrap { padding:12px 14px 0; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:0 14px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } .cd-completion-card{align-items:flex-start;flex-direction:column}.cd-completion-action{width:100%} }
   @media(max-width:620px)  { .cd-payment-methods { grid-template-columns:1fr; } .cd-payment-summary { grid-template-columns:1fr; } .cd-payment-amount { text-align:left; } .cd-payment-grid { grid-template-columns:1fr; } .cd-payment-result-grid { grid-template-columns:1fr; } }
   @media(max-width:768px){
   .cd-hero-top { padding: 0 14px 20px; }
@@ -964,6 +970,21 @@ const ClientDashboard = () => {
   const isPaidPlan  = profileData.plan === 'pro' || profileData.plan === 'featured';
   const planOrder   = { free: 0, pro: 1, featured: 2 };
   const days        = DAYS_OF_WEEK || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const profileCompletionChecks = [
+    profileData.name,
+    profileData.bio,
+    profileData.primaryCategory,
+    profileData.serviceTitle || profileData.services?.some(service => service?.title),
+    profileData.city,
+    profileData.province,
+    profileData.phone,
+    profileData.contactEmail || profileData.inquiryEmail,
+    profileData.pricingModel,
+    profileData.availabilityDays?.length,
+  ];
+  const profileCompletion = Math.round(
+    (profileCompletionChecks.filter(Boolean).length / profileCompletionChecks.length) * 100
+  );
 
   /* ─── edit helpers ─── */
   const startEdit = useCallback((section = 'all') => {
@@ -3277,6 +3298,20 @@ const ClientDashboard = () => {
         >
           <i className="fas fa-arrow-left"></i> Back to Directory
         </Link>
+        {profileCompletion < 100 && (
+          <section className="cd-completion-card" aria-label="Profile completion">
+            <div className="cd-completion-copy">
+              <div className="cd-completion-icon"><i className="fas fa-list-check" /></div>
+              <div>
+                <h2>Your profile is {profileCompletion}% complete</h2>
+                <p>Add your services, location, pricing, availability and contact details. Progress is saved automatically so you can return at any time.</p>
+              </div>
+            </div>
+            <button className="cd-completion-action" onClick={() => { setActiveTab('profile'); startEdit('profileInfo'); }}>
+              Continue Profile
+            </button>
+          </section>
+        )}
         {renderInquiryCenter('provider')}
         {renderActiveTab()}
       </main>

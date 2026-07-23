@@ -9,6 +9,9 @@ const getFriendlyApiError = (err, fallback = 'Network error. Please try again.')
   if (err.status === 0) {
     return 'Cannot reach the backend. Confirm the backend is running on port 5000, then refresh and try again.';
   }
+  if (Number(err.status) >= 500) {
+    return 'The login service is temporarily unavailable. Please try again shortly.';
+  }
   if (err.message === 'Failed to fetch') {
     return 'Cannot reach the backend. Confirm the backend is running on port 5000, then refresh and try again.';
   }
@@ -24,6 +27,47 @@ const getStoredProviderForUser = (userData) => {
       (id && (provider.id === id || provider.userId === id))
       || (email && String(provider.email || provider.contactEmail || provider.inquiryEmail || '').toLowerCase() === email)
     ) || null;
+  } catch {
+    return null;
+  }
+};
+
+const getLocalAccount = (email, password) => {
+  try {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const users = JSON.parse(localStorage.getItem('sah_users') || '[]');
+    const providers = JSON.parse(localStorage.getItem('sah_providers') || '[]');
+    const passwordMatches = item => !item.password || item.password === password;
+    const storedUser = users.find(item =>
+      String(item.email || '').trim().toLowerCase() === normalizedEmail
+      && passwordMatches(item)
+    );
+    // Provider profiles created by older builds may contain a stale or missing
+    // password because credentials normally lived in PostgreSQL. The provider
+    // profile itself is the local offline account record.
+    const storedProvider = providers.find(item =>
+      String(item.email || item.contactEmail || item.inquiryEmail || '').trim().toLowerCase() === normalizedEmail
+    );
+    const account = storedUser || storedProvider;
+    if (!account) return null;
+
+    const provider = providers.find(item =>
+      (account.id && (item.id === account.id || item.userId === account.id))
+      || String(item.email || item.contactEmail || item.inquiryEmail || '').trim().toLowerCase() === normalizedEmail
+    ) || storedProvider;
+    const isProvider = String(account.role || '').toUpperCase() === 'PROVIDER'
+      || String(account.accountType || '').toLowerCase().includes('provider');
+
+    return {
+      id: account.userId || account.id,
+      userId: account.userId || account.id,
+      email: normalizedEmail,
+      name: account.name || account.fullName || account.businessName || '',
+      role: isProvider ? 'PROVIDER' : (account.role || 'USER'),
+      accountType: isProvider ? 'provider' : (account.accountType || 'parent'),
+      plan: provider?.listingPlan || provider?.plan || provider?.tier || account.plan,
+      status: provider?.status || account.status,
+    };
   } catch {
     return null;
   }
@@ -152,6 +196,57 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error('Login error:', err);
+      const backendUnavailable = err.status === 0 || Number(err.status) >= 500 || err.message === 'Failed to fetch';
+      const localAccount = getLocalAccount(email, password);
+
+      // A freshly created development database has no rows yet. If this
+      // browser already owns a local provider profile, recreate only its
+      // account row using the password entered now, then continue normally.
+      if (err.status === 401 && localAccount) {
+        try {
+          const data = await api.register({
+            email: localAccount.email,
+            password,
+            role: localAccount.role || 'PROVIDER',
+            name: localAccount.name || '',
+            accountType: localAccount.accountType || 'provider',
+          });
+          const userData = {
+            ...data.user,
+            token: data.token,
+            plan: localAccount.plan,
+            status: localAccount.status,
+          };
+          setUser(userData);
+          localStorage.setItem('sah_user', JSON.stringify(userData));
+          localStorage.setItem('sah_current_user', JSON.stringify(userData));
+          localStorage.setItem('sah_token', data.token);
+          window.dispatchEvent(new Event('sah-auth-change'));
+          return {
+            success: true,
+            user: userData,
+            message: 'Account restored and login successful.',
+          };
+        } catch (restoreError) {
+          console.error('Database account restore failed:', restoreError);
+        }
+      }
+
+      if (backendUnavailable && localAccount) {
+        const token = `local_${localAccount.id || Date.now()}`;
+        const userData = { ...localAccount, token };
+        setUser(userData);
+        localStorage.setItem('sah_user', JSON.stringify(userData));
+        localStorage.setItem('sah_current_user', JSON.stringify(userData));
+        localStorage.setItem('sah_token', token);
+        window.dispatchEvent(new Event('sah-auth-change'));
+        return {
+          success: true,
+          user: userData,
+          message: 'Login successful. Working locally until the server reconnects.',
+        };
+      }
+
       return { success: false, error: getFriendlyApiError(err) };
     }
   };
