@@ -92,13 +92,10 @@ const CSS = `
   .sah-hero-bg::after{content:'';position:absolute;inset:0;background:rgba(24,35,48,0.68);}
   .sah-hero-inner{position:relative;z-index:2;padding:44px 0;width:100%;}
   .sah-hero-top{text-align:center;margin-bottom:24px;}
-  .sah-hero-h1{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:clamp(2.7rem,6vw,5rem);font-weight:700;line-height:1.02;color:#fff;margin-bottom:18px;letter-spacing:-1.5px;}
+  .sah-hero-h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.2rem,4.7vw,3.8rem);font-weight:800;line-height:1.08;color:#fff;margin-bottom:18px;letter-spacing:-0.8px;}
   .sah-hero-h1 em{font-style:italic;color:rgba(255,255,255,0.9);}
-  .sah-heading-carousel{min-height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:18px;}
+  .sah-heading-carousel{min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:18px;}
   .sah-heading-carousel .sah-hero-h1{margin-bottom:0;animation:sahHeadingFade .5s ease both;}
-  .sah-heading-dots{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;}
-  .sah-heading-dot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.42);cursor:pointer;transition:background .2s ease,transform .2s ease;}
-  .sah-heading-dot.active{background:var(--accent-solid);transform:scale(1.28);}
   @keyframes sahHeadingFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
   /* SEARCH BAR */
@@ -114,12 +111,19 @@ const CSS = `
   .sah-hero-services-list{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
   .sah-hero-services-list button{border:1px solid rgba(255,255,255,.48);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:8px 15px;font-size:.84rem;font-weight:500;backdrop-filter:blur(6px);transition:.18s ease;}
   .sah-hero-services-list button:hover,.sah-hero-services-list button.active{background:#fff;color:var(--accent-dark);border-color:#fff;}
+  .sah-hero-services-list button i{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-right:3px;border-radius:50%;background:color-mix(in srgb,var(--category-color) 18%,transparent);color:var(--category-color);font-size:.72rem;}
+  .sah-cat-education{--category-color:#60a5fa;}
+  .sah-cat-wellness{--category-color:#f472b6;}
+  .sah-cat-activities{--category-color:#c084fc;}
+  .sah-cat-healthcare{--category-color:#fb7185;}
+  .sah-cat-shopping{--category-color:#fbbf24;}
+  .sah-cat-family{--category-color:#4ade80;}
   .sah-hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px;}
   .sah-hero-secondary-cta{display:inline-flex;align-items:center;gap:9px;padding:12px 26px;border:1.5px solid rgba(255,255,255,.72);border-radius:var(--radius);background:rgba(255,255,255,.08);color:#fff;font-weight:700;}
 
   /* HERO CTA AREA */
   .sah-hero-tagline{text-align:center;margin-top:22px;margin-bottom:36px;}
-  @media(prefers-reduced-motion:reduce){.sah-heading-carousel .sah-hero-h1{animation:none}.sah-heading-dot{transition:none}}
+  @media(prefers-reduced-motion:reduce){.sah-heading-carousel .sah-hero-h1{animation:none}}
 
   /* BECOME PROVIDER BUTTON */
   .sah-become-btn{
@@ -1031,24 +1035,12 @@ export default function HomePage() {
                 <h1 className="sah-hero-h1" key={headingIndex}>
                   {HERO_HEADLINES[headingIndex]}
                 </h1>
-                <div className="sah-heading-dots" aria-label="Choose hero headline">
-                  {HERO_HEADLINES.map((headline, index) => (
-                    <button
-                      key={headline}
-                      type="button"
-                      className={`sah-heading-dot${index === headingIndex ? ' active' : ''}`}
-                      aria-label={`Show headline ${index + 1}: ${headline}`}
-                      aria-current={index === headingIndex ? 'true' : undefined}
-                      onClick={() => setHeadingIndex(index)}
-                    />
-                  ))}
-                </div>
               </div>
 
               <div className="sah-hero-services" aria-label="Browse services">
                 <div className="sah-hero-services-list">
                   {FILTER_PILLS.map(pill => (
-                    <button key={pill.cat} className={activeCat === pill.cat ? 'active' : ''}
+                    <button key={pill.cat} className={`${pill.icon ? `sah-cat-${pill.cat}` : ''}${activeCat === pill.cat ? ' active' : ''}`}
                       onClick={() => {
                         filterCat(pill.cat);
                         document.getElementById('sah-providers')?.scrollIntoView({ behavior:'smooth' });

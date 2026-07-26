@@ -92,6 +92,14 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-terms-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 .sah-terms-row a { color: var(--accent); font-weight: 700; text-decoration: none; }
 .sah-terms-row a:hover { text-decoration: underline; }
+.sah-next-steps-notice { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; padding: 16px 18px; background: #eef7fc; border: 1px solid #b7d5ea; border-left: 4px solid var(--accent); border-radius: var(--radius); color: #334155; }
+.sah-next-steps-notice > i { flex-shrink: 0; margin-top: 2px; color: var(--accent); font-size: 1rem; }
+.sah-next-steps-notice strong { display: block; margin-bottom: 4px; color: #365b78; font-size: 0.9rem; }
+.sah-next-steps-notice p { margin: 0; font-size: 0.84rem; line-height: 1.55; }
+.sah-registration-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 24px; font-size: 0.82rem; color: #334155; }
+.sah-registration-summary-item { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.sah-registration-summary-label { flex-shrink: 0; font-weight: 700; color: #64748b; }
+.sah-registration-summary-value { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
 .sah-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .sah-field { display: flex; flex-direction: column; gap: 5px; }
 .sah-full { grid-column: 1 / -1; }
@@ -185,6 +193,7 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 @media (max-width: 700px) {
   .sah-plan-grid { grid-template-columns: 1fr; }
   .sah-form-grid { grid-template-columns: 1fr; }
+  .sah-registration-summary-grid { grid-template-columns: 1fr; gap: 8px; }
   .sah-full { grid-column: 1; }
   .sah-step-card-body { padding: 18px 14px; }
   .sah-step-card-head { padding: 16px 16px 12px; }
@@ -1462,6 +1471,16 @@ const Registration = () => {
 
   const renderStep8 = () => (
     <>
+      <div className="sah-next-steps-notice" role="note">
+        <i className="fas fa-circle-info" aria-hidden="true" />
+        <div>
+          <strong>What happens after you create your account?</strong>
+          <p>
+            You&rsquo;ll continue to set up your profile in the system. Once your profile is ready,
+            you can subscribe to unlock more content and additional member benefits.
+          </p>
+        </div>
+      </div>
       <div className="sah-terms-box">
         <div className="sah-terms-box-head" onClick={() => setTermsOpen(o => !o)}>
           <div className="sah-terms-box-head-title">
@@ -1513,7 +1532,7 @@ const Registration = () => {
         <div style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0369a1', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
           <i className="fas fa-clipboard-check" /> Registration Summary
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px', fontSize: '0.82rem', color: '#334155' }}>
+        <div className="sah-registration-summary-grid">
           {[
             ['Name', data.fullName || '—'],
             ['Email', data.email || '—'],
@@ -1521,10 +1540,10 @@ const Registration = () => {
             ['Category', data.primaryCat || '—'],
             ['Location', data.city && data.province ? `${data.city}, ${data.province}` : '—'],
             ['Pricing', data.pricingModel || '—'],
-          ].map(([k, v]) => (
-            <div key={k} style={{ display: 'flex', gap: 6 }}>
-              <span style={{ fontWeight: 700, color: '#64748b', minWidth: 70 }}>{k}:</span>
-              <span style={{ fontWeight: 500 }}>{v}</span>
+          ].filter(([k]) => !['Category', 'Location', 'Pricing'].includes(k)).map(([k, v]) => (
+            <div key={k} className="sah-registration-summary-item">
+              <span className="sah-registration-summary-label">{k}:</span>
+              <span className="sah-registration-summary-value">{v}</span>
             </div>
           ))}
         </div>
