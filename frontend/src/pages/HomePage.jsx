@@ -83,6 +83,7 @@ const CSS = `
   }
   .sah-logout-btn:hover { filter:saturate(1.08) brightness(0.94); }
   .sah-logout-btn i { color: rgba(255,255,255,0.9); }
+  .sah-footer .sah-logout-btn { margin-left:auto; padding:8px 14px; border:1px solid rgba(255,255,255,.5); border-radius:7px; }
 
   /* HERO */
   .sah-hero{position:relative;min-height:64vh;display:flex;align-items:center;overflow:hidden;background:#1e1e1e;}
@@ -1006,9 +1007,6 @@ export default function HomePage() {
                       : (currentUser.email ? currentUser.email.split('@')[0] : 'My Account')}
                   </span>
                 </Link>
-                <button onClick={handleLogout} className="sah-logout-btn">
-                  <i className="fas fa-right-from-bracket" /> Log Out
-                </button>
               </>
             ) : (
               <>
@@ -1252,6 +1250,11 @@ export default function HomePage() {
                 </a>
               ))}
             </div>
+            {currentUser && (
+              <button type="button" onClick={handleLogout} className="sah-logout-btn">
+                <i className="fas fa-right-from-bracket" /> Log Out
+              </button>
+            )}
           </div>
         </div>
       </footer>

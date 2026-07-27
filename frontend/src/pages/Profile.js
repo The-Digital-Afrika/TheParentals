@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
-import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { createInquiry } from '../utils/inquiries';
 import '../assets/css/profile.css';
@@ -1042,7 +1041,6 @@ const Profile = () => {
   const [enquiryStatus, setEnquiryStatus] = useState('idle');
   const [enquiryError, setEnquiryError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const fromDashboard = searchParams.get('from') === 'dashboard';
@@ -1170,12 +1168,6 @@ const Profile = () => {
     const isMember = profile?.profileKind === 'member' || profile?.primaryCategory === 'Member Profile' || profile?.category === 'Member Profile';
     if (fromDashboard) navigate(isMember ? '/client-dashboard' : '/provider-dashboard');
     else navigate('/');
-  };
-
-  const handleProfileLogout = () => {
-    logout();
-    setIsAuthenticated(false);
-    navigate('/');
   };
 
   const closeContactModal = () => {
@@ -1328,9 +1320,6 @@ const Profile = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 6, border: '1.5px solid rgba(255,255,255,0.55)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                 <i className="fas fa-user-circle" /> {profile?.name || 'Provider'}
-              </button>
-              <button onClick={handleProfileLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 18px', borderRadius: 6, border: 'none', background: ORANGE, color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-                <i className="fas fa-right-from-bracket" /> Log Out
               </button>
             </div>
           </div>
