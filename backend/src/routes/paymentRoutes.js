@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const express = require('express');
 const https = require('https');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../db');
 const authMiddleware = require('../middlewares/authMiddleware');
 const {
   appUrl,
@@ -14,7 +14,6 @@ const {
 } = require('../config');
 
 const router = express.Router();
-const prisma = new PrismaClient();
 const mockPayments = new Map();
 
 const PAYMENT_STATUSES = {

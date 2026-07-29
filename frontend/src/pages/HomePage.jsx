@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "../services/api";
+import SocialSignIn from "../components/common/SocialSignIn";
 
 const injectHead = () => {
   if (document.getElementById("sah-fonts")) return;
@@ -176,15 +177,31 @@ const CSS = `
   .sah-ico-no{color:rgba(255,255,255,0.22);font-size:0.7rem;}
   .sah-plan-cta-link{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;background:var(--accent-solid);color:#fff !important;border:none;border-radius:var(--radius);font-size:0.82rem;font-weight:700;transition:filter 0.15s;cursor:pointer;text-decoration:none;}
   .sah-plan-cta-link:hover{filter:saturate(1.08) brightness(0.94);}
-  .sah-signup-prompt{position:fixed;inset:0;z-index:2200;background:rgba(24,35,48,.5);display:flex;align-items:flex-end;justify-content:flex-end;padding:28px;}
-  .sah-signup-prompt-card{position:relative;width:min(410px,100%);background:#fff;border-radius:14px;padding:28px;box-shadow:var(--shadow-lg);border:1px solid rgba(111,141,166,.22);}
-  .sah-signup-prompt-card h2{font-size:1.45rem;color:var(--dark);margin-bottom:8px;}
-  .sah-signup-prompt-card p{color:var(--muted);font-size:.92rem;margin-bottom:20px;}
-  .sah-signup-prompt-close{position:absolute;right:12px;top:12px;width:34px;height:34px;border:0;border-radius:50%;background:#f3f4f6;color:#666;}
+  .sah-signup-prompt{position:fixed;inset:0;z-index:2200;background:rgba(24,35,48,.48);display:flex;align-items:flex-start;justify-content:center;padding:118px 24px 24px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+  .sah-signup-prompt-card{position:relative;isolation:isolate;width:min(540px,100%);overflow:hidden;background:linear-gradient(145deg,#fff 58%,#fff5ed 100%);border-radius:20px;padding:34px 36px 30px;box-shadow:0 24px 70px rgba(24,35,48,.28),0 8px 0 rgba(111,141,166,.2);border:1px solid rgba(111,141,166,.3);animation:sahPromptDrop .38s cubic-bezier(.2,.8,.2,1);}
+  .sah-signup-prompt-card::before{content:'';position:absolute;z-index:-1;inset:0 0 auto;height:8px;background:linear-gradient(90deg,#6f8da6 0 38%,#ff8c42 38% 72%,#e62925 72%);}
+  .sah-signup-prompt-card::after{content:'';position:absolute;z-index:-1;width:150px;height:150px;border-radius:50%;right:-72px;bottom:-82px;background:radial-gradient(circle,#ff8c42 0 24%,#e62925 25% 43%,#6f8da6 44% 63%,transparent 64%);opacity:.12;}
+  .sah-signup-prompt-card h2{font-size:1.55rem;color:#333330;margin-bottom:8px;padding-right:36px;}
+  .sah-signup-prompt-card h2::before{content:'✦';display:inline-grid;place-items:center;width:34px;height:34px;margin-right:10px;border-radius:10px;background:#6f8da6;color:#fff;font-size:1rem;vertical-align:2px;box-shadow:4px 4px 0 #ff8c42;}
+  .sah-signup-prompt-card p{color:#6a655d;font-size:.94rem;margin-bottom:18px;padding-left:46px;}
+  .sah-signup-prompt-close{position:absolute;right:14px;top:16px;width:36px;height:36px;border:1px solid rgba(111,141,166,.2);border-radius:50%;background:#eef5fa;color:#557691;transition:transform .15s,background .15s,color .15s;}
+  .sah-signup-prompt-close:hover{transform:rotate(8deg) scale(1.05);background:#e62925;color:#fff;}
   .sah-signup-prompt-actions{display:flex;gap:10px;flex-wrap:wrap;}
   .sah-signup-prompt-actions button{flex:1;min-width:140px;padding:11px 16px;border-radius:7px;font-weight:700;}
-  .sah-signup-prompt-primary{border:0;background:var(--accent-solid);color:#fff;}
-  .sah-signup-prompt-secondary{border:1px solid var(--accent);background:#fff;color:var(--accent-dark);}
+  .sah-signup-prompt-primary{border:0;background:linear-gradient(135deg,#ff8c42,#ef6c27);color:#fff;box-shadow:0 7px 18px rgba(255,140,66,.27);}
+  .sah-signup-prompt-primary:hover{background:linear-gradient(135deg,#ef6c27,#e62925);transform:translateY(-1px);}
+  .sah-signup-prompt-secondary{border:1px solid #6f8da6;background:#fff;color:#557691;}
+  .sah-signup-prompt-secondary:hover{background:#6f8da6;color:#fff;transform:translateY(-1px);}
+  @keyframes sahPromptDrop{from{opacity:0;transform:translateY(-24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @media(max-width:600px){.sah-signup-prompt{padding:92px 14px 20px}.sah-signup-prompt-card{padding:30px 22px 24px;border-radius:16px}.sah-signup-prompt-card p{padding-left:0}.sah-signup-prompt-card h2{font-size:1.32rem}.sah-signup-prompt-actions{flex-direction:column}.sah-signup-prompt-actions button{width:100%}}
+  .sah-social-auth{width:100%;display:flex;flex-direction:column;gap:10px;margin:16px 0 4px;}
+  .sah-google-auth{width:100%;min-height:40px;display:flex;justify-content:center;}
+  .sah-google-auth>div{width:100%!important;}
+  .sah-facebook-auth{width:100%;min-height:42px;border:1px solid #ccd0d5;border-radius:5px;background:#fff;color:#1c1e21;font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .sah-facebook-auth i{color:#1877f2;font-size:1.2rem;}
+  .sah-facebook-auth:disabled{opacity:.65;cursor:wait;}
+  .sah-social-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.78rem;margin:2px 0;}
+  .sah-social-divider span{height:1px;background:#e3e4e7;flex:1;}
 
   /* FILTER BAR */
   .sah-filter-bar{background:var(--white);border-bottom:1px solid var(--border);}
@@ -834,6 +851,12 @@ export default function HomePage() {
     setShowSignupPrompt(false);
   };
 
+  const handleSocialSuccess = (user) => {
+    setCurrentUser(user);
+    dismissSignupPrompt();
+    showToast(`Welcome${user?.name ? `, ${user.name}` : ''}!`);
+  };
+
   useEffect(() => {
     let cancelled = false;
 
@@ -1318,9 +1341,10 @@ export default function HomePage() {
             </button>
             <h2 id="signup-prompt-title">Make Parentals yours</h2>
             <p>Create a free account to explore trusted parenting services and connect with providers.</p>
+            <SocialSignIn onSuccess={handleSocialSuccess} onError={message => showToast(message, true)} />
             <div className="sah-signup-prompt-actions">
               <button className="sah-signup-prompt-primary" onClick={() => { dismissSignupPrompt(); setRegModal(true); }}>
-                Create Free Account
+                Continue with Email
               </button>
               <button className="sah-signup-prompt-secondary" onClick={() => { dismissSignupPrompt(); navigate('/login'); }}>
                 Log In

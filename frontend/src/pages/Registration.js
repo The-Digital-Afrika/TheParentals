@@ -106,6 +106,8 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-field label { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--mid); }
 .sah-field label i { color: var(--accent); font-size: 0.68rem; }
 .sah-req { color: var(--accent); font-size: 1rem; font-style: normal; }
+.sah-required-note { font-size: .76rem; color: var(--muted); margin-bottom: 18px; }
+.sah-required-note .sah-req { margin-right: 3px; }
 .sah-field input, .sah-field select, .sah-field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); background: var(--card-white); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--dark); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; appearance: none; }
 .sah-field textarea { resize: vertical; min-height: 90px; }
 .sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
@@ -1007,6 +1009,7 @@ const Registration = () => {
         <label><i className="fas fa-user" /> Full Name / Business Name <em className="sah-req">*</em></label>
         <input type="text" value={data.fullName || ''} placeholder="e.g. Thando Mkhize or Bright Minds Learning"
           autoComplete="off"
+          required aria-required="true"
           className={fe.fullName ? 'err' : ''} onChange={e => set('fullName', e.target.value)} />
         <FieldErr msg={fe.fullName} />
       </div>
@@ -1014,6 +1017,7 @@ const Registration = () => {
         <label><i className="fas fa-envelope" /> Email Address <em className="sah-req">*</em></label>
         <input type="email" value={data.email || ''} placeholder="name@example.com"
           autoComplete="off" name="reg-email"
+          required aria-required="true"
           className={fe.email ? 'err' : ''} onChange={e => set('email', e.target.value)} />
         <FieldErr msg={fe.email} />
       </div>
@@ -1022,6 +1026,7 @@ const Registration = () => {
         <div className="sah-pw-wrap">
           <input type={showPw ? 'text' : 'password'} value={data.password || ''} placeholder="Min. 8 characters — include uppercase, numbers & symbols"
             autoComplete="new-password" name="reg-password"
+            required aria-required="true"
             className={fe.password ? 'err' : ''} onChange={e => set('password', e.target.value)} />
           <button type="button" className="sah-pw-eye" onClick={() => setShowPw(s => !s)}>
             <i className={`far fa-eye${showPw ? '-slash' : ''}`} />
@@ -1042,7 +1047,7 @@ const Registration = () => {
       </div>
       <div className="sah-field sah-full">
         <label><i className="fas fa-building" /> Account Type <em className="sah-req">*</em></label>
-        <select value={data.accountType || ''} className={fe.accountType ? 'err' : ''} onChange={e => set('accountType', e.target.value)}>
+        <select value={data.accountType || ''} required aria-required="true" className={fe.accountType ? 'err' : ''} onChange={e => set('accountType', e.target.value)}>
           <option value="">-- Select --</option>
           <option>Individual Provider</option>
           <option>Organisation / Company</option>
@@ -1078,12 +1083,14 @@ const Registration = () => {
         <label><i className="fas fa-hashtag" /> Years of Experience <em className="sah-req">*</em></label>
         <input type="number" value={data.experience ?? ''} placeholder="e.g. 8" min={0} max={60}
           style={{ height: '44px' }}
+          required aria-required="true"
           className={fe.experience ? 'err' : ''} onChange={e => set('experience', e.target.value)} />
         <FieldErr msg={fe.experience} />
       </div>
       <div className="sah-field sah-full">
         <label><i className="fas fa-align-left" /> Short Bio (150–250 words) <em className="sah-req">*</em></label>
         <textarea value={data.bio || ''} placeholder="Tell families about your teaching philosophy, experience, and approach..."
+          required aria-required="true"
           className={fe.bio ? 'err' : ''} onChange={e => set('bio', e.target.value)} />
         <FieldErr msg={fe.bio} />
       </div>
@@ -1521,9 +1528,9 @@ const Registration = () => {
         </div>
       </div>
       <label className={`sah-terms-row${data.terms ? ' checked' : ''}${fe.terms ? ' err-border' : ''}`}>
-        <input type="checkbox" checked={!!data.terms} onChange={e => set('terms', e.target.checked)} />
+        <input type="checkbox" required aria-required="true" checked={!!data.terms} onChange={e => set('terms', e.target.checked)} />
         <span>
-          I have read and agree to the <a href="/terms" target="_blank" rel="noreferrer">Terms and Community Guidelines</a>.
+          I have read and agree to the <a href="/terms" target="_blank" rel="noreferrer">Terms and Community Guidelines</a> <em className="sah-req">*</em>.
           By proceeding, I confirm all my details are accurate and I am authorised to create this listing.
         </span>
       </label>
@@ -1637,6 +1644,7 @@ const Registration = () => {
             <p>{STEPS[step - 1].desc}</p>
           </div>
           <div className="sah-step-card-body">
+            <div className="sah-required-note"><em className="sah-req">*</em> Required fields cannot be skipped.</div>
             {RENDERERS[step - 1]()}
           </div>
         </div>

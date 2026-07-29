@@ -1,14 +1,15 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../db');
 const { sendError } = require('../utils');
 
-const prisma = new PrismaClient();
 
 const getStats = async (req, res) => {
   try {
-    const totalProviders = await prisma.providerProfile.count();
-    const pendingApproval = await prisma.providerProfile.count({ where: { status: 'PENDING' } });
-    const featuredSlots = await prisma.featuredSlot.count({ where: { providerId: { not: null } } });
-    const pendingReviews = await prisma.review.count({ where: { status: 'pending' } });
+    const [totalProviders, pendingApproval, featuredSlots, pendingReviews] = await Promise.all([
+      prisma.providerProfile.count(),
+      prisma.providerProfile.count({ where: { status: 'PENDING' } }),
+      prisma.featuredSlot.count({ where: { providerId: { not: null } } }),
+      prisma.review.count({ where: { status: 'pending' } }),
+    ]);
 
     res.json({
       success: true,

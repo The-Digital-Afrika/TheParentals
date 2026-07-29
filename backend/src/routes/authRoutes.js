@@ -4,8 +4,7 @@ const express = require('express');
 const router  = express.Router();
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-const prisma  = new PrismaClient();
+const prisma  = require('../db');
 
 const JWT_SECRET  = process.env.JWT_SECRET  || 'sah_secret_key_change_in_production';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
@@ -47,6 +46,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
 
     const trimmedEmail = email.trim().toLowerCase();
+    const requestedRole = String(role).toUpperCase();
+    const safeRole = ['PROVIDER', 'USER'].includes(requestedRole) ? requestedRole : null;
+    if (!safeRole)
+      return res.status(400).json({ message: 'Invalid account role.' });
 
     // Block anyone from registering the admin email
     if (trimmedEmail === ADMIN_EMAIL)
@@ -61,7 +64,7 @@ router.post('/register', async (req, res) => {
       data: {
         email:       trimmedEmail,
         password:    hashed,
-        role:        role.toUpperCase(),
+        role:        safeRole,
         name:        name        || null,
         accountType: accountType || 'Individual Provider',
       },

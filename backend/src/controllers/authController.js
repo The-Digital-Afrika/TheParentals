@@ -1,11 +1,10 @@
 // backend/src/controllers/authController.js
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../db');
 const bcrypt           = require('bcryptjs');
 const jwt              = require('jsonwebtoken');
 const { jwtSecret }    = require('../config');
 const { sendError }    = require('../utils');
 
-const prisma = new PrismaClient();
 
 // ─────────────────────────────────────────────────────────────
 //  Hardcoded admin credentials

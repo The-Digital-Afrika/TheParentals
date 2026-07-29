@@ -98,6 +98,10 @@ model ProviderProfile {
   reviews       Review[]
   featuredSlots FeaturedSlot[]
   payments      PaymentTransaction[]
+
+  @@index([status])
+  @@index([publicDisplay, status])
+  @@index([createdAt])
 }
 
 model PaymentTransaction {
@@ -147,6 +151,9 @@ model Review {
   text       String
   status     String          @default("pending")
   createdAt  DateTime        @default(now())
+
+  @@index([providerId])
+  @@index([status])
 }
 
 model FeaturedSlot {
@@ -155,4 +162,7 @@ model FeaturedSlot {
   provider   ProviderProfile? @relation(fields: [providerId], references: [id])
   addedAt    DateTime         @default(now())
   expiresAt  DateTime?
+
+  @@index([providerId])
+  @@index([expiresAt])
 }

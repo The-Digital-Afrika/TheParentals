@@ -79,6 +79,7 @@ export const api = {
   // Auth
   login: (data) => apiRequest('POST', '/api/auth/login', data),
   register: (data) => apiRequest('POST', '/api/auth/register', data),
+  socialAuth: (data) => apiRequest('POST', '/api/auth/social', data),
   getUsers: (token) => apiRequest('GET', '/api/auth/users', null, token),
 
   // Providers
