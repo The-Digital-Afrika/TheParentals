@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../services/api';
+import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -1644,6 +1645,7 @@ const Registration = () => {
             <p>{STEPS[step - 1].desc}</p>
           </div>
           <div className="sah-step-card-body">
+            {step === 1 && <SocialSignIn googleRole="PROVIDER" onError={message => setFieldErrors({ _submit: message })} />}
             <div className="sah-required-note"><em className="sah-req">*</em> Required fields cannot be skipped.</div>
             {RENDERERS[step - 1]()}
           </div>

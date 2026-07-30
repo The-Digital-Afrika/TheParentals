@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
   if (document.getElementById('sah-ur-fonts')) return;
@@ -318,6 +319,7 @@ const UserRegister = () => {
           </div>
 
           <div className="ur-card-body">
+            <SocialSignIn googleRole="USER" onError={message => setSubmitErr(message)} />
             <div className="ur-required-note"><strong>*</strong> Required fields cannot be skipped.</div>
 
             {successMsg && (

@@ -28,6 +28,8 @@ const getApiBaseCandidates = () => {
 };
 
 export const API_BASE_URL = getApiBaseCandidates()[0] || '';
+export const getGoogleAuthUrl = (role = 'USER') =>
+  `${API_BASE_URL}/api/auth/google?role=${encodeURIComponent(String(role).toUpperCase())}`;
 
 export const apiRequest = async (method, endpoint, body = null, token = null) => {
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;

@@ -11,6 +11,7 @@ import ClientDashboard from './pages/ClientDashboard';
 import ProviderDashboard from './pages/ProviderDashboard';
 import Profile from './pages/Profile';
 import PaymentDemo from './pages/PaymentDemo';
+import AuthCallback from './pages/AuthCallback';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/payment/callback" element={<PaymentDemo />} />
             <Route path="/payment-demo" element={<PaymentDemo />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthProvider>

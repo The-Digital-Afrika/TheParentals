@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { api } from '../../services/api';
+import { useState } from 'react';
+import { api, getGoogleAuthUrl } from '../../services/api';
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID || '';
 
 const loadScript = (id, src) => new Promise((resolve, reject) => {
@@ -30,8 +29,7 @@ const saveSession = (data) => {
   return user;
 };
 
-export default function SocialSignIn({ onSuccess, onError }) {
-  const googleButton = useRef(null);
+export default function SocialSignIn({ onSuccess, onError, googleRole = 'USER' }) {
   const [busy, setBusy] = useState('');
 
   const complete = async (payload) => {
@@ -45,30 +43,6 @@ export default function SocialSignIn({ onSuccess, onError }) {
       setBusy('');
     }
   };
-
-  useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !googleButton.current) return undefined;
-    let active = true;
-    loadScript('google-identity-services', 'https://accounts.google.com/gsi/client')
-      .then(() => {
-        if (!active || !window.google || !googleButton.current) return;
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: ({ credential }) => complete({ provider: 'google', credential }),
-        });
-        googleButton.current.replaceChildren();
-        window.google.accounts.id.renderButton(googleButton.current, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text: 'continue_with',
-          shape: 'rectangular',
-          width: Math.min(340, googleButton.current.clientWidth || 340),
-        });
-      })
-      .catch(error => onError?.(error.message));
-    return () => { active = false; };
-  }, []);
 
   const continueWithFacebook = async () => {
     try {
@@ -89,18 +63,30 @@ export default function SocialSignIn({ onSuccess, onError }) {
     }
   };
 
-  if (!GOOGLE_CLIENT_ID && !FACEBOOK_APP_ID) return null;
-
   return (
-    <div className="sah-social-auth">
-      {GOOGLE_CLIENT_ID && <div className="sah-google-auth" ref={googleButton} aria-label="Continue with Google" />}
+    <div className="sah-social-auth" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10, margin: '0 0 16px' }}>
+      <button
+        type="button"
+        className="sah-google-auth"
+        onClick={() => window.location.assign(getGoogleAuthUrl(googleRole))}
+        style={{
+          width: '100%', minHeight: 44, border: '1px solid #ccd0d5', borderRadius: 7,
+          background: '#fff', color: '#333330', fontWeight: 700, display: 'flex',
+          alignItems: 'center', justifyContent: 'center', gap: 10,
+        }}
+      >
+        <span aria-hidden="true" style={{ color: '#4285f4', fontSize: 18, fontWeight: 800 }}>G</span>
+        Continue with Google
+      </button>
       {FACEBOOK_APP_ID && (
         <button type="button" className="sah-facebook-auth" onClick={continueWithFacebook} disabled={!!busy}>
           <i className="fab fa-facebook" />
           {busy === 'facebook' ? 'Connecting…' : 'Continue with Facebook'}
         </button>
       )}
-      <div className="sah-social-divider"><span /> or <span /></div>
+      <div className="sah-social-divider" style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#837b70', fontSize: '.78rem' }}>
+        <span style={{ height: 1, background: '#e3e4e7', flex: 1 }} /> or <span style={{ height: 1, background: '#e3e4e7', flex: 1 }} />
+      </div>
     </div>
   );
 }
