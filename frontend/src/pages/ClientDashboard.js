@@ -486,6 +486,8 @@ const DASH_CSS = `
   .cd-wrap { font-family:'DM Sans','Segoe UI',sans-serif; background:#f4f1ec; min-height:100vh; -webkit-font-smoothing:antialiased; }
   .cd-wrap * { box-sizing:border-box; }
   .cd-hero { background:#6f8da6; padding:32px 0 0; position:relative; overflow:hidden; }
+  .cd-hero.cd-hero-tabs-only{padding-top:0;}
+  .cd-hero-tabs-only .cd-hero-top{display:none;}
   .cd-hero::before { content:''; position:absolute; inset:0; background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23fff' fill-opacity='.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
   .cd-hero-top { max-width:1280px; margin:0 auto; padding:0 32px 28px; position:relative; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
   .cd-hero-left { flex:1; min-width:0; }
@@ -507,8 +509,10 @@ const DASH_CSS = `
   .cd-btn-solid:disabled { opacity:.6; cursor:not-allowed; transform:none; }
   .cd-btn-solid.cancel { background:#6f8da6; }
   .cd-btn-solid.cancel:hover { background:#557691; }
-  .cd-tab-bar { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; gap:2px; position:relative; z-index:10; }
-  .cd-tab-btn { padding:10px 18px; background:#ff8c42; border:none; border-bottom:none; color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; border-radius:8px 8px 0 0; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; box-shadow:0 8px 18px rgba(255,140,66,.18); }
+  .cd-tab-bar { max-width:1280px; margin:0 auto; padding:9px 32px; display:flex; align-items:center; gap:8px; position:relative; z-index:10; }
+  .cd-tab-btn { padding:10px 18px; background:#ff8c42; border:none; border-bottom:none; color:#fff; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; border-radius:8px; transition:all .15s; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; box-shadow:0 8px 18px rgba(255,140,66,.18); }
+  .cd-tab-back{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid rgba(255,255,255,.58);border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:.78rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:background .15s,border-color .15s;}
+  .cd-tab-back:hover{background:rgba(255,255,255,.22);border-color:#fff;color:#fff;}
   .cd-tab-btn:hover { background:#f47b2b; color:#fff; }
   .cd-tab-btn.active { background:#e96f1f; color:#fff; font-weight:800; }
   .cd-main { max-width:1280px; margin:0 auto; padding:22px 32px 64px; }
@@ -527,11 +531,32 @@ const DASH_CSS = `
   .cd-directory-back { display:inline-flex; align-items:center; gap:8px; width:fit-content; margin:0 0 16px; padding:9px 16px; border-radius:8px; border:1.5px solid rgba(111,141,166,.35); background:#fff; color:#6f8da6; font-size:.86rem; font-weight:800; text-decoration:none; box-shadow:0 4px 14px rgba(0,0,0,.05); transition:all .15s; }
   .cd-directory-back:hover { border-color:#6f8da6; transform:translateY(-1px); box-shadow:0 8px 20px rgba(0,0,0,.08); }
   .cd-layout { display:grid; grid-template-columns:1fr 300px; gap:18px; align-items:start; }
+  .cd-sidebar-stack{min-width:0;}
+  .cd-sidebar-stack #dashboard-enquiries{margin-bottom:14px;}
+  .cd-sidebar-stack #dashboard-enquiries{border-top:3px solid #ff8c42;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-card-header{padding:12px 14px;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-card-header{background:#fff8f2;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-card-header-icon{background:#ff8c42;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-count{background:#ff8c42;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-card-body{padding:11px;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-empty{background:#fffaf5;border-color:#ffd2b5;color:#b76514;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-layout{grid-template-columns:1fr;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-detail-grid{grid-template-columns:1fr;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-detail-row.wide{grid-column:auto;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-response-actions{align-items:stretch;flex-direction:column;}
+  .cd-sidebar-stack #dashboard-enquiries .cd-inquiry-response-actions .cd-btn-solid{justify-content:center;width:100%;}
   .cd-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04); margin-bottom:16px; border:1px solid rgba(0,0,0,.05); }
   .cd-card-header { display:flex; align-items:center; gap:11px; padding:14px 20px; border-bottom:1px solid #f0ece5; background:#faf9f7; }
   .cd-card-header-icon { width:34px; height:34px; border-radius:8px; background:#6f8da6; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.8rem; flex-shrink:0; }
   .cd-card-title    { font-size:0.88rem; font-weight:700; color:#1a1a1a; margin:0; }
   .cd-card-subtitle { font-size:0.71rem; color:#888; margin:1px 0 0; }
+  .cd-account-heading{min-width:180px;}
+  .cd-account-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:7px;}
+  .cd-account-meta .cd-status-pill{padding:3px 9px;font-size:.66rem;}
+  .cd-account-meta .cd-status-pill.pending{background:#fff7e6;color:#b76514;border-color:#f6d58c;}
+  .cd-account-meta .cd-status-pill.approved{background:#ecfdf5;color:#047857;border-color:#a7f3d0;}
+  .cd-account-meta .cd-status-pill.rejected{background:#fff1f0;color:#b42318;border-color:#fecaca;}
+  .cd-plan-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:50px;background:#f0f7fb;border:1px solid #c8dce9;color:#557691;font-size:.66rem;font-weight:700;}
   .cd-card-body     { padding:20px; }
   .cd-card-body.tight { padding:14px 20px; }
   .cd-card-actions { margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
@@ -750,11 +775,11 @@ const DASH_CSS = `
   .cd-docs-section-title { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#aaa; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
   .cd-docs-empty { font-size:0.8rem; color:#bbb; font-style:italic; padding:8px 0; }
   @media(max-width:1024px) { .cd-layout { grid-template-columns:1fr; } .cd-plan-grid { grid-template-columns:1fr; } }
-  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-alert-wrap { padding:12px 14px 0; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:0 14px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } }
+  @media(max-width:768px)  { .cd-main { padding:16px 14px 48px; } .cd-alert-wrap { padding:12px 14px 0; } .cd-hero-top { padding:0 16px 24px; } .cd-tab-bar { padding:8px 14px; gap:6px; overflow-x:auto; flex-wrap:nowrap; } .cd-row { grid-template-columns:1fr; } .cd-svc-grid { grid-template-columns:1fr 1fr; } }
   @media(max-width:620px)  { .cd-payment-methods { grid-template-columns:1fr; } .cd-payment-summary { grid-template-columns:1fr; } .cd-payment-amount { text-align:left; } .cd-payment-grid { grid-template-columns:1fr; } .cd-payment-result-grid { grid-template-columns:1fr; } }
   @media(max-width:768px){
   .cd-hero-top { padding: 0 14px 20px; }
-  .cd-tab-bar { padding: 0 10px; gap: 1px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .cd-tab-bar { padding:8px 10px; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .cd-tab-btn { padding: 8px 10px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0; }
   .cd-tab-btn i { display: none; }
   .cd-layout { grid-template-columns: 1fr; }
@@ -964,7 +989,6 @@ const ClientDashboard = () => {
   const isPaidPlan  = profileData.plan === 'pro' || profileData.plan === 'featured';
   const planOrder   = { free: 0, pro: 1, featured: 2 };
   const days        = DAYS_OF_WEEK || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
   /* ─── edit helpers ─── */
   const startEdit = useCallback((section = 'all') => {
     setSnapshot({ ...profileData });
@@ -1675,7 +1699,8 @@ const ClientDashboard = () => {
   };
 
   const renderSidebar = () => (
-    <div>
+    <div className="cd-sidebar-stack">
+      {renderInquiryCenter('provider')}
       <div className="cd-sidebar-card">
         <div className="cd-sidebar-header">
           <div className="cd-sidebar-title"><i className="fas fa-tasks" style={{ marginRight: 6 }}></i>Profile Completeness</div>
@@ -1690,7 +1715,7 @@ const ClientDashboard = () => {
           <div style={{ marginTop: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
               <span style={{ fontSize: '0.69rem', color: '#888', fontWeight: 700 }}>COMPLETE</span>
-              <span style={{ fontSize: '0.69rem', color: '#6f8da6', fontWeight: 800 }}>{compPct}%</span>
+              <span style={{ fontSize: '0.69rem', color: '#b76514', fontWeight: 800 }}>{compPct}%</span>
             </div>
             <div style={{ height: 5, background: '#f0ece5', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${compPct}%`, background: '#ff8c42', borderRadius: 3, transition: 'width .5s' }} />
@@ -1806,19 +1831,38 @@ const ClientDashboard = () => {
         <div className="cd-card">
           <div className="cd-card-header">
             <div className="cd-card-header-icon"><i className="fas fa-id-card"></i></div>
-            <div><div className="cd-card-title">Account Information</div><div className="cd-card-subtitle">Your public-facing identity</div></div>
+            <div className="cd-account-heading">
+              <div className="cd-card-title">Account Information</div>
+              <div className="cd-card-subtitle">Your public-facing identity</div>
+              <div className="cd-account-meta">
+                <span className={`cd-status-pill ${statusInfo.cls}`}>
+                  <i className={`fas ${statusInfo.icon}`}></i> {statusInfo.label}
+                </span>
+                <span className="cd-plan-pill">
+                  <i className="fas fa-crown"></i> {getPlanName()}
+                </span>
+              </div>
+            </div>
             {isEditingSection('profileInfo') && (
               <div className="cd-card-actions">
+                <button type="button" className="cd-edit-toggle inactive" onClick={openPublicView}>
+                  <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-eye'}`}></i> Public View
+                </button>
                 <button className="cd-btn-solid" onClick={saveChanges} disabled={loading}>
                   <i className="fas fa-floppy-disk"></i> {loading ? 'Saving...' : 'Save'}
                 </button>
                 <button className="cd-btn-solid cancel" onClick={cancelEdit} disabled={loading}>Cancel</button>
               </div>
             )}
-            {!editing && <button className="cd-edit-toggle inactive" onClick={() => startEdit('profileInfo')}>
+            {!editing && <div className="cd-card-actions">
+              <button type="button" className="cd-edit-toggle inactive" onClick={openPublicView}>
+                <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-eye'}`}></i> Public View
+              </button>
+              <button className="cd-edit-toggle inactive" onClick={() => startEdit('profileInfo')}>
               <i className="fas fa-edit"></i>
               {editing ? 'Editing…' : 'Edit Profile'}
-            </button>}
+              </button>
+            </div>}
           </div>
           <div className="cd-card-body">
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18, paddingBottom: 16, borderBottom: '1px solid #f0ece5' }}>
@@ -2612,25 +2656,25 @@ const ClientDashboard = () => {
     setTimeout(() => setShakingBell(false), 420);
   };
 
-  const renderEnquiryAlert = (audience) => {
+  const renderEnquiryAlert = (audience, inline = false) => {
     const visible = getDashboardInquiries(audience);
     const isProviderView = audience === 'provider';
     const unreadCount = visible.filter(item => isProviderView ? !item.providerRead : !item.clientRead).length;
 
-    return (
-      <div className="cd-alert-wrap">
-        <button
-          type="button"
-          className={`cd-enquiry-bell${shakingBell ? ' shake' : ''}`}
-          onClick={scrollToEnquiries}
-          aria-label="View enquiry notifications"
-          title="View enquiry notifications"
-        >
-          <i className="fas fa-bell"></i>
-          {unreadCount > 0 && <span className="cd-enquiry-alert-count">{unreadCount}</span>}
-        </button>
-      </div>
+    const button = (
+      <button
+        type="button"
+        className={`cd-enquiry-bell${shakingBell ? ' shake' : ''}`}
+        onClick={scrollToEnquiries}
+        aria-label="View enquiry notifications"
+        title="View enquiry notifications"
+      >
+        <i className="fas fa-bell"></i>
+        {unreadCount > 0 && <span className="cd-enquiry-alert-count">{unreadCount}</span>}
+      </button>
     );
+
+    return inline ? button : <div className="cd-alert-wrap">{button}</div>;
   };
 
   const renderInquiryCenter = (audience) => {
@@ -3225,7 +3269,7 @@ const ClientDashboard = () => {
   return (
     <div className="cd-wrap">
       <Header userType="client" backPath="/" />
-      <section className="cd-hero">
+      <section className="cd-hero cd-hero-tabs-only">
         <div className="cd-hero-top">
           <div className="cd-hero-left">
             <div className="cd-hero-eyebrow"><span></span>Provider Dashboard</div>
@@ -3258,6 +3302,16 @@ const ClientDashboard = () => {
           </div>
         </div>
         <div className="cd-tab-bar">
+          <Link
+            to="/#sah-providers"
+            className="cd-tab-back"
+            onClick={(event) => {
+              event.preventDefault();
+              saveAndNavigate('/#sah-providers');
+            }}
+          >
+            <i className="fas fa-arrow-left"></i> Back to Directory
+          </Link>
           {TABS.map(t => (
             <button key={t.id} className={`cd-tab-btn ${activeTab === t.id ? 'active' : ''}`} onClick={() => setActiveTab(t.id)}>
               <i className={`fas ${t.icon}`}></i> {t.label}
@@ -3265,19 +3319,7 @@ const ClientDashboard = () => {
           ))}
         </div>
       </section>
-      {renderEnquiryAlert('provider')}
       <main className="cd-main">
-        <Link
-          to="/#sah-providers"
-          className="cd-directory-back"
-          onClick={(event) => {
-            event.preventDefault();
-            saveAndNavigate('/#sah-providers');
-          }}
-        >
-          <i className="fas fa-arrow-left"></i> Back to Directory
-        </Link>
-        {renderInquiryCenter('provider')}
         {renderActiveTab()}
       </main>
       {renderTermsModal()}

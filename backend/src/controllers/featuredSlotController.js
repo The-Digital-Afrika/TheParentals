@@ -1,7 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../db');
 const { sendError } = require('../utils');
 
-const prisma = new PrismaClient();
 
 const getFeaturedSlots = async (req, res) => {
   try {

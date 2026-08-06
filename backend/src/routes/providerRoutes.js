@@ -2,18 +2,40 @@
 // Handles full provider profile creation + retrieval including PDF/image file storage
 const express = require('express');
 const router  = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma  = new PrismaClient();
+const prisma  = require('../db');
 const multer  = require('multer');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // ── multer: keep files in memory so we can convert to base64 ──────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits:  { fileSize: 10 * 1024 * 1024 }, // Keep database-backed uploads small.
+  limits:  {
+    fileSize: 10 * 1024 * 1024,
+    files: 2,
+    fields: 80,
+    fieldSize: 10 * 1024 * 1024,
+  },
 });
 const uploadAny = upload.any();
+const MAX_CONCURRENT_UPLOADS = Math.max(1, Number(process.env.MAX_CONCURRENT_UPLOADS) || 4);
+let activeUploads = 0;
 
 function handleProviderUpload(req, res, next) {
+  if (activeUploads >= MAX_CONCURRENT_UPLOADS) {
+    res.set('Retry-After', '2');
+    return res.status(503).json({ message: 'The server is busy processing uploads. Please retry shortly.' });
+  }
+
+  activeUploads += 1;
+  let released = false;
+  const release = () => {
+    if (released) return;
+    released = true;
+    activeUploads -= 1;
+  };
+  res.once('finish', release);
+  res.once('close', release);
+
   uploadAny(req, res, (error) => {
     if (!error) return next();
 
@@ -384,7 +406,7 @@ router.patch('/:userId', handleProviderUpload, async (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 //  PATCH /api/providers/:userId/status  — admin approve / reject
 // ─────────────────────────────────────────────────────────────────────────────
-router.patch('/:userId/status', async (req, res) => {
+router.patch('/:userId/status', authMiddleware(['ADMIN']), async (req, res) => {
   try {
     return updateProviderStatus(req.params.userId, req.body.status, res);
   } catch (error) {
@@ -394,7 +416,7 @@ router.patch('/:userId/status', async (req, res) => {
 });
 
 // Legacy admin URLs kept for older frontend service calls.
-router.post('/:userId/approve', async (req, res) => {
+router.post('/:userId/approve', authMiddleware(['ADMIN']), async (req, res) => {
   try {
     return updateProviderStatus(req.params.userId, 'APPROVED', res);
   } catch (error) {
@@ -403,7 +425,7 @@ router.post('/:userId/approve', async (req, res) => {
   }
 });
 
-router.post('/:userId/reject', async (req, res) => {
+router.post('/:userId/reject', authMiddleware(['ADMIN']), async (req, res) => {
   try {
     return updateProviderStatus(req.params.userId, 'REJECTED', res);
   } catch (error) {

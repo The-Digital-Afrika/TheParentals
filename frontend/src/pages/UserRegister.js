@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
   if (document.getElementById('sah-ur-fonts')) return;
@@ -65,6 +66,8 @@ const CSS = `
   .ur-field-err { color:#dc2626; font-size:0.74rem; font-weight:600; padding:4px 9px; background:#fff0f0; border-radius:5px; border-left:3px solid #dc2626; display:flex; align-items:center; gap:5px; }
   .ur-field-hint { font-size:0.73rem; color:var(--muted); display:flex; align-items:center; gap:4px; margin-top:2px; }
   .ur-field-hint i { color:var(--acc); font-size:0.65rem; }
+  .ur-required-note { font-size:0.76rem; color:var(--muted); margin-bottom:16px; }
+  .ur-required-note strong { color:var(--acc-solid); font-size:1rem; }
 
   .ur-pw { position:relative; }
   .ur-pw input { padding-right:42px; }
@@ -316,6 +319,8 @@ const UserRegister = () => {
           </div>
 
           <div className="ur-card-body">
+            <SocialSignIn googleRole="USER" onError={message => setSubmitErr(message)} />
+            <div className="ur-required-note"><strong>*</strong> Required fields cannot be skipped.</div>
 
             {successMsg && (
               <div className="ur-success-banner">
@@ -350,6 +355,8 @@ const UserRegister = () => {
                     placeholder="e.g. sarah_learns"
                     autoComplete="off"
                     name="new-username"
+                    required
+                    aria-required="true"
                     className={fe.username ? 'err' : ''}
                     onChange={e => { setUsername(e.target.value); setErrors(p => ({ ...p, username: '' })); setSubmitErr(''); }}
                     onKeyDown={e => e.key === 'Enter' && handleSubmit()}
@@ -369,6 +376,8 @@ const UserRegister = () => {
                     placeholder="janedoe@gmail.com"
                     autoComplete="off"
                     name="new-email"
+                    required
+                    aria-required="true"
                     className={fe.email ? 'err' : ''}
                     onChange={e => { setEmail(e.target.value); setErrors(p => ({ ...p, email: '' })); setSubmitErr(''); }}
                     onKeyDown={e => e.key === 'Enter' && handleSubmit()}
@@ -385,6 +394,8 @@ const UserRegister = () => {
                       placeholder="••••••••"
                       autoComplete="new-password"
                       name="new-password"
+                      required
+                      aria-required="true"
                       className={fe.password ? 'err' : ''}
                       onChange={e => { setPassword(e.target.value); setErrors(p => ({ ...p, password: '' })); setSubmitErr(''); }}
                       onKeyDown={e => e.key === 'Enter' && handleSubmit()}
@@ -405,6 +416,8 @@ const UserRegister = () => {
                       placeholder="••••••••"
                       autoComplete="new-password"
                       name="new-confirm-password"
+                      required
+                      aria-required="true"
                       className={fe.confirm ? 'err' : ''}
                       onChange={e => { setConfirm(e.target.value); setErrors(p => ({ ...p, confirm: '' })); setSubmitErr(''); }}
                       onKeyDown={e => e.key === 'Enter' && handleSubmit()}

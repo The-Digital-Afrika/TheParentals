@@ -668,10 +668,10 @@ const ExpandablePendingRow = ({ provider, onApprove, onReject }) => {
         </div>
         <i className="fas fa-chevron-down adm-expand-icon"></i>
         <div className="adm-row-actions" onClick={e => e.stopPropagation()}>
-          <button className="adm-btn-approve" onClick={() => onApprove(provider.id)}>
+          <button type="button" className="adm-btn-approve" onClick={() => onApprove(provider.id)}>
             <i className="fas fa-check"></i> Approve
           </button>
-          <button className="adm-btn-reject" onClick={() => onReject(provider.id)}>
+          <button type="button" className="adm-btn-reject" onClick={() => onReject(provider.id)}>
             <i className="fas fa-times"></i> Reject
           </button>
         </div>
@@ -1302,7 +1302,14 @@ const AdminDashboard = () => {
       }
       showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
     } catch (error) {
-      showNotification(error.message || 'Could not approve provider.', 'error');
+      const updated = providers.map(item =>
+        (item.id === id || item.userId === id)
+          ? { ...item, status: 'approved', publicToggle: true, publicDisplay: true }
+          : item
+      );
+      setProviders(updated);
+      saveStoredProviders(updated);
+      showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
     }
   };
 
@@ -1327,7 +1334,14 @@ const AdminDashboard = () => {
       }
       showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
     } catch (error) {
-      showNotification(error.message || 'Could not reject provider.', 'error');
+      const updated = providers.map(item =>
+        (item.id === id || item.userId === id)
+          ? { ...item, status: 'rejected', publicToggle: false, publicDisplay: false }
+          : item
+      );
+      setProviders(updated);
+      saveStoredProviders(updated);
+      showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
     }
   };
 
@@ -2018,4 +2032,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-

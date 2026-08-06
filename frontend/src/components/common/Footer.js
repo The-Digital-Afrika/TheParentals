@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 /* ── Inject footer CSS once — exact match to HomePage ───────────────────── */
 const FOOTER_CSS = `
@@ -167,6 +168,13 @@ const FOOTER_CSS = `
     transition: color 0.15s;
   }
   .sah-footer-bottom-links a:hover { color: #fff; }
+  .sah-footer-logout {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 8px 14px; border: 1px solid rgba(255,255,255,.5); border-radius: 7px;
+    background: #ff8c42; color: #fff; font: 700 .78rem 'DM Sans', sans-serif;
+    cursor: pointer; white-space: nowrap; transition: transform .15s, background .15s;
+  }
+  .sah-footer-logout:hover { background:#e96f1f; transform:translateY(-1px); }
 
   /* Socials */
   .sah-footer-socials { display: flex; gap: 8px; }
@@ -220,6 +228,8 @@ function injectFooterCSS() {
 }
 
 const Footer = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [nlEmail, setNlEmail] = useState('');
   const [nlMsg, setNlMsg] = useState({ text: '', type: '' });
 
@@ -234,6 +244,20 @@ const Footer = () => {
     } else {
       setNlMsg({ text: 'Please enter a valid email address.', type: 'error' });
     }
+  };
+
+  let storedUser = null;
+  try { storedUser = JSON.parse(localStorage.getItem('sah_current_user')); } catch {}
+  const isLoggedIn = !!user || !!storedUser;
+  const handleFooterLogout = () => {
+    logout();
+    try {
+      localStorage.removeItem('sah_current_user');
+      localStorage.removeItem('sah_user');
+      localStorage.removeItem('sah_token');
+      window.dispatchEvent(new Event('sah-auth-change'));
+    } catch {}
+    navigate('/');
   };
 
   return (
@@ -354,6 +378,11 @@ const Footer = () => {
               </a>
             ))}
           </div>
+          {isLoggedIn && (
+            <button type="button" className="sah-footer-logout" onClick={handleFooterLogout}>
+              <i className="fas fa-sign-out-alt" /> Log Out
+            </button>
+          )}
         </div>
 
       </div>

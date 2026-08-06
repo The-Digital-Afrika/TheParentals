@@ -8,6 +8,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
   if (document.getElementById('sah-login-fonts')) return;
@@ -481,6 +482,15 @@ const Login = () => {
       s.id = 'sah-login-styles'; s.textContent = CSS;
       document.head.appendChild(s);
     }
+
+    const oauthError = new URLSearchParams(window.location.search).get('oauthError');
+    if (oauthError) {
+      const message = oauthError === 'google_not_configured'
+        ? 'Google sign-in is not configured yet. Please use email and password.'
+        : 'Google sign-in was cancelled or could not be completed. Please try again.';
+      setAlert({ msg: message, type: 'error' });
+      window.history.replaceState(null, '', '/login');
+    }
   }, []);
 
   const validate = () => {
@@ -592,6 +602,7 @@ const Login = () => {
             </div>
 
             <div className="sah-login-card-body">
+              <SocialSignIn googleRole="USER" onError={message => setAlert({ msg: message, type: 'error' })} />
               <form onSubmit={handleSubmit} noValidate autoComplete="off">
                 <div className="sah-lfield">
                   <label><i className="fas fa-envelope" /> Email Address <span>*</span></label>

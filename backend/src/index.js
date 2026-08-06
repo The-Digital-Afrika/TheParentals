@@ -12,6 +12,7 @@ const paymentRoutes      = require('./routes/paymentRoutes');
 
 const app = express();
 
+app.disable('x-powered-by');
 app.use(cors());
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '10mb' })); // allow base64 profile photos
@@ -40,7 +41,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, error: 'Server error' });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`\n✅  SA Homeschooling API running on http://localhost:${port}`);
   console.log(`\n   Endpoints:`);
   console.log(`   GET  /api/health`);
@@ -59,3 +60,25 @@ app.listen(port, () => {
   console.log(`   GET  /api/payments/verify/:ref (PROVIDER)`);
   console.log(`   POST /api/payments/webhook     (Paystack)\n`);
 });
+
+// Bound slow or abandoned connections so they cannot occupy resources forever.
+server.requestTimeout = 30_000;
+server.headersTimeout = 15_000;
+server.keepAliveTimeout = 5_000;
+
+async function shutdown(signal) {
+  console.log(`[SERVER] ${signal} received; draining active requests.`);
+  server.close(async () => {
+    const prisma = require('./db');
+    await prisma.$disconnect();
+    process.exit(0);
+  });
+
+  // Do not hang indefinitely if a client never finishes its request.
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+
+process.once('SIGTERM', () => shutdown('SIGTERM'));
+process.once('SIGINT', () => shutdown('SIGINT'));
+
+module.exports = { app, server };

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "../services/api";
+import SocialSignIn from "../components/common/SocialSignIn";
 
 const injectHead = () => {
   if (document.getElementById("sah-fonts")) return;
@@ -29,7 +30,8 @@ const CSS = `
     --radius:8px; --radius-lg:12px; --header-h:96px;
   }
   .sah-wrap *,.sah-wrap *::before,.sah-wrap *::after{box-sizing:border-box;margin:0;padding:0;}
-  .sah-wrap{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--dark);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  .sah-wrap{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:300;background:var(--white);color:var(--dark);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  .sah-wrap h1,.sah-wrap h2,.sah-wrap h3,.sah-wrap h4,.sah-wrap h5,.sah-wrap h6{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;}
   .sah-wrap a{color:inherit;text-decoration:none;}
   .sah-wrap button{cursor:pointer;font-family:inherit;}
   .sah-wrap img{display:block;max-width:100%;}
@@ -82,17 +84,21 @@ const CSS = `
   }
   .sah-logout-btn:hover { filter:saturate(1.08) brightness(0.94); }
   .sah-logout-btn i { color: rgba(255,255,255,0.9); }
+  .sah-footer .sah-logout-btn { margin-left:auto; padding:8px 14px; border:1px solid rgba(255,255,255,.5); border-radius:7px; }
 
   /* HERO */
-  .sah-hero{position:relative;min-height:68vh;display:flex;align-items:center;overflow:hidden;background:#1e1e1e;}
+  .sah-hero{position:relative;min-height:64vh;display:flex;align-items:center;overflow:hidden;background:#1e1e1e;}
   .sah-hero-bg{position:absolute;inset:0;z-index:0;
     background-image:url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1600&auto=format&fit=crop&q=80');
     background-size:cover;background-position:center 30%;}
   .sah-hero-bg::after{content:'';position:absolute;inset:0;background:rgba(24,35,48,0.68);}
   .sah-hero-inner{position:relative;z-index:2;padding:44px 0;width:100%;}
   .sah-hero-top{text-align:center;margin-bottom:24px;}
-  .sah-hero-h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5.5vw,4.4rem);font-weight:900;line-height:1.07;color:#fff;margin-bottom:22px;letter-spacing:-0.3px;}
+  .sah-hero-h1{font-family:'Playfair Display',Georgia,serif;font-size:clamp(2.2rem,4.7vw,3.8rem);font-weight:800;line-height:1.08;color:#fff;margin-bottom:18px;letter-spacing:-0.8px;}
   .sah-hero-h1 em{font-style:italic;color:rgba(255,255,255,0.9);}
+  .sah-heading-carousel{min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:18px;}
+  .sah-heading-carousel .sah-hero-h1{margin-bottom:0;animation:sahHeadingFade .5s ease both;}
+  @keyframes sahHeadingFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
   /* SEARCH BAR */
   .sah-hero-search{display:flex;flex-direction:row;align-items:stretch;background:#fff;border-radius:var(--radius);overflow:hidden;max-width:780px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,0.4);width:100%;}
@@ -103,21 +109,23 @@ const CSS = `
   .sah-hero-search select{border:none;outline:none;padding:0 14px;background:transparent;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--muted);cursor:pointer;min-width:140px;flex-shrink:0;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23aaa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
   .sah-hs-btn{background:var(--accent-solid);color:#fff;border:none;padding:0 26px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.92rem;white-space:nowrap;transition:filter 0.15s;flex-shrink:0;cursor:pointer;}
   .sah-hs-btn:hover{filter:saturate(1.08) brightness(0.94);}
+  .sah-hero-services{max-width:900px;margin:0 auto 24px;color:#fff;}
+  .sah-hero-services-list{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
+  .sah-hero-services-list button{border:1px solid rgba(255,255,255,.48);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:8px 15px;font-size:.84rem;font-weight:500;backdrop-filter:blur(6px);transition:.18s ease;}
+  .sah-hero-services-list button:hover,.sah-hero-services-list button.active{background:#fff;color:var(--accent-dark);border-color:#fff;}
+  .sah-hero-services-list button i{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;margin-right:3px;border-radius:50%;background:color-mix(in srgb,var(--category-color) 18%,transparent);color:var(--category-color);font-size:.72rem;}
+  .sah-cat-education{--category-color:#60a5fa;}
+  .sah-cat-wellness{--category-color:#f472b6;}
+  .sah-cat-activities{--category-color:#c084fc;}
+  .sah-cat-healthcare{--category-color:#fb7185;}
+  .sah-cat-shopping{--category-color:#fbbf24;}
+  .sah-cat-family{--category-color:#4ade80;}
+  .sah-hero-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px;}
+  .sah-hero-secondary-cta{display:inline-flex;align-items:center;gap:9px;padding:12px 26px;border:1.5px solid rgba(255,255,255,.72);border-radius:var(--radius);background:rgba(255,255,255,.08);color:#fff;font-weight:700;}
 
-  /* HERO TAGLINE */
+  /* HERO CTA AREA */
   .sah-hero-tagline{text-align:center;margin-top:22px;margin-bottom:36px;}
-  .sah-hero-tagline h2{
-    font-family:'Playfair Display',serif;
-    font-size:clamp(1.1rem,2.2vw,1.4rem);
-    font-weight:800;color:#fff;margin-bottom:8px;line-height:1.25;
-  }
-  .sah-hero-tagline p{
-    font-family:'Playfair Display',serif;
-    font-style:italic;
-    font-size:clamp(0.88rem,1.3vw,0.98rem);
-    color:rgba(255,255,255,0.78);
-    max-width:580px;margin:0 auto 22px;line-height:1.7;
-  }
+  @media(prefers-reduced-motion:reduce){.sah-heading-carousel .sah-hero-h1{animation:none}}
 
   /* BECOME PROVIDER BUTTON */
   .sah-become-btn{
@@ -134,38 +142,66 @@ const CSS = `
   .sah-become-btn.active .sah-chev{transform:rotate(180deg);}
 
   /* PLANS ACCORDION */
-  .sah-hero-plans-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows 0.45s cubic-bezier(0.4,0,0.2,1);}
+  .sah-plans-section{padding:56px 0 62px;background:#fff;border-bottom:1px solid var(--border);}
+  .sah-plans-heading{text-align:center;margin-bottom:28px;}
+  .sah-plans-heading p{color:var(--muted);margin-top:6px;}
+  .sah-hero-plans-wrap{display:grid;grid-template-rows:1fr;}
   .sah-hero-plans-wrap.open{grid-template-rows:1fr;}
   .sah-hero-plans-inner{overflow:hidden;}
   .sah-hero-plans-grid-outer{padding-top:24px;padding-bottom:8px;}
-  .sah-hero-plans-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:600px;margin:0 auto;}
+  .sah-hero-plans-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:850px;margin:0 auto;}
 
   /* PLAN CARDS */
-  .sah-plan-item{border:1px solid rgba(255,255,255,0.28);border-radius:var(--radius-lg);background:rgba(20,20,20,0.58);transition:border-color 0.2s,background 0.2s;cursor:pointer;overflow:hidden;user-select:none;backdrop-filter:blur(6px);display:flex;flex-direction:column;}
-  .sah-plan-item:hover{border-color:rgba(85,118,145,0.65);background:rgba(20,20,20,0.68);}
-  .sah-plan-item.highlight{border-color:var(--accent);background:rgba(20,20,20,0.70);box-shadow:0 0 0 1px var(--accent);}
+  .sah-plan-item{border:1px solid var(--border);border-radius:var(--radius-lg);background:#fff;transition:border-color .2s,box-shadow .2s,transform .2s;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);}
+  .sah-plan-item:hover{border-color:rgba(85,118,145,.65);box-shadow:var(--shadow-md);transform:translateY(-2px);}
+  .sah-plan-item.highlight{border-color:var(--accent);background:#f8fbfd;box-shadow:0 0 0 1px var(--accent),var(--shadow-md);}
   .sah-plan-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 18px 12px;}
   .sah-plan-info{flex:1;}
-  .sah-plan-name{font-weight:700;font-size:0.95rem;color:#fff;}
-  .sah-plan-desc{font-size:0.75rem;color:rgba(255,255,255,0.6);margin-top:3px;}
+  .sah-plan-name{font-weight:700;font-size:1.05rem;color:var(--dark);}
+  .sah-plan-desc{font-size:0.8rem;color:var(--muted);margin-top:3px;}
   .sah-plan-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:10px;}
-  .sah-plan-price{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;color:#fff;line-height:1;}
-  .sah-plan-price small{font-size:0.66rem;color:rgba(255,255,255,0.5);font-weight:400;display:block;text-align:right;}
-  .sah-plan-chevron{color:rgba(255,255,255,0.5);font-size:0.72rem;transition:transform 0.25s ease;flex-shrink:0;margin-top:4px;}
+  .sah-plan-price{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:1.4rem;font-weight:700;color:var(--accent-dark);line-height:1;}
+  .sah-plan-price small{font-size:0.66rem;color:var(--muted);font-weight:300;display:block;text-align:right;}
+  .sah-plan-chevron{display:none;}
   .sah-plan-item.highlight .sah-plan-chevron{color:var(--accent);}
   .sah-plan-chevron.open{transform:rotate(180deg);}
-  .sah-plan-details{display:grid;grid-template-rows:0fr;transition:grid-template-rows 0.32s ease;}
+  .sah-plan-details{display:grid;grid-template-rows:1fr;}
   .sah-plan-details.open{grid-template-rows:1fr;}
   .sah-plan-details-inner{overflow:hidden;padding:0 18px;transition:padding 0.32s ease;}
-  .sah-plan-details.open .sah-plan-details-inner{padding:0 18px 16px;}
-  .sah-plan-details-content{padding-top:12px;border-top:1px solid rgba(255,255,255,0.18);}
+  .sah-plan-details-inner,.sah-plan-details.open .sah-plan-details-inner{padding:0 18px 18px;}
+  .sah-plan-details-content{padding-top:12px;border-top:1px solid var(--border);}
   .sah-plan-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;padding:0;}
-  .sah-plan-features li{display:flex;align-items:center;gap:7px;font-size:0.82rem;color:rgba(255,255,255,0.8);}
-  .sah-plan-features li.no{color:rgba(255,255,255,0.32);}
+  .sah-plan-features li{display:flex;align-items:center;gap:7px;font-size:0.84rem;color:var(--mid);}
+  .sah-plan-features li.no{color:#aaa;}
   .sah-ico-yes{color:#4ade80;font-size:0.7rem;}
   .sah-ico-no{color:rgba(255,255,255,0.22);font-size:0.7rem;}
   .sah-plan-cta-link{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;background:var(--accent-solid);color:#fff !important;border:none;border-radius:var(--radius);font-size:0.82rem;font-weight:700;transition:filter 0.15s;cursor:pointer;text-decoration:none;}
   .sah-plan-cta-link:hover{filter:saturate(1.08) brightness(0.94);}
+  .sah-signup-prompt{position:fixed;inset:0;z-index:2200;background:rgba(24,35,48,.48);display:flex;align-items:flex-start;justify-content:center;padding:118px 24px 24px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+  .sah-signup-prompt-card{position:relative;isolation:isolate;width:min(540px,100%);overflow:hidden;background:linear-gradient(145deg,#fff 58%,#fff5ed 100%);border-radius:20px;padding:34px 36px 30px;box-shadow:0 24px 70px rgba(24,35,48,.28),0 8px 0 rgba(111,141,166,.2);border:1px solid rgba(111,141,166,.3);animation:sahPromptDrop .38s cubic-bezier(.2,.8,.2,1);}
+  .sah-signup-prompt-card::before{content:'';position:absolute;z-index:-1;inset:0 0 auto;height:8px;background:linear-gradient(90deg,#6f8da6 0 38%,#ff8c42 38% 72%,#e62925 72%);}
+  .sah-signup-prompt-card::after{content:'';position:absolute;z-index:-1;width:150px;height:150px;border-radius:50%;right:-72px;bottom:-82px;background:radial-gradient(circle,#ff8c42 0 24%,#e62925 25% 43%,#6f8da6 44% 63%,transparent 64%);opacity:.12;}
+  .sah-signup-prompt-card h2{font-size:1.55rem;color:#333330;margin-bottom:8px;padding-right:36px;}
+  .sah-signup-prompt-card h2::before{content:'✦';display:inline-grid;place-items:center;width:34px;height:34px;margin-right:10px;border-radius:10px;background:#6f8da6;color:#fff;font-size:1rem;vertical-align:2px;box-shadow:4px 4px 0 #ff8c42;}
+  .sah-signup-prompt-card p{color:#6a655d;font-size:.94rem;margin-bottom:18px;padding-left:46px;}
+  .sah-signup-prompt-close{position:absolute;right:14px;top:16px;width:36px;height:36px;border:1px solid rgba(111,141,166,.2);border-radius:50%;background:#eef5fa;color:#557691;transition:transform .15s,background .15s,color .15s;}
+  .sah-signup-prompt-close:hover{transform:rotate(8deg) scale(1.05);background:#e62925;color:#fff;}
+  .sah-signup-prompt-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .sah-signup-prompt-actions button{flex:1;min-width:140px;padding:11px 16px;border-radius:7px;font-weight:700;}
+  .sah-signup-prompt-primary{border:0;background:linear-gradient(135deg,#ff8c42,#ef6c27);color:#fff;box-shadow:0 7px 18px rgba(255,140,66,.27);}
+  .sah-signup-prompt-primary:hover{background:linear-gradient(135deg,#ef6c27,#e62925);transform:translateY(-1px);}
+  .sah-signup-prompt-secondary{border:1px solid #6f8da6;background:#fff;color:#557691;}
+  .sah-signup-prompt-secondary:hover{background:#6f8da6;color:#fff;transform:translateY(-1px);}
+  @keyframes sahPromptDrop{from{opacity:0;transform:translateY(-24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @media(max-width:600px){.sah-signup-prompt{padding:92px 14px 20px}.sah-signup-prompt-card{padding:30px 22px 24px;border-radius:16px}.sah-signup-prompt-card p{padding-left:0}.sah-signup-prompt-card h2{font-size:1.32rem}.sah-signup-prompt-actions{flex-direction:column}.sah-signup-prompt-actions button{width:100%}}
+  .sah-social-auth{width:100%;display:flex;flex-direction:column;gap:10px;margin:16px 0 4px;}
+  .sah-google-auth{width:100%;min-height:40px;display:flex;justify-content:center;}
+  .sah-google-auth>div{width:100%!important;}
+  .sah-facebook-auth{width:100%;min-height:42px;border:1px solid #ccd0d5;border-radius:5px;background:#fff;color:#1c1e21;font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;}
+  .sah-facebook-auth i{color:#1877f2;font-size:1.2rem;}
+  .sah-facebook-auth:disabled{opacity:.65;cursor:wait;}
+  .sah-social-divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.78rem;margin:2px 0;}
+  .sah-social-divider span{height:1px;background:#e3e4e7;flex:1;}
 
   /* FILTER BAR */
   .sah-filter-bar{background:var(--white);border-bottom:1px solid var(--border);}
@@ -374,6 +410,7 @@ const CSS = `
 
 @media(max-width:480px){
   .sah-hero-h1 { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+  .sah-heading-carousel { min-height: 90px; }
   .sah-container { padding: 0 16px; }
   .sah-brand-logo { width:140px;height:92px;max-width:42vw; }
   .sah-provider-grid { grid-template-columns: 1fr; }
@@ -652,9 +689,9 @@ function ProviderCard({ p, onView }) {
 }
 
 function PlanCard({ plan, openId, onToggle, allOpen, onCtaClick }) {
-  const isOpen = allOpen || openId === plan.id;
+  const isOpen = true;
   return (
-    <div className={`sah-plan-item${plan.highlight ? " highlight" : ""}`} onClick={() => onToggle(plan.id)}>
+    <div className={`sah-plan-item${plan.highlight ? " highlight" : ""}`}>
       <div className="sah-plan-header">
         <div className="sah-plan-info">
           <div className="sah-plan-name">{plan.name}</div>
@@ -735,6 +772,19 @@ function LoginRequiredModal({ open, onClose, onLogin, onRegister, message }) {
   );
 }
 
+const HERO_HEADLINES = [
+  'Find Parenting Services',
+  'Parenting Starts Here',
+  'Raising Families Together',
+  'Support Every Step',
+  'Helping Parents Thrive',
+  'Discover Trusted Care',
+  'Your Parenting Partner',
+  'Everything Families Need',
+  'Find Help. Build Confidence.',
+  'Parenting Made Simpler',
+];
+
 /* ─── MAIN COMPONENT ─────────────────────────────────────────────────────── */
 export default function HomePage() {
   const navigate = useNavigate();
@@ -752,6 +802,9 @@ export default function HomePage() {
   const [toast, setToast]               = useState({ show:false, msg:"", err:false });
   const [currentUser, setCurrentUser]   = useState(() => getValidSession()); // restore session immediately on first render
   const [loginModal, setLoginModal]     = useState({ open:false, message:"" });
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const [headingIndex, setHeadingIndex] = useState(0);
+  const [headingPaused, setHeadingPaused] = useState(false);
 
   useEffect(() => {
     injectHead();
@@ -777,6 +830,32 @@ export default function HomePage() {
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, []);
+
+  useEffect(() => {
+    if (currentUser || sessionStorage.getItem('sah_signup_prompt_dismissed') === '1') return undefined;
+    const timer = window.setTimeout(() => setShowSignupPrompt(true), 3 * 60 * 1000);
+    return () => window.clearTimeout(timer);
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (headingPaused) return undefined;
+    const timer = window.setInterval(
+      () => setHeadingIndex(index => (index + 1) % HERO_HEADLINES.length),
+      4000
+    );
+    return () => window.clearInterval(timer);
+  }, [headingPaused]);
+
+  const dismissSignupPrompt = () => {
+    sessionStorage.setItem('sah_signup_prompt_dismissed', '1');
+    setShowSignupPrompt(false);
+  };
+
+  const handleSocialSuccess = (user) => {
+    setCurrentUser(user);
+    dismissSignupPrompt();
+    showToast(`Welcome${user?.name ? `, ${user.name}` : ''}!`);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -860,7 +939,7 @@ export default function HomePage() {
   };
 
   const handlePlanCtaClick = (planParam) => {
-    navigate(`/register/provider?step=2&plan=${encodeURIComponent(planParam)}`);
+    navigate(`/register/provider?step=1&plan=${encodeURIComponent(planParam)}`);
   };
 
   const viewProfile = (id) => {
@@ -951,9 +1030,6 @@ export default function HomePage() {
                       : (currentUser.email ? currentUser.email.split('@')[0] : 'My Account')}
                   </span>
                 </Link>
-                <button onClick={handleLogout} className="sah-logout-btn">
-                  <i className="fas fa-right-from-bracket" /> Log Out
-                </button>
               </>
             ) : (
               <>
@@ -971,9 +1047,30 @@ export default function HomePage() {
         <div className="sah-container">
           <div className="sah-hero-inner">
             <div className="sah-hero-top">
-              <h1 className="sah-hero-h1">
-                Everything you need to be the<br /><em>best parent you can be</em>
-              </h1>
+              <div
+                className="sah-heading-carousel"
+                onMouseEnter={() => setHeadingPaused(true)}
+                onMouseLeave={() => setHeadingPaused(false)}
+                aria-live="polite"
+              >
+                <h1 className="sah-hero-h1" key={headingIndex}>
+                  {HERO_HEADLINES[headingIndex]}
+                </h1>
+              </div>
+
+              <div className="sah-hero-services" aria-label="Browse services">
+                <div className="sah-hero-services-list">
+                  {FILTER_PILLS.map(pill => (
+                    <button key={pill.cat} className={`${pill.icon ? `sah-cat-${pill.cat}` : ''}${activeCat === pill.cat ? ' active' : ''}`}
+                      onClick={() => {
+                        filterCat(pill.cat);
+                        document.getElementById('sah-providers')?.scrollIntoView({ behavior:'smooth' });
+                      }}>
+                      {pill.icon && <i className={`fas ${pill.icon}`} />} {pill.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* SEARCH BAR */}
               <div className="sah-hero-search">
@@ -998,41 +1095,15 @@ export default function HomePage() {
                 <button className="sah-hs-btn" onClick={handleSearch}>Search</button>
               </div>
 
-              {/* HERO TAGLINE */}
+              {/* HERO ACTIONS */}
               <div className="sah-hero-tagline">
-                <h2>Get found by the parents who need you most.</h2>
-                <p>
-                  Join South Africa's growing directory of parent-focused products and services —
-                  free to start, powerful to upgrade.
-                </p>
-                <button
-                  className={`sah-become-btn${plansVisible ? " active" : ""}`}
-                  onClick={handleBecomeProvider}
-                >
-                  <i className="fas fa-store" />
-                  List Your Business
-                  <i className={`fas fa-chevron-down sah-chev`} />
-                </button>
-              </div>
-            </div>
-
-            {/* PLANS ACCORDION */}
-            <div id="sah-plans-anchor" />
-            <div className={`sah-hero-plans-wrap${plansVisible ? " open" : ""}`}>
-              <div className="sah-hero-plans-inner">
-                <div className="sah-hero-plans-grid-outer">
-                  <div className="sah-hero-plans-grid">
-                    {PLANS.map(plan => (
-                      <PlanCard
-                        key={plan.id}
-                        plan={plan}
-                        openId={openPlanId}
-                        onToggle={togglePlan}
-                        allOpen={allPlansOpen}
-                        onCtaClick={handlePlanCtaClick}
-                      />
-                    ))}
-                  </div>
+                <div className="sah-hero-actions">
+                  <button className="sah-become-btn" onClick={handleSearch}>
+                    <i className="fas fa-magnifying-glass" /> Find a Service
+                  </button>
+                  <button className="sah-hero-secondary-cta" onClick={() => navigate('/register/provider')}>
+                    <i className="fas fa-store" /> List Your Business
+                  </button>
                 </div>
               </div>
             </div>
@@ -1041,23 +1112,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FILTER BAR */}
-      <div className="sah-filter-bar">
+      <section className="sah-plans-section" id="sah-plans-anchor">
         <div className="sah-container">
-          <div className="sah-filter-bar-row">
-            <span className="sah-filter-label">Browse:</span>
-            {FILTER_PILLS.map(pill => (
-              <button
-                key={pill.cat}
-                className={`sah-fpill${activeCat === pill.cat ? " active" : ""}`}
-                onClick={() => filterCat(pill.cat)}
-              >
-                {pill.icon && <i className={`fas ${pill.icon}`} />} {pill.label}
-              </button>
+          <div className="sah-plans-heading">
+            <h2>List your services on Parentals</h2>
+            <p>Choose the listing that fits your business. You can change plans later.</p>
+          </div>
+          <div className="sah-hero-plans-grid">
+            {PLANS.map(plan => (
+              <PlanCard key={plan.id} plan={plan} openId={openPlanId} onToggle={togglePlan}
+                allOpen={allPlansOpen} onCtaClick={handlePlanCtaClick} />
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* PROVIDERS */}
       <section className="sah-providers-section" id="sah-providers">
@@ -1205,6 +1273,11 @@ export default function HomePage() {
                 </a>
               ))}
             </div>
+            {currentUser && (
+              <button type="button" onClick={handleLogout} className="sah-logout-btn">
+                <i className="fas fa-right-from-bracket" /> Log Out
+              </button>
+            )}
           </div>
         </div>
       </footer>
@@ -1260,6 +1333,27 @@ export default function HomePage() {
         onRegister={handleLoginModalRegister}
       />
 
+      {showSignupPrompt && !currentUser && (
+        <div className="sah-signup-prompt" role="dialog" aria-modal="true" aria-labelledby="signup-prompt-title">
+          <div className="sah-signup-prompt-card">
+            <button className="sah-signup-prompt-close" aria-label="Dismiss sign-up prompt" onClick={dismissSignupPrompt}>
+              <i className="fas fa-times" />
+            </button>
+            <h2 id="signup-prompt-title">Make Parentals yours</h2>
+            <p>Create a free account to explore trusted parenting services and connect with providers.</p>
+            <SocialSignIn onSuccess={handleSocialSuccess} onError={message => showToast(message, true)} />
+            <div className="sah-signup-prompt-actions">
+              <button className="sah-signup-prompt-primary" onClick={() => { dismissSignupPrompt(); setRegModal(true); }}>
+                Continue with Email
+              </button>
+              <button className="sah-signup-prompt-secondary" onClick={() => { dismissSignupPrompt(); navigate('/login'); }}>
+                Log In
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* TOAST */}
       <div
         className={`sah-toast${toast.show ? " show" : ""}`}
@@ -1272,4 +1366,3 @@ export default function HomePage() {
     </div>
   );
 }
-

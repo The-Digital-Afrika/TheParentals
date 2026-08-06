@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
-import { useAuth } from '../contexts/AuthContext';
 import { api } from '../services/api';
 import { createInquiry } from '../utils/inquiries';
 import '../assets/css/profile.css';
@@ -481,8 +480,9 @@ const injectStyles = () => {
       background-size: cover;
       background-position: center 20%;
       box-shadow: 0 12px 40px rgba(0,0,0,0.32);
-      width: 100%;
-      min-height: 300px;
+      width: min(100%, 980px);
+      min-height: 190px;
+      margin: 0 auto;
     }
     .pv2-right-overlay {
       position: absolute;
@@ -493,12 +493,12 @@ const injectStyles = () => {
     .pv2-right-content {
       position: relative;
       z-index: 1;
-      padding: 34px 40px;
+      padding: 20px 24px;
       display: flex;
       flex-direction: row;
       align-items: stretch;
       gap: 0;
-      min-height: 300px;
+      min-height: 190px;
     }
 
     /* Avatar column — left strip */
@@ -507,10 +507,10 @@ const injectStyles = () => {
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      padding-right: 40px;
+      padding-right: 20px;
       border-right: 1px solid rgba(255,255,255,0.1);
       flex-shrink: 0;
-      width: 140px;
+      width: 106px;
     }
 
     /* Info column — center, takes all remaining space */
@@ -519,7 +519,7 @@ const injectStyles = () => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 0 36px;
+      padding: 0 22px;
     }
 
     /* Actions column — right strip */
@@ -530,20 +530,20 @@ const injectStyles = () => {
       justify-content: center;
       gap: 10px;
       flex-shrink: 0;
-      width: 230px;
-      padding-left: 34px;
+      width: 180px;
+      padding-left: 20px;
       border-left: 1px solid rgba(255,255,255,0.1);
     }
 
     .pv2-avatar {
-      width: 112px; height: 112px;
+      width: 82px; height: 82px;
       border-radius: 50%; object-fit: cover;
       border: 4px solid ${ORANGE};
       display: block;
       box-shadow: 0 8px 28px rgba(194,81,10,0.45);
     }
     .pv2-avatar-placeholder {
-      width: 112px; height: 112px;
+      width: 82px; height: 82px;
       border-radius: 50%;
       background: rgba(255,255,255,0.1);
       border: 4px solid ${ORANGE};
@@ -593,7 +593,7 @@ const injectStyles = () => {
     }
     .pv2-name {
       font-family: 'Playfair Display', serif;
-      font-size: 2.4rem; font-weight: 900; color: #fff;
+      font-size: 1.9rem; font-weight: 900; color: #fff;
       line-height: 1.1; margin: 0 0 6px;
     }
     .pv2-tagline {
@@ -1041,7 +1041,6 @@ const Profile = () => {
   const [enquiryStatus, setEnquiryStatus] = useState('idle');
   const [enquiryError, setEnquiryError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const fromDashboard = searchParams.get('from') === 'dashboard';
@@ -1169,12 +1168,6 @@ const Profile = () => {
     const isMember = profile?.profileKind === 'member' || profile?.primaryCategory === 'Member Profile' || profile?.category === 'Member Profile';
     if (fromDashboard) navigate(isMember ? '/client-dashboard' : '/provider-dashboard');
     else navigate('/');
-  };
-
-  const handleProfileLogout = () => {
-    logout();
-    setIsAuthenticated(false);
-    navigate('/');
   };
 
   const closeContactModal = () => {
@@ -1327,9 +1320,6 @@ const Profile = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 16px', borderRadius: 6, border: '1.5px solid rgba(255,255,255,0.55)', background: 'transparent', color: '#fff', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
                 <i className="fas fa-user-circle" /> {profile?.name || 'Provider'}
-              </button>
-              <button onClick={handleProfileLogout} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '7px 18px', borderRadius: 6, border: 'none', background: ORANGE, color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}>
-                <i className="fas fa-right-from-bracket" /> Log Out
               </button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../services/api';
+import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -92,12 +93,22 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 .sah-terms-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
 .sah-terms-row a { color: var(--accent); font-weight: 700; text-decoration: none; }
 .sah-terms-row a:hover { text-decoration: underline; }
+.sah-next-steps-notice { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 20px; padding: 16px 18px; background: #eef7fc; border: 1px solid #b7d5ea; border-left: 4px solid var(--accent); border-radius: var(--radius); color: #334155; }
+.sah-next-steps-notice > i { flex-shrink: 0; margin-top: 2px; color: var(--accent); font-size: 1rem; }
+.sah-next-steps-notice strong { display: block; margin-bottom: 4px; color: #365b78; font-size: 0.9rem; }
+.sah-next-steps-notice p { margin: 0; font-size: 0.84rem; line-height: 1.55; }
+.sah-registration-summary-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 24px; font-size: 0.82rem; color: #334155; }
+.sah-registration-summary-item { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.sah-registration-summary-label { flex-shrink: 0; font-weight: 700; color: #64748b; }
+.sah-registration-summary-value { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
 .sah-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .sah-field { display: flex; flex-direction: column; gap: 5px; }
 .sah-full { grid-column: 1 / -1; }
 .sah-field label { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--mid); }
 .sah-field label i { color: var(--accent); font-size: 0.68rem; }
 .sah-req { color: var(--accent); font-size: 1rem; font-style: normal; }
+.sah-required-note { font-size: .76rem; color: var(--muted); margin-bottom: 18px; }
+.sah-required-note .sah-req { margin-right: 3px; }
 .sah-field input, .sah-field select, .sah-field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid rgba(0,0,0,0.11); border-radius: var(--radius); background: var(--card-white); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--dark); outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; appearance: none; }
 .sah-field textarea { resize: vertical; min-height: 90px; }
 .sah-field input:focus, .sah-field select:focus, .sah-field textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(85,118,145,0.14); }
@@ -185,6 +196,7 @@ const CSS = `:root{ --accent: #6f8da6; --accent-dark: #557691; --accent-light: #
 @media (max-width: 700px) {
   .sah-plan-grid { grid-template-columns: 1fr; }
   .sah-form-grid { grid-template-columns: 1fr; }
+  .sah-registration-summary-grid { grid-template-columns: 1fr; gap: 8px; }
   .sah-full { grid-column: 1; }
   .sah-step-card-body { padding: 18px 14px; }
   .sah-step-card-head { padding: 16px 16px 12px; }
@@ -227,14 +239,9 @@ const MAX_TOTAL_UPLOAD_MB = 10;
 const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
 const STEPS = [
-  { title: 'Select Plan', label: 'Select Plan', desc: 'Choose a listing plan for your profile', icon: 'fa-layer-group' },
-  { title: 'Account Setup', label: 'Account', desc: 'Create your provider account credentials', icon: 'fa-user-circle' },
+  { title: 'Plan & Account', label: 'Account', desc: 'Choose your plan and create your login', icon: 'fa-user-circle' },
   { title: 'Identity & Trust', label: 'Identity', desc: 'Build trust with your qualifications and bio', icon: 'fa-id-card' },
-  { title: 'Services Offered', label: 'Services', desc: 'Tell families what you offer', icon: 'fa-briefcase' },
-  { title: 'Location & Reach', label: 'Location', desc: 'Where can you serve families?', icon: 'fa-map-marker-alt' },
-  { title: 'Pricing & Availability', label: 'Pricing', desc: 'Set your rates and schedule', icon: 'fa-calendar-alt' },
-  { title: 'Contact Details', label: 'Contact', desc: 'How families can reach you', icon: 'fa-phone' },
-  { title: 'Terms & Conditions', label: 'Terms', desc: 'Review and agree to our terms before creating your profile', icon: 'fa-file-contract' },
+  { title: 'Terms & Create Account', label: 'Finish', desc: 'Confirm the terms and create your account', icon: 'fa-file-contract' },
 ];
 
 const TOTAL = STEPS.length;
@@ -466,10 +473,6 @@ const Registration = () => {
     if (topRef.current) topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setFieldErrors({});
     setTimeSlotErr('');
-    if (step === 2) {
-      setData(p => ({ ...p, email: '', password: '' }));
-      setShowPw(false);
-    }
   }, [step]);
 
   // ── Close social dropdown on outside click ──
@@ -615,7 +618,7 @@ const Registration = () => {
   // ── Validation ──
   const validateStep = () => {
     const errs = {};
-    if (step === 2) {
+    if (step === 1) {
       if (!data.fullName?.trim()) errs.fullName = 'Please enter your full name or business name.';
       if (!data.email?.trim() || !/^\S+@\S+\.\S+$/.test(data.email)) errs.email = 'Enter a valid email address (e.g. name@example.com).';
       if (!data.password || data.password.length < 8) {
@@ -626,35 +629,11 @@ const Registration = () => {
       }
       if (!data.accountType) errs.accountType = 'Please select whether you are an individual or organisation.';
     }
-    if (step === 3) {
+    if (step === 2) {
       if (!data.bio?.trim()) errs.bio = 'Please write a short bio.';
       if (!data.experience && data.experience !== 0) errs.experience = 'Please enter your years of experience.';
     }
-    if (step === 4) {
-      if (!data.primaryCat) errs.primaryCat = 'Please select your primary service category.';
-      if (!data.serviceTitle?.trim()) errs.serviceTitle = 'Please enter a title for your service.';
-      if (!data.serviceDesc?.trim()) errs.serviceDesc = 'Please describe the services you offer.';
-      if (!data.subjects?.trim()) errs.subjects = 'Please list the subjects or specialisations you offer.';
-      if (!data.ageGroups?.length) errs.ageGroups = 'Please select at least one age group.';
-      if (!data.deliveryMode) errs.deliveryMode = 'Please select how you deliver your services.';
-    }
-    if (step === 5) {
-      if (!data.city?.trim()) errs.city = 'Please enter your city.';
-      if (!data.province) errs.province = 'Please select your province.';
-      if (!data.serviceAreas?.length) errs.serviceAreas = 'Please select at least one service area.';
-    }
-    if (step === 6) {
-      if (!data.pricingModel) errs.pricingModel = 'Please select how you charge for your services.';
-      if (!data.daysAvailable?.length) errs.daysAvailable = 'Please select at least one day.';
-      if (!data.timeSlots?.trim()) errs.timeSlots = 'Please enter your available time slots.';
-      else if (!TIME_SLOT_REGEX.test(data.timeSlots.trim())) errs.timeSlots = 'Use the format HH:MM - HH:MM.';
-    }
-    if (step === 7) {
-      if (!data.phoneLocal?.trim()) errs.phoneLocal = 'Please enter your phone number.';
-      else if (data.phoneLocal.replace(/\D/g, '').length !== 9) errs.phoneLocal = 'Enter exactly 9 digits after +27.';
-      if (!data.inquiryEmail?.trim() || !/^\S+@\S+\.\S+$/.test(data.inquiryEmail)) errs.inquiryEmail = 'Please enter a valid email for enquiries.';
-    }
-    if (step === 8) {
+    if (step === 3) {
       if (!data.terms) errs.terms = 'Please tick the box to agree to the Terms and Community Guidelines before creating your profile.';
     }
     return errs;
@@ -984,7 +963,6 @@ const Registration = () => {
             onClick={() => {
               set('listingPlan', plan.param);
               setFieldErrors({});
-              setStep(2);
             }}>
             <div className="sah-plan-card-head">
               <div>
@@ -1014,7 +992,6 @@ const Registration = () => {
                   e.stopPropagation();
                   set('listingPlan', plan.param);
                   setFieldErrors({});
-                  setStep(2);
                 }}>
                 {selected ? <><i className="fas fa-check" /> Selected</> : plan.cta}
               </button>
@@ -1033,6 +1010,7 @@ const Registration = () => {
         <label><i className="fas fa-user" /> Full Name / Business Name <em className="sah-req">*</em></label>
         <input type="text" value={data.fullName || ''} placeholder="e.g. Thando Mkhize or Bright Minds Learning"
           autoComplete="off"
+          required aria-required="true"
           className={fe.fullName ? 'err' : ''} onChange={e => set('fullName', e.target.value)} />
         <FieldErr msg={fe.fullName} />
       </div>
@@ -1040,6 +1018,7 @@ const Registration = () => {
         <label><i className="fas fa-envelope" /> Email Address <em className="sah-req">*</em></label>
         <input type="email" value={data.email || ''} placeholder="name@example.com"
           autoComplete="off" name="reg-email"
+          required aria-required="true"
           className={fe.email ? 'err' : ''} onChange={e => set('email', e.target.value)} />
         <FieldErr msg={fe.email} />
       </div>
@@ -1048,6 +1027,7 @@ const Registration = () => {
         <div className="sah-pw-wrap">
           <input type={showPw ? 'text' : 'password'} value={data.password || ''} placeholder="Min. 8 characters — include uppercase, numbers & symbols"
             autoComplete="new-password" name="reg-password"
+            required aria-required="true"
             className={fe.password ? 'err' : ''} onChange={e => set('password', e.target.value)} />
           <button type="button" className="sah-pw-eye" onClick={() => setShowPw(s => !s)}>
             <i className={`far fa-eye${showPw ? '-slash' : ''}`} />
@@ -1068,7 +1048,7 @@ const Registration = () => {
       </div>
       <div className="sah-field sah-full">
         <label><i className="fas fa-building" /> Account Type <em className="sah-req">*</em></label>
-        <select value={data.accountType || ''} className={fe.accountType ? 'err' : ''} onChange={e => set('accountType', e.target.value)}>
+        <select value={data.accountType || ''} required aria-required="true" className={fe.accountType ? 'err' : ''} onChange={e => set('accountType', e.target.value)}>
           <option value="">-- Select --</option>
           <option>Individual Provider</option>
           <option>Organisation / Company</option>
@@ -1104,12 +1084,14 @@ const Registration = () => {
         <label><i className="fas fa-hashtag" /> Years of Experience <em className="sah-req">*</em></label>
         <input type="number" value={data.experience ?? ''} placeholder="e.g. 8" min={0} max={60}
           style={{ height: '44px' }}
+          required aria-required="true"
           className={fe.experience ? 'err' : ''} onChange={e => set('experience', e.target.value)} />
         <FieldErr msg={fe.experience} />
       </div>
       <div className="sah-field sah-full">
         <label><i className="fas fa-align-left" /> Short Bio (150–250 words) <em className="sah-req">*</em></label>
         <textarea value={data.bio || ''} placeholder="Tell families about your teaching philosophy, experience, and approach..."
+          required aria-required="true"
           className={fe.bio ? 'err' : ''} onChange={e => set('bio', e.target.value)} />
         <FieldErr msg={fe.bio} />
       </div>
@@ -1497,6 +1479,16 @@ const Registration = () => {
 
   const renderStep8 = () => (
     <>
+      <div className="sah-next-steps-notice" role="note">
+        <i className="fas fa-circle-info" aria-hidden="true" />
+        <div>
+          <strong>What happens after you create your account?</strong>
+          <p>
+            You&rsquo;ll continue to set up your profile in the system. Once your profile is ready,
+            you can subscribe to unlock more content and additional member benefits.
+          </p>
+        </div>
+      </div>
       <div className="sah-terms-box">
         <div className="sah-terms-box-head" onClick={() => setTermsOpen(o => !o)}>
           <div className="sah-terms-box-head-title">
@@ -1537,9 +1529,9 @@ const Registration = () => {
         </div>
       </div>
       <label className={`sah-terms-row${data.terms ? ' checked' : ''}${fe.terms ? ' err-border' : ''}`}>
-        <input type="checkbox" checked={!!data.terms} onChange={e => set('terms', e.target.checked)} />
+        <input type="checkbox" required aria-required="true" checked={!!data.terms} onChange={e => set('terms', e.target.checked)} />
         <span>
-          I have read and agree to the <a href="/terms" target="_blank" rel="noreferrer">Terms and Community Guidelines</a>.
+          I have read and agree to the <a href="/terms" target="_blank" rel="noreferrer">Terms and Community Guidelines</a> <em className="sah-req">*</em>.
           By proceeding, I confirm all my details are accurate and I am authorised to create this listing.
         </span>
       </label>
@@ -1548,7 +1540,7 @@ const Registration = () => {
         <div style={{ fontWeight: 800, fontSize: '0.88rem', color: '#0369a1', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 7 }}>
           <i className="fas fa-clipboard-check" /> Registration Summary
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px', fontSize: '0.82rem', color: '#334155' }}>
+        <div className="sah-registration-summary-grid">
           {[
             ['Name', data.fullName || '—'],
             ['Email', data.email || '—'],
@@ -1556,10 +1548,10 @@ const Registration = () => {
             ['Category', data.primaryCat || '—'],
             ['Location', data.city && data.province ? `${data.city}, ${data.province}` : '—'],
             ['Pricing', data.pricingModel || '—'],
-          ].map(([k, v]) => (
-            <div key={k} style={{ display: 'flex', gap: 6 }}>
-              <span style={{ fontWeight: 700, color: '#64748b', minWidth: 70 }}>{k}:</span>
-              <span style={{ fontWeight: 500 }}>{v}</span>
+          ].filter(([k]) => !['Category', 'Location', 'Pricing'].includes(k)).map(([k, v]) => (
+            <div key={k} className="sah-registration-summary-item">
+              <span className="sah-registration-summary-label">{k}:</span>
+              <span className="sah-registration-summary-value">{v}</span>
             </div>
           ))}
         </div>
@@ -1584,7 +1576,15 @@ const Registration = () => {
     </>
   );
 
-  const RENDERERS = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6, renderStep7, renderStep8];
+  const renderPlanAndAccount = () => (
+    <>
+      {renderStep1()}
+      <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
+      {renderStep2()}
+    </>
+  );
+
+  const RENDERERS = [renderPlanAndAccount, renderStep3, renderStep8];
 
   const pct = Math.round((step / TOTAL) * 100);
 
@@ -1645,13 +1645,16 @@ const Registration = () => {
             <p>{STEPS[step - 1].desc}</p>
           </div>
           <div className="sah-step-card-body">
+            {step === 1 && <SocialSignIn googleRole="PROVIDER" onError={message => setFieldErrors({ _submit: message })} />}
+            <div className="sah-required-note"><em className="sah-req">*</em> Required fields cannot be skipped.</div>
             {RENDERERS[step - 1]()}
           </div>
         </div>
 
-        {step > 1 && (
-          <div className="sah-form-nav-wrap">
-            <button className="sah-nav-prev" onClick={prev}><i className="fas fa-arrow-left" /> Previous</button>
+        <div className="sah-form-nav-wrap">
+            {step > 1
+              ? <button className="sah-nav-prev" onClick={prev}><i className="fas fa-arrow-left" /> Previous</button>
+              : <div aria-hidden="true" />}
             <div className="sah-nav-counter">
               <strong>{step}</strong> of {TOTAL} steps
               <div className="sah-nav-progress">
@@ -1661,7 +1664,7 @@ const Registration = () => {
             <button
               className={`sah-nav-next${step === TOTAL ? ' sah-nav-submit' : ''}`}
               onClick={next}
-              disabled={submitting || (step === 3 && overLimit)}
+              disabled={submitting || (step === 2 && overLimit)}
             >
               {submitting ? <span className="sah-spinner" /> : null}
               {step < TOTAL
@@ -1669,12 +1672,9 @@ const Registration = () => {
                 : <><i className="fas fa-check-circle" /> <span>{submitting ? 'Creating Profile…' : 'Create My Profile'}</span></>}
             </button>
           </div>
-        )}
       </div>
     </div>
   );
 };
 
 export default Registration;
-
-

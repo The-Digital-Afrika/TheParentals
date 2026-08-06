@@ -58,11 +58,21 @@ body {
   min-height: 100%;
   background: var(--sah-grey-50) !important;
   color: var(--sah-ink);
-  font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 700;
 }
 
 code {

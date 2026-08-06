@@ -4,8 +4,8 @@ const express = require('express');
 const router  = express.Router();
 const bcrypt  = require('bcryptjs');
 const jwt     = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-const prisma  = new PrismaClient();
+const crypto  = require('crypto');
+const prisma  = require('../db');
 
 const JWT_SECRET  = process.env.JWT_SECRET  || 'sah_secret_key_change_in_production';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
@@ -17,6 +17,47 @@ const ADMIN_NAME     =  process.env.ADMIN_NAME     || 'SA Homeschooling Admin';
 
 function signToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error_description || data.error?.message || 'Identity provider rejected the token.');
+  return data;
+}
+
+async function verifyGoogleCredential(credential) {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) throw new Error('Google sign-in is not configured.');
+
+  const profile = await fetchJson(
+    `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`
+  );
+  if (profile.aud !== clientId || profile.email_verified !== 'true') {
+    throw new Error('Google could not verify this email address.');
+  }
+  return { email: profile.email, name: profile.name, providerId: profile.sub };
+}
+
+async function verifyFacebookToken(accessToken) {
+  const appId = process.env.FACEBOOK_APP_ID;
+  const appSecret = process.env.FACEBOOK_APP_SECRET;
+  if (!appId || !appSecret) throw new Error('Facebook sign-in is not configured.');
+
+  const debug = await fetchJson(
+    `https://graph.facebook.com/debug_token?input_token=${encodeURIComponent(accessToken)}&access_token=${encodeURIComponent(`${appId}|${appSecret}`)}`
+  );
+  if (!debug.data?.is_valid || String(debug.data.app_id) !== String(appId)) {
+    throw new Error('Facebook could not verify this sign-in.');
+  }
+
+  const profile = await fetchJson(
+    `https://graph.facebook.com/me?fields=id,name,email&access_token=${encodeURIComponent(accessToken)}`
+  );
+  if (!profile.email) {
+    throw new Error('Your Facebook account did not provide an email address. Please continue with email.');
+  }
+  return { email: profile.email, name: profile.name, providerId: profile.id };
 }
 
 function requireAdmin(req, res, next) {
@@ -47,6 +88,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
 
     const trimmedEmail = email.trim().toLowerCase();
+    const requestedRole = String(role).toUpperCase();
+    const safeRole = ['PROVIDER', 'USER'].includes(requestedRole) ? requestedRole : null;
+    if (!safeRole)
+      return res.status(400).json({ message: 'Invalid account role.' });
 
     // Block anyone from registering the admin email
     if (trimmedEmail === ADMIN_EMAIL)
@@ -61,7 +106,7 @@ router.post('/register', async (req, res) => {
       data: {
         email:       trimmedEmail,
         password:    hashed,
-        role:        role.toUpperCase(),
+        role:        safeRole,
         name:        name        || null,
         accountType: accountType || 'Individual Provider',
       },
@@ -78,6 +123,62 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     console.error('POST /api/auth/register error:', error);
     return res.status(500).json({ message: 'Server error during registration', error: error.message });
+  }
+});
+
+// POST /api/auth/social — verify a provider token, then sign in or create a parent account.
+router.post('/social', async (req, res) => {
+  try {
+    const provider = String(req.body.provider || '').toLowerCase();
+    const providerToken = req.body.credential || req.body.accessToken;
+    if (!providerToken || !['google', 'facebook'].includes(provider)) {
+      return res.status(400).json({ message: 'A supported social sign-in token is required.' });
+    }
+
+    const profile = provider === 'google'
+      ? await verifyGoogleCredential(providerToken)
+      : await verifyFacebookToken(providerToken);
+    const email = String(profile.email || '').trim().toLowerCase();
+    if (!email) return res.status(400).json({ message: 'The social account did not provide an email address.' });
+    if (email === ADMIN_EMAIL) return res.status(403).json({ message: 'This account cannot use social sign-in.' });
+
+    let user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      const randomPassword = crypto.randomBytes(32).toString('hex');
+      user = await prisma.user.create({
+        data: {
+          email,
+          password: await bcrypt.hash(randomPassword, 10),
+          role: 'USER',
+          name: profile.name || null,
+          accountType: 'parent',
+        },
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLogin: new Date(),
+          ...(!user.name && profile.name ? { name: profile.name } : {}),
+        },
+      });
+    }
+
+    const token = signToken({ userId: user.id, email: user.email, role: user.role });
+    return res.json({
+      message: 'Social sign-in successful',
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        accountType: user.accountType,
+      },
+    });
+  } catch (error) {
+    console.error('POST /api/auth/social error:', error.message);
+    return res.status(401).json({ message: error.message || 'Social sign-in failed.' });
   }
 });
 

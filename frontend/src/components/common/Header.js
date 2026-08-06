@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNotification } from '../../contexts/NotificationContext';
 
 const HEADER_CSS = `
   :root {
@@ -220,26 +219,11 @@ function injectCSS() {
 
 const Header = ({ userType = 'guest' } = {}) => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, logout } = useAuth();
-  const { showNotification } = useNotification();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const location = useLocation();
 
   useEffect(() => { injectCSS(); }, []);
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
-
-  const handleLogout = () => {
-    logout();
-    try {
-      localStorage.removeItem('sah_current_user');
-      localStorage.removeItem('sah_user');
-      localStorage.removeItem('sah_token');
-      window.dispatchEvent(new Event('sah-auth-change'));
-    } catch {}
-    showNotification('Logged out successfully', 'success');
-    setMobileOpen(false);
-    navigate('/');
-  };
 
   let currentUser = null;
   try { currentUser = JSON.parse(localStorage.getItem('sah_current_user')); } catch {}
@@ -252,6 +236,7 @@ const Header = ({ userType = 'guest' } = {}) => {
   const isProvider = ['provider', 'client', 'provideraccount'].includes(roleForPath) || accountTypeForPath.includes('provider');
   const isHomepage = location.pathname === '/';
   const isAdminDashboard = location.pathname === '/admin-dashboard' || userType === 'admin';
+  const isProviderDashboard = location.pathname === '/provider-dashboard';
   const closeMob = () => setMobileOpen(false);
 
   // Where to send the logged-in user when they click their name
@@ -288,15 +273,12 @@ const Header = ({ userType = 'guest' } = {}) => {
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
-                  {!isAdmin && (
+                  {!isAdmin && !isProviderDashboard && (
                     <Link to={dashboardPath} className="sah-hdr-ghost">
                       <i className="fas fa-user-circle" />
                       {displayName}
                     </Link>
                   )}
-                  <button className="sah-hdr-solid" onClick={handleLogout}>
-                    <i className="fas fa-sign-out-alt" /> Log Out
-                  </button>
                 </>
               ) : (
                 <>
@@ -333,11 +315,7 @@ const Header = ({ userType = 'guest' } = {}) => {
         {isLoggedIn && !isAdmin && (
           <Link to={dashboardPath} onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
         )}
-        {isLoggedIn ? (
-          <button className="mob-link" onClick={handleLogout}>
-            <i className="fas fa-sign-out-alt" /> Log Out
-          </button>
-        ) : (
+        {!isLoggedIn && (
           <div className="sah-mob-cta-row">
             <Link to="/login" className="sah-mob-ghost" onClick={closeMob}>Log In</Link>
             <Link to="/register" className="sah-mob-solid" onClick={closeMob}>Register</Link>
