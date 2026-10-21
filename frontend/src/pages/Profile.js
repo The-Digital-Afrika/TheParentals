@@ -5,60 +5,13 @@ import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import { api } from '../services/api';
 import { createInquiry } from '../utils/inquiries';
+import { useAuth } from '../contexts/AuthContext';
 import '../assets/css/profile.css';
-
-const SEED_PROVIDERS = [
-  {
-    id: "s1", name: "STEM Mastery Tutors", category: "tutor", location: "Johannesburg, Gauteng",
-    delivery: "Online & In-person",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2b033f?w=600&auto=format&fit=crop&q=75",
-    priceFrom: "R280/hr", badge: "featured", rating: 4.9, reviewCount: 62, tier: "featured",
-    registered: "2025-01-10T08:00:00Z", status: "approved",
-    primaryCategory: "Tutor", city: "Johannesburg", province: "Gauteng", deliveryMode: "Online & In-person",
-    bio: "Specialist STEM tutors for Grades 8–12. We focus on Mathematics, Physical Sciences and Life Sciences with a proven track record of improving results.",
-    tags: ["Mathematics", "Physical Sciences", "Life Sciences", "Grades 8–12"],
-    ageGroups: ["11–13", "14–18"], startingPrice: "R280/hr",
-    availabilityDays: ["Mon", "Tue", "Wed", "Thu", "Fri"],
-    availabilityNotes: "Weekday afternoons & Saturdays",
-    phone: "+27 11 000 1111", contactEmail: "info@stemmastery.co.za",
-    certifications: "SACE Registered, Honours in Mathematics Education",
-    listingPlan: "featured",
-    reviews: { average: 4.9, count: 62, items: [{ reviewer: "Nomsa P.", rating: 5, text: "My son went from 40% to 82% in Maths. Incredible tutors." }] }
-  },
-  {
-    id: "khan", name: "Khan Academy SA", category: "curriculum", location: "Johannesburg, Gauteng",
-    delivery: "Online",
-    image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=600&auto=format&fit=crop&q=75",
-    priceFrom: "Free", badge: "featured", rating: 4.9, reviewCount: 156, tier: "featured",
-    registered: "2025-01-01T00:00:00Z", status: "approved",
-    primaryCategory: "Curriculum Provider", city: "Johannesburg", province: "Gauteng", deliveryMode: "Online",
-    bio: "Free world-class education for anyone, anywhere. Our curriculum covers mathematics, science, computing, humanities and more. We provide video lessons, practice exercises, and personalised learning dashboards for homeschoolers across South Africa. Completely free, forever.",
-    tags: ["Mathematics", "Science", "Online Learning", "Free Curriculum", "Video Lessons", "All Ages"],
-    ageGroups: ["5–7", "8–10", "11–13", "14–18"], startingPrice: "Free",
-    availabilityDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    availabilityNotes: "24/7 Online — self-paced learning available anytime",
-    phone: "+27 11 555 1234", contactEmail: "support@khanacademy.org.za",
-    email: "contact@khanacademy.org.za",
-    certifications: "Khan Academy Certified Content Provider, Google for Education Partner",
-    degrees: "BSc Computer Science (Stanford), MEd (Harvard)",
-    memberships: "SA Curriculum Association, Digital Learning Collective",
-    clearance: "Verified (2025)",
-    social: "https://www.khanacademy.org",
-    listingPlan: "featured",
-    reviews: {
-      average: 4.9, count: 156,
-      items: [
-        { reviewer: "Sarah J.", rating: 5, text: "Excellent resource for our homeschool curriculum." },
-        { reviewer: "Thabo M.", rating: 5, text: "My kids love the math challenges." }
-      ]
-    }
-  },
-];
 
 function findProvider(id, email) {
   try {
     const stored = JSON.parse(localStorage.getItem('sah_providers') || '[]');
-    const all = [...stored, ...SEED_PROVIDERS];
+    const all = stored;
     let found = null;
     if (id) found = all.find(p => p.id === id || p.userId === id) || null;
     else if (email) found = all.find(p => p.email === email || p.contactEmail === email) || null;
@@ -216,7 +169,10 @@ function normalizeApiProfile(found) {
     instagram: found.instagram || '',
     tiktok: found.tiktok || '',
     twitter: found.twitter || '',
-    reviews: found.reviews || { average: found.rating || 0, count: found.reviewCount || 0, items: [] },
+    reviews: Array.isArray(found.reviews) ? (() => {
+      const items = found.reviews.filter(r => r.status === 'approved');
+      return { average: items.length ? Number((items.reduce((sum, r) => sum + r.rating, 0) / items.length).toFixed(1)) : 0, count: items.length, items };
+    })() : (found.reviews || { average: found.rating || 0, count: found.reviewCount || 0, items: [] }),
   };
 }
 
@@ -1033,6 +989,7 @@ const MembersOnlyGate = () => (
 );
 
 const Profile = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1079,20 +1036,17 @@ const Profile = () => {
       if (!found && id) {
         try {
           const remoteProfile = normalizeApiProfile(await api.getProviderById(id));
-          const localProfile = findProvider(id, email);
-          found = shouldUseLocalProfile(localProfile, remoteProfile)
-            ? fillMissingProfileFields(localProfile, remoteProfile)
-            : fillMissingProfileFields(remoteProfile, localProfile);
+          found = remoteProfile;
         } catch (error) {
           console.warn('Profile API load failed, using local data:', error.message);
         }
       }
 
       // 3. Fall back to localStorage providers list
-      if (!found) found = findProvider(id, email);
+      if (!found && !id && !email) found = findProvider(id, email);
 
       // 4. Try to load the logged-in user's own profile from localStorage
-      if (!found) {
+      if (!found && !id && !email) {
         try {
           const cu = JSON.parse(
             localStorage.getItem('sah_current_user') ||
@@ -1132,11 +1086,6 @@ const Profile = () => {
             }
           }
         } catch {}
-      }
-
-      // 4. Only fall back to seed data if explicitly viewing a seed profile by ID
-      if (!found && id) {
-        found = SEED_PROVIDERS.find(p => p.id === id) || null;
       }
 
       // 5. FIX: restore a locally-saved photo if whatever source we used above
@@ -1265,6 +1214,8 @@ const Profile = () => {
   const tier = profile.listingPlan || profile.tier || 'free';
   const isPaid = tier === 'pro' || tier === 'featured';
   const isMemberProfile = profile.profileKind === 'member' || profile.primaryCategory === 'Member Profile' || profile.category === 'Member Profile';
+  const isOwnBusiness = !isMemberProfile && String(user?.role || '').toUpperCase() === 'PROVIDER'
+    && !!user?.id && user.id === (profile.userId || profile.id);
   const serviceCards = (profile.services || []).map((svc) => {
     if (typeof svc === 'string') return svc;
     return {
@@ -1333,6 +1284,10 @@ const Profile = () => {
           <Link to="/#sah-providers" className="pv2-directory-back">
             <i className="fas fa-arrow-left" /> Directory
           </Link>
+          {isOwnBusiness && <div className="pv2-owner-notice" role="status">
+            <div><strong><i className="fas fa-store" aria-hidden="true" /> Your Business Profile</strong><p>This is your listing. Manage your business details and services from your dashboard.</p></div>
+            <Link to="/provider-dashboard">Manage My Business <i className="fas fa-arrow-right" aria-hidden="true" /></Link>
+          </div>}
 
           {/* ── TOP GRID ── */}
           <div className="pv2-top-grid">
@@ -1415,7 +1370,7 @@ const Profile = () => {
                     </button>
                   )}
 
-                  {!fromDashboard && !isMemberProfile ? (
+                  {!fromDashboard && !isMemberProfile && !isOwnBusiness ? (
                     <button
                       className="pv2-contact-toggle"
                       onClick={() => setContactOpen(true)}

@@ -688,3 +688,11 @@
   }
 }
 
+
+#profilePageV2 .pv2-owner-notice { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:18px 22px; margin:0 0 24px; background:#eef5fa; border:1px solid #ccdce8; border-radius:12px; color:#557691; }
+#profilePageV2 .pv2-owner-notice strong { font-size:.95rem; }
+#profilePageV2 .pv2-owner-notice strong i { margin-right:7px; }
+#profilePageV2 .pv2-owner-notice p { margin:5px 0 0; color:#6a655d; font-size:.84rem; line-height:1.5; }
+#profilePageV2 .pv2-owner-notice a { flex-shrink:0; padding:10px 16px; border-radius:6px; background:#6f8da6; color:#fff; font-size:.84rem; font-weight:600; text-decoration:none; }
+#profilePageV2 .pv2-owner-notice a:focus-visible { outline:3px solid #ff8c42; outline-offset:3px; }
+@media(max-width:600px) { #profilePageV2 .pv2-owner-notice { flex-direction:column; align-items:flex-start; } }

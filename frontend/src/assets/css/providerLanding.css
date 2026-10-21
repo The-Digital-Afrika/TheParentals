@@ -1,0 +1,15 @@
+.provider-page .provider-intro{max-width:850px;margin:0 auto 40px;text-align:center}
+.provider-page .provider-intro h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.2;margin:12px 0 18px;color:var(--dark)}
+.provider-page .provider-intro p{color:var(--muted);font-size:.95rem;line-height:1.7;max-width:700px;margin:0 auto}
+.provider-page .sah-plan-item{height:100%}
+.provider-page .sah-plan-details{display:flex;flex:1}
+.provider-page .sah-plan-details-inner{display:flex;flex:1}
+.provider-page .sah-plan-details-content{display:flex;flex:1;flex-direction:column;width:100%}
+.provider-page .sah-plan-features{flex:1}
+.provider-page .sah-plan-features li{align-items:flex-start;line-height:1.5}
+.provider-page .sah-plan-features i{flex-shrink:0;margin-top:5px}
+.provider-page .sah-plan-cta-link{align-self:flex-start;margin-top:8px;min-height:40px}
+.provider-page .sah-ico-no{color:#aaa}
+.provider-page .provider-approval-note{text-align:center;max-width:850px;margin:24px auto 0;color:var(--muted);font-size:.8rem}
+.provider-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:480px){.provider-page .sah-plan-header{flex-wrap:wrap;gap:14px}.provider-page .sah-plan-right{margin-left:0;align-items:flex-start}.provider-page .sah-plan-price small{text-align:left}.provider-page .provider-intro{margin-bottom:30px}}

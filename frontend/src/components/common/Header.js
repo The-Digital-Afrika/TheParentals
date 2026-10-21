@@ -259,17 +259,18 @@ const Header = ({ userType = 'guest' } = {}) => {
           <div className="sah-hdr-right">
             {isHomepage && (
               <nav className="sah-hdr-nav" aria-label="Main navigation">
-                <a href="/#sah-providers">Find Services</a>
-                <a href="/#sah-how">How It Works</a>
-                <a href="/#sah-list">Parental Plus+</a>
-                <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer">
-                  Magazine <i className="fas fa-arrow-up-right-from-square" style={{ fontSize: '0.58rem' }} />
-                </a>
+                {!isProvider && <Link to="/become-a-provider">Become a Service Provider</Link>}
+
                 {isLoggedIn && isAdmin && <Link to="/admin-dashboard">Admin</Link>}
                 {isLoggedIn && !isAdmin && <Link to={dashboardPath}>Dashboard</Link>}
               </nav>
             )}
 
+            {!isHomepage && isLoggedIn && <nav className="sah-hdr-nav" aria-label="Account navigation">
+              <Link to={dashboardPath}>Dashboard</Link>
+              <Link to="/#sah-providers">Browse Directory</Link>
+              {!isProvider && !isAdmin && <a href="/client-dashboard#saved-businesses">Saved Businesses</a>}
+            </nav>}
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
@@ -283,7 +284,7 @@ const Header = ({ userType = 'guest' } = {}) => {
               ) : (
                 <>
                   <Link to="/login" className="sah-hdr-ghost">Log In</Link>
-                  <Link to="/register" className="sah-hdr-solid">Register</Link>
+                  <Link to="/register/user" className="sah-hdr-solid">Sign Up</Link>
                 </>
               )}
             </div>
@@ -303,15 +304,12 @@ const Header = ({ userType = 'guest' } = {}) => {
       {/* MOBILE DRAWER */}
       <nav className={`sah-hdr-mobile${mobileOpen ? ' open' : ''}`} aria-label="Mobile navigation">
         <Link to="/" onClick={closeMob}><i className="fas fa-home" /> Home</Link>
-        <a href="/#sah-providers" onClick={closeMob}><i className="fas fa-search" /> Find Services</a>
-        <a href="/#sah-how" onClick={closeMob}><i className="fas fa-info-circle" /> How It Works</a>
-        <a href="/#sah-list" onClick={closeMob}><i className="fas fa-layer-group" /> Parental Plus+</a>
-        <a href="https://sahomeschooling.com" target="_blank" rel="noreferrer" onClick={closeMob}>
-          <i className="fas fa-newspaper" /> Magazine
-        </a>
+        {!isProvider && <Link to="/become-a-provider" onClick={closeMob}>Become a Service Provider</Link>}
+
         {isLoggedIn && isAdmin && (
           <Link to="/admin-dashboard" onClick={closeMob}><i className="fas fa-shield-halved" /> Admin</Link>
         )}
+        {isLoggedIn && !isProvider && !isAdmin && <Link to="/client-dashboard#saved-businesses" onClick={closeMob}>Saved Businesses</Link>}
         {isLoggedIn && !isAdmin && (
           <Link to={dashboardPath} onClick={closeMob}><i className="fas fa-user-circle" /> Dashboard</Link>
         )}

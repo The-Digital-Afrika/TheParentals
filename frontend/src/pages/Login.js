@@ -456,8 +456,7 @@ const getRedirectPath = (userData) => {
   if (role === 'admin') return '/admin-dashboard';
   if (['provider', 'client', 'provideraccount'].includes(role)) return '/provider-dashboard';
   if (userData?.accountType === 'provider') return '/provider-dashboard';
-  // Normal users (role === 'user', 'USER', or anything else) go home
-  return '/';
+  return '/client-dashboard';
 };
 
 // ── Main Login Component ──────────────────────────────────────────────────────
