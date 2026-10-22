@@ -73,7 +73,7 @@ export default function Directory({ onRequireLogin }) {
       <label htmlFor="directory-query">Search businesses, services, subjects or places</label>
       <div className="marketplace-search-row"><input id="directory-query" ref={input} value={query} role="combobox" aria-autocomplete="list" aria-expanded={focused && suggestions.length > 0} aria-controls="directory-suggestions" aria-activedescendant={focused && active >= 0 ? `suggestion-${active}` : undefined}
         onChange={e => { setQuery(e.target.value); setFocused(true); }} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-        onKeyDown={e => { if (e.key === 'Escape') setFocused(false); if (['ArrowDown', 'ArrowUp'].includes(e.key) && suggestions.length) { e.preventDefault(); setFocused(true); setActive(n => (n + (e.key === 'ArrowDown' ? 1 : -1) + suggestions.length) % suggestions.length); } }} placeholder="Try Maths tutoring in Sandton" /><button type="submit">Search</button></div>
+        onKeyDown={e => { if (e.key === 'Escape') setFocused(false); if (['ArrowDown', 'ArrowUp'].includes(e.key) && suggestions.length) { e.preventDefault(); setFocused(true); setActive(n => (n + (e.key === 'ArrowDown' ? 1 : -1) + suggestions.length) % suggestions.length); } }} placeholder="what are you looking for" /><button type="submit">Search</button></div>
       {focused && suggestions.length > 0 && <ul id="directory-suggestions" role="listbox" className="marketplace-suggestions">{suggestions.map((s, i) => <li key={s.label} id={`suggestion-${i}`} role="option" aria-selected={active === i} onMouseDown={e => { e.preventDefault(); submit(s.label); }}><span>{s.label}</span><small>{s.type}</small></li>)}</ul>}
     </form>
     <div className="marketplace-filters">

@@ -325,7 +325,7 @@ export default function HomePage() {
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleSearch()}
-                  placeholder="Search products, services, providers or locations..."
+                  placeholder="what are you looking for"
                 />
                 <div className="sah-hs-sep" />
                 <select value={searchCat} onChange={e => setSearchCat(e.target.value)}>
@@ -340,17 +340,16 @@ export default function HomePage() {
                 <button className="sah-hs-btn" onClick={handleSearch}>Search</button>
               </div>
 
-              {/* HERO ACTIONS */}
               <div className="sah-hero-tagline">
                 <div className="sah-hero-actions">
-                  <button className="sah-become-btn" onClick={handleSearch}>
-                    <i className="fas fa-magnifying-glass" /> Find a Service
-                  </button>
-                  {getDashboardPath() !== '/provider-dashboard' && <button className="sah-hero-secondary-cta" onClick={() => navigate('/become-a-provider')}>
-                    <i className="fas fa-store" /> Become a Service Provider
-                  </button>}
+                  {getDashboardPath() !== '/provider-dashboard' && (
+                    <button className="sah-hero-secondary-cta" onClick={handleBecomeProvider}>
+                      <i className="fas fa-store" /> Become a Service Provider
+                    </button>
+                  )}
                 </div>
               </div>
+
             </div>
 
           </div>

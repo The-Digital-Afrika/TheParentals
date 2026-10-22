@@ -240,7 +240,7 @@ const MAX_TOTAL_UPLOAD_BYTES = MAX_TOTAL_UPLOAD_MB * 1024 * 1024;
 
 const STEPS = [
   { title: 'Plan & Account', label: 'Account', desc: 'Choose your plan and create your login', icon: 'fa-user-circle' },
-  { title: 'Identity & Trust', label: 'Identity', desc: 'Build trust with your qualifications and bio', icon: 'fa-id-card' },
+  { title: 'Provider Details', label: 'Details', desc: 'Complete your services, specialisations, location and contact details', icon: 'fa-id-card' },
   { title: 'Terms & Create Account', label: 'Finish', desc: 'Confirm the terms and create your account', icon: 'fa-file-contract' },
 ];
 
@@ -632,6 +632,15 @@ const Registration = () => {
     if (step === 2) {
       if (!data.bio?.trim()) errs.bio = 'Please write a short bio.';
       if (!data.experience && data.experience !== 0) errs.experience = 'Please enter your years of experience.';
+      for (const [key, label] of Object.entries({ primaryCat: 'a primary category', serviceTitle: 'a service title', serviceDesc: 'a service description', subjects: 'subjects or specialisations', deliveryMode: 'a delivery mode', city: 'your city', province: 'your province', pricingModel: 'a pricing model', inquiryEmail: 'a contact email' })) {
+        if (!data[key]?.trim()) errs[key] = `Please enter ${label}.`;
+      }
+      for (const [key, label] of Object.entries({ languages: 'language', ageGroups: 'age group', serviceAreas: 'service area', daysAvailable: 'available day' })) {
+        if (!data[key]?.length) errs[key] = `Please select at least one ${label}.`;
+      }
+      if (!/^\S+@\S+\.\S+$/.test(data.inquiryEmail || '')) errs.inquiryEmail = 'Enter a valid contact email.';
+      if ((data.phoneLocal || '').replace(/\D/g, '').length !== 9) errs.phoneLocal = 'Enter 9 digits after +27.';
+
     }
     if (step === 3) {
       if (!data.terms) errs.terms = 'Please tick the box to agree to the Terms and Community Guidelines before creating your profile.';
@@ -1185,7 +1194,7 @@ const Registration = () => {
         )}
       </div>
       <div className="sah-field sah-full">
-        <label><i className="fas fa-check-square" /> Languages Spoken</label>
+        <label><i className="fas fa-check-square" /> Languages Spoken <em className="sah-req">*</em></label>
         <div className="sah-check-group">
           {['English','Afrikaans','isiZulu','isiXhosa','Sepedi','Setswana','Sesotho','Xitsonga','SiSwati','Tshivenda','isiNdebele','Other'].map(lang => (
             <label key={lang}>
@@ -1588,7 +1597,17 @@ const Registration = () => {
     </>
   );
 
-  const RENDERERS = [renderPlanAndAccount, renderStep3, renderStep8];
+  const renderProviderDetails = () => (
+    <>
+      <p>Complete your provider details on every plan so families can find your services. Include specific subjects such as Business Management. Your plan determines which details appear publicly.</p>
+      {renderStep3()}
+      {renderStep4()}
+      {renderStep5()}
+      {renderStep6()}
+      {renderStep7()}
+    </>
+  );
+  const RENDERERS = [renderPlanAndAccount, renderProviderDetails, renderStep8];
 
   const pct = Math.round((step / TOTAL) * 100);
 
@@ -1651,6 +1670,11 @@ const Registration = () => {
           <div className="sah-step-card-body">
             {step === 1 && <SocialSignIn googleRole="PROVIDER" onError={message => setFieldErrors({ _submit: message })} />}
             <div className="sah-required-note"><em className="sah-req">*</em> Required fields cannot be skipped.</div>
+            {Object.keys(fe).some(key => key !== '_submit') && (
+              <div className="sah-field-err" role="alert">
+                {Object.entries(fe).filter(([key, message]) => key !== '_submit' && message).map(([key, message]) => <div key={key}>{message}</div>)}
+              </div>
+            )}
             {RENDERERS[step - 1]()}
           </div>
         </div>

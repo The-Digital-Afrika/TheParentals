@@ -271,6 +271,11 @@ const Header = ({ userType = 'guest' } = {}) => {
               <Link to="/#sah-providers">Browse Directory</Link>
               {!isProvider && !isAdmin && <a href="/client-dashboard#saved-businesses">Saved Businesses</a>}
             </nav>}
+            {location.pathname === '/become-a-provider' && (
+              <Link to="/#sah-providers" className="sah-hdr-ghost">
+                <i className="fas fa-arrow-left" aria-hidden="true" /> Back to Directory
+              </Link>
+            )}
             <div className="sah-hdr-ctas">
               {isLoggedIn ? (
                 <>
