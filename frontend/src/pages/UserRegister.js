@@ -234,7 +234,7 @@ const UserRegister = () => {
           const displayName = username.trim();
           setSuccessMsg(`Welcome, ${displayName}! Your account has been created.`);
           showNotification?.(`✅ Welcome, ${displayName}! Registration successful.`, 'success');
-          setTimeout(() => navigate('/'), 1500);
+          setTimeout(() => navigate('/client-dashboard'), 1500);
           return;
         }
 
@@ -278,7 +278,7 @@ const UserRegister = () => {
     const displayName = username.trim();
     setSuccessMsg(`Welcome, ${displayName}! Your account has been created.`);
     showNotification?.(`✅ Welcome, ${displayName}! Registration successful.`, 'success');
-    setTimeout(() => navigate('/'), 1500);
+    setTimeout(() => navigate('/client-dashboard'), 1500);
   };
 
   const fe = errors;

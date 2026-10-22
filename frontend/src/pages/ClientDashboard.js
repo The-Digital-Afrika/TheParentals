@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import SavedBusinesses from '../components/SavedBusinesses';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
@@ -1105,6 +1106,9 @@ const ClientDashboard = () => {
     const finalProfile = {
       ...mapped,
       ...toSave,
+      status: mapped.status || toSave.status,
+      publicDisplay: mapped.publicDisplay,
+      publicToggle: mapped.publicToggle,
       id: mapped.userId || mapped.id || toSave.userId,
       userId: mapped.userId || toSave.userId,
       email: toSave.email || mapped.email,
@@ -3264,6 +3268,7 @@ const ClientDashboard = () => {
           <Link to="/#sah-providers" className="cd-directory-back">
             <i className="fas fa-arrow-left"></i> Back to Directory
           </Link>
+          <SavedBusinesses />
           {renderInquiryCenter('client')}
           <div className="cd-layout" style={{ gridTemplateColumns: 'minmax(0, 760px) minmax(240px, 320px)' }}>
             <div className="cd-card">

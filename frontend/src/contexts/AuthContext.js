@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
     const syncUserFromStorage = () => {
       try {
         const storedUser = localStorage.getItem('sah_user') || localStorage.getItem('sah_current_user');
-        if (!storedUser) {
+        if (!storedUser || !localStorage.getItem('sah_token')) {
           setUser(null);
           return;
         }

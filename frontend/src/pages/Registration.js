@@ -514,7 +514,7 @@ const Registration = () => {
     login({ ...auth.user, token: auth.token });
     showNotification?.('Continuing your Parental Plus+ payment...', 'info');
     if (saveProviderProfile) {
-      await saveProviderProfile(auth.user.id);
+      await saveProviderProfile(auth.user.id, auth.token);
     }
     await startPaidRegistrationPayment(plan, auth.token);
   };
@@ -773,6 +773,10 @@ const Registration = () => {
         experience: parseInt(data.experience, 10) || 0,
         primaryCategory: data.primaryCat,
         secondaryCategories: data.secondaryCats || [],
+        tags: newProvider.tags || [],
+        services: newProvider.services || [],
+        serviceAreas: svcAreas,
+        contactName: data.fullName,
         serviceTitle: data.serviceTitle,
         serviceDesc: data.serviceDesc,
         subjects: data.subjects,
@@ -810,8 +814,8 @@ const Registration = () => {
       return formData;
     };
 
-    const saveRegistrationProviderProfile = (userId) => (
-      apiRequest('POST', '/api/providers', buildProviderFormData(userId))
+    const saveRegistrationProviderProfile = (userId, token) => (
+      apiRequest('POST', '/api/providers', buildProviderFormData(userId), token)
     );
 
     // Check localStorage for duplicate email first
@@ -849,7 +853,7 @@ const Registration = () => {
       });
         const dbUserId = userData?.user?.id || userData?.userId || providerId;
 
-        await saveRegistrationProviderProfile(dbUserId);
+        await saveRegistrationProviderProfile(dbUserId, userData.token);
 
         const activeTier = tier === 'free' ? 'free' : 'free';
         const localProvider = {

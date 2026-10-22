@@ -85,9 +85,9 @@ export const api = {
   getUsers: (token) => apiRequest('GET', '/api/auth/users', null, token),
 
   // Providers
-  getProviders: () => apiRequest('GET', '/api/providers'),
-  getProviderById: (id) => apiRequest('GET', `/api/providers/${id}`),
-  createProvider: (data) => apiRequest('POST', '/api/providers', data),
+  getProviders: () => apiRequest('GET', '/api/providers', null, localStorage.getItem('sah_token')),
+  getProviderById: (id) => apiRequest('GET', `/api/providers/${id}`, null, localStorage.getItem('sah_token')),
+  createProvider: (data) => apiRequest('POST', '/api/providers', data, localStorage.getItem('sah_token')),
   updateProvider: (id, data, token) => apiRequest('PATCH', `/api/providers/${id}`, data, token),
   updateProviderStatus: (id, status, token) => apiRequest('PATCH', `/api/providers/${id}/status`, { status }, token),
   approveProvider: (id, token) => apiRequest('POST', `/api/providers/${id}/approve`, null, token),

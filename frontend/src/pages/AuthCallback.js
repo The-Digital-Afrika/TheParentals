@@ -30,7 +30,7 @@ export default function AuthCallback() {
       localStorage.setItem('sah_token', token);
       window.dispatchEvent(new Event('sah-auth-change'));
       window.history.replaceState(null, '', '/auth/callback');
-      navigate(safeNext, { replace: true });
+      navigate(user.role === 'USER' ? '/client-dashboard' : safeNext, { replace: true });
     } catch (error) {
       console.error('Google callback error:', error);
       setMessage('Google sign-in could not be completed. Returning to login…');
