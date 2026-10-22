@@ -45,6 +45,11 @@ const CSS = `
   .sah-nav-links a{padding:8px 14px;border-radius:5px;font-weight:600;font-size:1rem;color:rgba(255,255,255,0.85);transition:all 0.15s;}
   .sah-nav-links a:hover{color:#fff;background:rgba(255,255,255,0.2);}
   .sah-nav-ctas{display:flex;align-items:center;gap:8px;}
+  @media(max-width:640px){
+    .sah-header{height:auto;min-height:var(--header-h);}
+    .sah-nav-inner{flex-wrap:wrap;gap:8px;padding-top:10px;padding-bottom:10px;}
+    .sah-nav-ctas{flex-wrap:wrap;justify-content:flex-end;max-width:100%;}
+  }
   .sah-btn-ghost-nav{padding:7px 16px;border-radius:5px;border:1.5px solid rgba(255,255,255,0.6);background:transparent;color:#fff;font-weight:600;font-size:0.85rem;transition:all 0.15s;cursor:pointer;}
   .sah-btn-ghost-nav:hover{border-color:#fff;background:rgba(255,255,255,0.2);}
   .sah-btn-solid-nav{
