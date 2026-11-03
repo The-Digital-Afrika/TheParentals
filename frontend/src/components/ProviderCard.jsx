@@ -12,8 +12,14 @@ export default function ProviderCard({ p, onView, onSave, saved, isOwn = false }
   const ic = CAT_ICON[p.category] || "fa-star";
   const tier = p.listingPlan || p.tier || "free";
   const isPaid = tier === "pro" || tier === "featured";
-  const rawDescription = p.bio || p.description || "";
-  const shortDescription = rawDescription.split(/\s+/).filter(Boolean).slice(0, 24).join(" ");
+  const rawDescription = [p.bio, p.description, p.serviceDesc, ...(p.services || []).map(service => service.description)]
+    .find(value => typeof value === 'string' && value.trim()) || '';
+  const description = rawDescription.replace(/\s+/g, ' ').trim();
+  const descriptionLimit = isPaid ? 150 : 30;
+  const descriptionCharacters = Array.from(description);
+  const shortDescription = descriptionCharacters.length > descriptionLimit
+    ? `${descriptionCharacters.slice(0, descriptionLimit - 1).join('').trimEnd()}…`
+    : description;
   return (
     <article className={`sah-provider-card${p._inFeaturedSlot ? " is-featured-slot" : ""}`} data-cat={p.category} onClick={() => onView(p.id)} style={{ cursor: 'pointer' }}>
       <div className="sah-card-thumb">
@@ -37,11 +43,7 @@ export default function ProviderCard({ p, onView, onSave, saved, isOwn = false }
           <span><i className="fas fa-map-marker-alt" />{p.location}</span>
           <span><i className="fas fa-laptop" />{p.deliveryMode}</span>
         </div>
-        {!isPaid && shortDescription && (
-          <p style={{ fontSize:"0.78rem", color:"var(--muted)", lineHeight:1.5, marginBottom:10 }}>
-            {shortDescription}{shortDescription.length < rawDescription.length ? "..." : ""}
-          </p>
-        )}
+        <p className="sah-card-description">{shortDescription || 'No description added yet.'}</p>
         {isPaid && p.rating && (
           <div className="sah-card-rating">
             <span className="sah-stars">{'\u2605'.repeat(Math.round(p.rating))}</span>

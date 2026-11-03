@@ -1,0 +1,37 @@
+.sah-wrap .sah-hero:has(.business-search){overflow:visible;z-index:3;}
+.sah-wrap .business-search{position:relative;max-width:850px;margin:0 auto;text-align:left;color:#283747;}
+.sah-wrap .business-search-bar{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr) auto;align-items:center;gap:0;padding:8px;min-height:76px;background:#fff;border:1px solid #e5eaf0;border-radius:40px;box-shadow:0 10px 32px #17233120;}
+.sah-wrap .business-search-bar:focus-within{box-shadow:0 0 0 3px #c3d9e780,0 10px 32px #17233120;}
+.sah-wrap .business-search-query,.sah-wrap .business-search-location{display:flex;align-items:center;gap:12px;min-width:0;margin:0;padding:0 20px;}
+.sah-wrap .business-search-location{border-left:1px solid #e5e9ed;}
+.sah-wrap .business-search-query>i,.sah-wrap .business-search-location>i{width:18px;flex-shrink:0;font-size:17px;text-align:center;color:#718b9d;}
+/* Override the global input borders and focus rings within the shared surface. */
+.sah-wrap .business-search-bar input,.sah-wrap .business-search-bar input:hover,.sah-wrap .business-search-bar input:focus,.sah-wrap .business-search-bar input:focus-visible{display:block;width:100%;min-width:0;height:52px;margin:0;padding:0;border:0!important;border-radius:0;outline:none!important;box-shadow:none!important;background:transparent!important;color:#283747!important;font:inherit;font-size:15px;font-weight:400;}
+.sah-wrap .business-search-bar input::placeholder{color:#7c8995;opacity:1;}
+.sah-wrap .business-search-submit{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:122px;height:56px;margin:0;padding:0 25px;border:0;border-radius:30px;background:#f5823c;color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:background .18s;}
+.sah-wrap .business-search-submit:hover{background:#e87430;}
+.sah-wrap .business-search-submit i{font-size:12px;}
+.sah-wrap .business-search-dropdown{position:absolute;z-index:50;top:calc(100% + 10px);left:0;right:0;padding:8px;border:1px solid #e5eaf0;border-radius:22px;background:#fff;box-shadow:0 18px 45px #17233126;overflow:hidden;}
+.sah-wrap .business-search-intro{padding:13px 16px 12px;color:#748391;font-size:12px;font-weight:600;letter-spacing:.03em;}
+.sah-wrap .business-search-dropdown ul{list-style:none;margin:0;padding:0 4px;max-height:300px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#ced8e0 transparent;}
+.sah-wrap .business-search-dropdown li{display:flex;align-items:center;gap:13px;min-height:62px;margin:2px 0;padding:10px 12px;border-radius:12px;cursor:pointer;transition:background .15s;}
+.sah-wrap .business-search-dropdown li:hover,.sah-wrap .business-search-dropdown li.active{background:#f0f5f8;}
+.sah-wrap .business-search-option-icon{display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;border-radius:50%;background:#f3f6f8;color:#7890a1;font-size:13px;}
+.sah-wrap .business-search-option-label{flex:1;min-width:0;overflow-wrap:anywhere;font-size:14px;font-weight:500;line-height:1.4;}
+.sah-wrap .business-search-option-label small{display:block;margin-top:3px;font-size:12px;font-weight:400;color:#7b8994;}
+.sah-wrap .business-search-type{padding:0 4px;font-size:11px;font-weight:400;color:#8796a2;}
+.sah-wrap .business-search-status:empty{display:none;}
+.sah-wrap .business-search-status{padding:16px;font-size:14px;color:#657989;}
+.sah-wrap .business-search-all,.sah-wrap .business-search-retry{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:8px 0 0;padding:15px 18px;border:0;border-top:1px solid #edf0f3;border-radius:0 0 14px 14px;background:#fff;color:#557791;font:inherit;font-size:13px;font-weight:600;text-align:left;cursor:pointer;}
+.sah-wrap .business-search-all:hover,.sah-wrap .business-search-retry:hover{background:#f5f8fa;}
+@media(max-width:640px){
+.sah-wrap .business-search-bar{grid-template-columns:minmax(0,1fr) auto;padding:7px;border-radius:24px;}
+.sah-wrap .business-search-query{grid-column:1/-1;padding:0 12px;border-bottom:1px solid #edf0f3;margin-bottom:7px;}
+.sah-wrap .business-search-location{border-left:0;padding:0 12px;}
+.sah-wrap .business-search-bar input{height:48px;font-size:14px;}
+.sah-wrap .business-search-submit{height:46px;min-width:100px;padding:0 18px;font-size:14px;}
+.sah-wrap .business-search-submit i{display:none;}
+.sah-wrap .business-search-dropdown{border-radius:18px;}
+.sah-wrap .business-search-dropdown ul{max-height:min(280px,42dvh);}
+.sah-wrap .business-search-type{display:none;}
+}

@@ -5,6 +5,7 @@ import { useNotification } from '../contexts/NotificationContext';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../services/api';
 import SocialSignIn from '../components/common/SocialSignIn';
+import { CATEGORY_LABELS, findBusinessCategory } from '../utils/businessCategories';
 
 const injectHead = () => {
   if (document.getElementById('sah-reg-fonts')) return;
@@ -289,18 +290,15 @@ const EXTRA_SOCIALS = [
   { key: 'twitter', label: 'X / Twitter', icon: 'fab fa-x-twitter', placeholder: 'https://x.com/yourhandle' },
 ];
 
-const ALL_CATEGORIES = [
-  'Education & Tutoring', 'Child Wellness & Therapy', 'Learning Resources',
-  'Activities & Enrichment', 'Healthcare', 'Family Shops', 'Everyday Family Services',
-];
+const ALL_CATEGORIES = CATEGORY_LABELS;
 
 const SECONDARY_CAT_MAP = {
-  'Tutor': 'Education & Tutoring',
-  'Therapist': 'Child Wellness & Therapy',
+  'Tutor': 'Tutors',
+  'Therapist': 'Wellness & Therapy',
   'Curriculum': 'Learning Resources',
-  'School': 'Activities & Enrichment',
-  'Consultant': 'Everyday Family Services',
-  'Enrichment': 'Activities & Enrichment',
+  'School': 'Schools & Homeschooling',
+  'Consultant': 'Parenting & Family Support',
+  'Enrichment': 'Arts & Music',
 };
 // ── Password strength helper ──────────────────────────────────────────────────
 const getPasswordStrength = (pw) => {
@@ -334,14 +332,7 @@ const getPlanByValue = (value) => {
   )) || PLANS[0];
 };
 
-const catToSlug = (cat) => {
-  const m = {
-    'Education & Tutoring': 'education', 'Child Wellness & Therapy': 'wellness', 'Learning Resources': 'education',
-    'Activities & Enrichment': 'activities', 'Healthcare': 'healthcare', 'Family Shops': 'shopping',
-    'Everyday Family Services': 'family',
-  };
-  return m[cat] || 'family';
-};
+const catToSlug = cat => findBusinessCategory(cat)?.id || 'other';
 const formatBytes = (bytes) => {
   if (bytes < 1024) return bytes + ' B';
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';

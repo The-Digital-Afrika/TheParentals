@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { applyDirectoryStyles } from "../utils/directoryStyles";
 import HowItWorks from "../components/HowItWorks";
 import Directory from "../components/Directory";
+import BusinessSearch from "../components/BusinessSearch";
 import SocialSignIn from "../components/common/SocialSignIn";
 import { subscribeToNewsletter, getPublishedPromotions } from "../utils/plusBenefits";
 import { useAuth } from '../contexts/AuthContext';
@@ -98,8 +99,6 @@ const HERO_HEADLINES = [
 export default function HomePage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm]     = useState("");
-  const [searchCat, setSearchCat]       = useState("");
   const [activeCat, setActiveCat]       = useState("all");
   const [regModal, setRegModal]         = useState(false);
   const [nlEmail, setNlEmail]           = useState("");
@@ -191,10 +190,7 @@ export default function HomePage() {
     setTimeout(() => setToast(t => ({ ...t, show:false })), 3500);
   }, []);
 
-  const handleSearch = () => {
-    navigate('/?' + new URLSearchParams({ q: searchTerm, category: searchCat }) + '#sah-providers');
-    document.getElementById('sah-providers')?.scrollIntoView({ behavior: 'smooth' });
-  };
+
   const filterCat = cat => {
     setActiveCat(cat);
     navigate('/?' + new URLSearchParams({ category: cat === 'all' ? '' : cat }) + '#sah-providers');
@@ -247,7 +243,7 @@ export default function HomePage() {
     { cat:"all",        label:"All Services" },
     { cat:"education",  label:"Education",   icon:"fa-book-open" },
     { cat:"wellness",   label:"Wellness",    icon:"fa-heart-pulse" },
-    { cat:"activities", label:"Activities",  icon:"fa-palette" },
+    { cat:"tutors", label:"Tutors", icon:"fa-chalkboard-teacher" },
     { cat:"healthcare", label:"Healthcare",  icon:"fa-briefcase-medical" },
     { cat:"shopping",   label:"Shops",       icon:"fa-bag-shopping" },
     { cat:"family",     label:"Family Life", icon:"fa-people-roof" },
@@ -318,27 +314,7 @@ export default function HomePage() {
               </div>
 
               {/* SEARCH BAR */}
-              <div className="sah-hero-search">
-                <div className="sah-hs-icon"><i className="fas fa-search" /></div>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleSearch()}
-                  placeholder="what are you looking for"
-                />
-                <div className="sah-hs-sep" />
-                <select value={searchCat} onChange={e => setSearchCat(e.target.value)}>
-                  <option value="">All Categories</option>
-                  <option value="education">Education</option>
-                  <option value="wellness">Wellness</option>
-                  <option value="activities">Activities</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="shopping">Shops</option>
-                  <option value="family">Family Life</option>
-                </select>
-                <button className="sah-hs-btn" onClick={handleSearch}>Search</button>
-              </div>
+              <BusinessSearch />
 
               <div className="sah-hero-tagline">
                 <div className="sah-hero-actions">
@@ -411,7 +387,7 @@ export default function HomePage() {
             <div className="sah-footer-col"><h4>For Families</h4><ul>
               <li><a href="#sah-providers">Education</a></li>
               <li><a href="#sah-providers">Wellness</a></li>
-              <li><a href="#sah-providers">Activities</a></li>
+              <li><a href="/?category=tutors#sah-providers">Tutors</a></li>
               <li><a href="#sah-providers">Family Shops</a></li>
             </ul></div>
             <div className="sah-footer-col"><h4>For Providers</h4><ul>

@@ -7,6 +7,7 @@ import SavedBusinesses from '../components/SavedBusinesses';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import TagsInput from '../components/client/TagsInput';
+import { CATEGORY_LABELS, categoryLabel } from '../utils/businessCategories';
 import { DAYS_OF_WEEK, PRICING_MODELS, PROVINCES } from '../utils/constants';
 import { getPlanLimits } from '../utils/helpers';
 import { formatInquiryDate, getInquiries, markInquiryRead, respondToInquiry } from '../utils/inquiries';
@@ -2010,9 +2011,9 @@ const ClientDashboard = () => {
             <div className="cd-field">
               <label className="cd-label">Primary Category</label>
               {isEditingSection('profileInfo')
-                ? <select className="cd-input cd-select" value={profileData.primaryCategory || ''} onChange={e => upd({ primaryCategory: e.target.value })}>
+                ? <select className="cd-input cd-select" value={profileData.primaryCategory ? categoryLabel(profileData.primaryCategory) : ''} onChange={e => upd({ primaryCategory: e.target.value })}>
                     <option value="">-- Select --</option>
-                    {['Tutor', 'Therapist', 'Curriculum Provider', 'Online / Hybrid School', 'Educational Consultant', 'Extracurricular / Enrichment'].map(o => <option key={o}>{o}</option>)}
+                    {CATEGORY_LABELS.map(o => <option key={o}>{o}</option>)}
                   </select>
                 : <div className={`cd-value ${!profileData.primaryCategory ? 'empty' : ''}`}>{profileData.primaryCategory || '—'}</div>}
             </div>
