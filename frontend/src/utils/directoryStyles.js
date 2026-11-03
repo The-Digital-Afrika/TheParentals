@@ -240,6 +240,7 @@ const CSS = `
   .sah-pav-name{font-weight:700;font-size:0.77rem;color:var(--dark);line-height:1.2;}
   .sah-pav-tier{font-size:0.68rem;color:var(--muted);}
   .sah-card-body{padding:9px 13px 14px;flex:1;display:flex;flex-direction:column;}
+  .sah-card-description{font-size:0.78rem;color:var(--muted);line-height:1.5;min-height:1.5em;margin:0 0 10px;overflow-wrap:anywhere;}
   .sah-card-title{font-weight:700;font-size:0.87rem;color:var(--dark);margin-bottom:7px;line-height:1.35;}
   .sah-card-meta{display:flex;flex-direction:column;gap:3px;font-size:0.74rem;color:var(--muted);margin-bottom:8px;}
   .sah-card-meta span{display:flex;align-items:center;gap:4px;}

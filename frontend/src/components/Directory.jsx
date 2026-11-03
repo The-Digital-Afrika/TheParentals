@@ -4,6 +4,7 @@ import { apiRequest } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { readSavedBusinesses, toggleSavedBusiness } from '../utils/savedBusinesses';
 import ProviderCard from './ProviderCard';
+import { BUSINESS_CATEGORIES } from '../utils/businessCategories';
 import '../assets/css/marketplace.css';
 
 export default function Directory({ onRequireLogin }) {
@@ -13,7 +14,7 @@ export default function Directory({ onRequireLogin }) {
   const { user: sessionUser } = useAuth();
   const user = localStorage.getItem('sah_token') ? sessionUser : null;
   const [query, setQuery] = useState(params.get('q') || '');
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState(() => ({ city: params.get('city') || '' }));
   const [page, setPage] = useState(1);
   const [result, setResult] = useState({ items: [], total: 0 });
   const [suggestions, setSuggestions] = useState([]);
@@ -27,6 +28,8 @@ export default function Directory({ onRequireLogin }) {
   const input = useRef(null);
   const q = params.get('q') || '';
   const category = params.get('category') || '';
+  const city = params.get('city') || '';
+  useEffect(() => { setFilters(prev => ({ ...prev, city })); setPage(1); }, [city]);
   useEffect(() => { setQuery(q); setPage(1); }, [q, category]);
   const filterKey = JSON.stringify(filters);
   useEffect(() => {
@@ -65,9 +68,10 @@ export default function Directory({ onRequireLogin }) {
   const updateFilter = (key, value) => { setFilters(prev => ({ ...prev, [key]: value })); setPage(1); };
   return <section className="sah-providers-section" id="sah-providers" aria-label="Business directory">
     <div className="sah-container">
-    <div className="sah-sec-header"><div><span className="sah-sec-eyebrow">Parent-Focused Listings</span><h2>{q || category ? 'Search Results' : 'Recently Added'}</h2></div>
+    {(q || category || result.items.length > 4) && <div className="sah-sec-header" style={{ justifyContent: q || category ? 'space-between' : 'flex-end' }}>
+      {(q || category) && <h2>Search Results</h2>}
       {result.items.length > 4 && <button className="sah-link-btn" onClick={() => setShowAll(value => !value)}>{showAll ? 'Show fewer' : `Show all ${result.total} listings ?`}</button>}
-    </div>
+    </div>}
     <details className="directory-refine"><summary>Refine search</summary><div className="marketplace directory-search-tools">
     <form className="marketplace-search" onSubmit={e => { e.preventDefault(); submit(active >= 0 && focused ? suggestions[active].label : query); }}>
       <label htmlFor="directory-query">Search businesses, services, subjects or places</label>
@@ -77,7 +81,7 @@ export default function Directory({ onRequireLogin }) {
       {focused && suggestions.length > 0 && <ul id="directory-suggestions" role="listbox" className="marketplace-suggestions">{suggestions.map((s, i) => <li key={s.label} id={`suggestion-${i}`} role="option" aria-selected={active === i} onMouseDown={e => { e.preventDefault(); submit(s.label); }}><span>{s.label}</span><small>{s.type}</small></li>)}</ul>}
     </form>
     <div className="marketplace-filters">
-      <label>Category<input value={category} placeholder="Any category" onChange={e => { setParams({ q, category: e.target.value }); setPage(1); }} /></label>
+      <label>Category<select value={category} onChange={e => { setParams({ q, category: e.target.value }); setPage(1); }}><option value="">All categories</option>{BUSINESS_CATEGORIES.map(item => <option key={item.id} value={item.label}>{item.label}</option>)}</select></label>
       <label>Subcategory<input value={filters.subcategory || ''} onChange={e => updateFilter('subcategory', e.target.value)} placeholder="Any subcategory" /></label>
       <label>Province<select value={filters.province || ''} onChange={e => updateFilter('province', e.target.value)}><option value="">All provinces</option>{['Eastern Cape','Free State','Gauteng','KwaZulu-Natal','Limpopo','Mpumalanga','North West','Northern Cape','Western Cape'].map(p => <option key={p}>{p}</option>)}</select></label>
       <label>City / suburb<input value={filters.city || ''} placeholder="Any city" onChange={e => updateFilter('city', e.target.value)} /></label>
