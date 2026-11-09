@@ -388,7 +388,7 @@ function saveToLocalStorage({ userId, email, fullName, tier, password, newProvid
 
     // session
     const sessionUser = {
-      role: 'client',
+      role: 'PROVIDER',
       email: email.toLowerCase(),
       id: userId,
       name: fullName,
@@ -492,7 +492,7 @@ const Registration = () => {
     window.location.href = payment.authorizationUrl;
   };
 
-  const continueExistingPaidRegistration = async (email, password, plan, saveProviderProfile = null) => {
+  const continueExistingRegistration = async (email, password, plan, saveProviderProfile = null) => {
     const auth = await apiRequest('POST', '/api/auth/login', {
       email,
       password,
@@ -503,11 +503,15 @@ const Registration = () => {
     }
 
     login({ ...auth.user, token: auth.token });
-    showNotification?.('Continuing your Parental Plus+ payment...', 'info');
     if (saveProviderProfile) {
       await saveProviderProfile(auth.user.id, auth.token);
     }
-    await startPaidRegistrationPayment(plan, auth.token);
+    if (plan !== 'free') {
+      await startPaidRegistrationPayment(plan, auth.token);
+    } else {
+      showNotification?.('Profile saved. Your listing will appear after admin approval.', 'success');
+      navigate('/provider-dashboard');
+    }
   };
 
   const toggleMulti = (name, value, checked) => {
@@ -818,31 +822,8 @@ const Registration = () => {
       apiRequest('POST', '/api/providers', buildProviderFormData(userId), token)
     );
 
-    // Check localStorage for duplicate email first
-    const existingUsers = JSON.parse(localStorage.getItem('sah_users') || '[]');
-    const existingProviders = JSON.parse(localStorage.getItem('sah_providers') || '[]');
+    // The server is authoritative; browser caches may contain failed registrations.
     const emailLower = (data.email || '').trim().toLowerCase();
-    const alreadyExists =
-      existingUsers.find(u => (u.email || '').toLowerCase() === emailLower) ||
-      existingProviders.find(p => (p.email || '').toLowerCase() === emailLower);
-
-    if (alreadyExists) {
-      if (tier !== 'free') {
-        try {
-          await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
-          return;
-        } catch (retryErr) {
-          setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
-          setSubmitting(false);
-          return;
-        }
-      }
-      setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
-      setSubmitting(false);
-      return;
-    }
-
-    // ── Try real API ─────────────────────────────────────────────────────────
     try {
       const userData = await apiRequest('POST', '/api/auth/register', {
         email: emailLower,
@@ -892,55 +873,16 @@ const Registration = () => {
         return;
     } catch (apiErr) {
       if (apiErr.status === 409) {
-        if (tier !== 'free') {
-          try {
-            await continueExistingPaidRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
-            return;
-          } catch (retryErr) {
-            setFieldErrors({ _submit: retryErr.message || 'This account already exists. Please log in to continue payment.' });
-            setSubmitting(false);
-            return;
-          }
+        try {
+          await continueExistingRegistration(emailLower, data.password, tier, saveRegistrationProviderProfile);
+          return;
+        } catch (retryErr) {
+          setFieldErrors({ _submit: retryErr.message || 'Unable to finish your profile. Please log in and try again.' });
+          setSubmitting(false);
+          return;
         }
-        setFieldErrors({ _submit: 'An account with this email already exists. Please log in instead.' });
-        setSubmitting(false);
-        return;
       }
-      if (tier !== 'free') {
-        setFieldErrors({ _submit: apiErr.message || 'Parental Plus+ registration needs the backend payment service. Please confirm the backend is running, then try again.' });
-        setSubmitting(false);
-        return;
-      }
-      console.warn('Provider registration API failed, using localStorage fallback:', apiErr.message);
-    }
-
-    // ── localStorage-only fallback ───────────────────────────────────────────
-    try {
-      const sessionUser = saveToLocalStorage({
-        userId: providerId,
-        email: emailLower,
-        fullName: data.fullName,
-        tier: tier === 'free' ? 'free' : 'free',
-        password: data.password,
-        newProvider: {
-          ...newProvider,
-          plan: tier === 'free' ? 'free' : 'free',
-          listingPlan: tier === 'free' ? 'free' : 'free',
-          tier: tier === 'free' ? 'free' : 'free',
-          requestedPlan: tier === 'free' ? null : tier,
-          billingStatus: tier === 'free' ? 'inactive' : 'payment_required',
-        },
-      });
-
-      if (sessionUser) {
-        login(sessionUser);
-      }
-
-      showNotification?.('✅ Registration successful! Your profile is pending admin approval.', 'success');
-      setTimeout(() => navigate('/provider-dashboard'), 300);
-    } catch (localErr) {
-      console.error('localStorage fallback failed:', localErr);
-      setFieldErrors({ _submit: 'Registration failed. Please try again.' });
+      setFieldErrors({ _submit: apiErr.message || 'Unable to save your registration. Please try again. Your listing must be saved online before it can be reviewed.' });
       setSubmitting(false);
     }
   };

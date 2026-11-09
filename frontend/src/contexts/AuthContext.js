@@ -1,6 +1,7 @@
 // frontend/src/contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '../services/api';
+import { normalizeAccountSession } from '../utils/accountRole.mjs';
 
 const AuthContext = createContext();
 
@@ -94,7 +95,9 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
-        const parsedUser = JSON.parse(storedUser);
+        const parsedUser = normalizeAccountSession(JSON.parse(storedUser));
+        localStorage.setItem('sah_user', JSON.stringify(parsedUser));
+        localStorage.setItem('sah_current_user', JSON.stringify(parsedUser));
         setUser(parsedUser);
       } catch (e) {
         localStorage.removeItem('sah_user');
@@ -164,7 +167,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (emailOrUserObj, password) => {
     // Pre-built user object (e.g. called right after register)
     if (emailOrUserObj && typeof emailOrUserObj === 'object') {
-      const userData = emailOrUserObj;
+      const userData = normalizeAccountSession(emailOrUserObj);
       setUser(userData);
       localStorage.setItem('sah_user', JSON.stringify(userData));
       localStorage.setItem('sah_current_user', JSON.stringify(userData));
