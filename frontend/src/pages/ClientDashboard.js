@@ -358,6 +358,7 @@ function mapDbProfileToLocal(db) {
     requestedPlan: db.requestedPlan || null,
     billingStatus: db.billingStatus || 'inactive',
     nextBillingAt: db.nextBillingAt || null,
+    rejectionReason: db.rejectionReason || '',
     status:       (db.status      || 'pending').toLowerCase(),
     publicToggle: db.publicDisplay ?? db.publicToggle ?? true,
     listingPublic:db.publicDisplay ?? db.listingPublic ?? true,
@@ -3407,6 +3408,7 @@ const ClientDashboard = () => {
             <div className="cd-hero-eyebrow"><span></span>Provider Dashboard</div>
             <h1 className="cd-hero-title">Welcome back, <em>{profileData.name || 'Provider'}</em></h1>
             <div className="cd-hero-meta">
+              {profileData.status === 'rejected' && profileData.rejectionReason && <p role="status" style={{whiteSpace:'pre-wrap'}}>Reason for rejection: {profileData.rejectionReason}</p>}
               <div className={`cd-status-pill ${statusInfo.cls}`}>
                 <i className={`fas ${statusInfo.icon}`}></i> {statusInfo.label}
               </div>

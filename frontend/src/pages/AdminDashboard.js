@@ -657,7 +657,7 @@ const AdminFileCard = ({ file, fileName, fileType, label }) => {
 };
 
 /* ── Expandable Pending Row ── */
-const ExpandablePendingRow = ({ provider, onApprove, onReject }) => {
+const ExpandablePendingRow = ({ provider, onApprove, onReject, decisionBusy }) => {
   const [expanded, setExpanded] = useState(false);
   const initial = (provider.name || '?')[0].toUpperCase();
   const regDate = provider.registered ? new Date(provider.registered).toLocaleDateString('en-ZA') : '—';
@@ -691,10 +691,10 @@ const ExpandablePendingRow = ({ provider, onApprove, onReject }) => {
         </div>
         <i className="fas fa-chevron-down adm-expand-icon"></i>
         <div className="adm-row-actions" onClick={e => e.stopPropagation()}>
-          <button type="button" className="adm-btn-approve" onClick={() => onApprove(provider.id)}>
+          <button type="button" className="adm-btn-approve" disabled={decisionBusy} onClick={() => onApprove(provider.id)}>
             <i className="fas fa-check"></i> Approve
           </button>
-          <button type="button" className="adm-btn-reject" onClick={() => onReject(provider.id)}>
+          <button type="button" className="adm-btn-reject" disabled={decisionBusy} onClick={() => onReject(provider.id)}>
             <i className="fas fa-times"></i> Reject
           </button>
         </div>
@@ -1321,69 +1321,45 @@ const AdminDashboard = () => {
     totalAccounts:   registeredUsers.length,
   };
 
-  const handleApprove = async (id) => {
+  const [rejectionId, setRejectionId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [decisionBusy, setDecisionBusy] = useState(false);
+  const [decisionFeedback, setDecisionFeedback] = useState(null);
+  const decisionInFlight = useRef(false);
+  const saveDecision = async (id, status, reason) => {
+    if (decisionInFlight.current) return;
+    setDecisionFeedback(null);
     const p = providers.find(x => x.id === id || x.userId === id);
     const token = user?.token || localStorage.getItem('sah_token');
+    if (!token || String(token).startsWith('local_')) { setDecisionFeedback({error:true,message:'Sign in to the backend as an administrator to save this decision.'}); return; }
+    decisionInFlight.current = true;
+    setDecisionBusy(true);
     try {
-      if (token && !String(token).startsWith('local_')) {
-        const result = await api.updateProviderStatus(p?.userId || id, 'APPROVED', token);
-        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'approved' });
-        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
-        setProviders(updated); saveStoredProviders(updated);
-      } else {
-        const updated = providers.map(item => item.id === id ? { ...item, status: 'approved', publicToggle: true } : item);
-        setProviders(updated); saveStoredProviders(updated);
-      }
-      showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
+      const result = await api.updateProviderStatus(p?.userId || id, status, token, reason);
+      const updatedProvider = normalizeProviderForAdmin(result.profile);
+      const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
+      setProviders(updated); saveStoredProviders(updated);
+      setDecisionFeedback({error:false,message: (status === 'APPROVED' ? 'Provider approved and published. ' : 'Provider rejected and hidden from the directory. ') + (result.notificationStatus === 'SENT' ? 'Email accepted for delivery.' : 'Email notification retained for later delivery.')});
+      showNotification('Decision saved. ' + (result.notificationStatus === 'SENT' ? 'Email accepted for delivery.' : 'Notification: ' + result.notificationStatus + '. Use Retry notifications if pending or failed.'), 'success');
+      setRejectionId(null); setRejectionReason('');
     } catch (error) {
-      const updated = providers.map(item =>
-        (item.id === id || item.userId === id)
-          ? { ...item, status: 'approved', publicToggle: true, publicDisplay: true }
-          : item
-      );
-      setProviders(updated);
-      saveStoredProviders(updated);
-      showNotification(`${p?.name || 'Provider'} approved and is now live.`, 'success');
+      setDecisionFeedback({error:true,message:error.message || 'Decision could not be saved.'});
+      showNotification(error.message || 'Decision could not be saved.', 'error');
     }
+    finally { decisionInFlight.current = false; setDecisionBusy(false); }
   };
-
-  const handleApproveLocalOnly = (id) => {
-    const updated = providers.map(p => p.id === id ? { ...p, status: 'approved' } : p);
-    setProviders(updated); saveStoredProviders(updated);
-    const p = providers.find(x => x.id === id);
-    showNotification(`✅ ${p?.name || 'Provider'} approved and is now live.`, 'success');
-  };
-  const handleReject = async (id) => {
-    const p = providers.find(x => x.id === id || x.userId === id);
+  const handleApprove = id => saveDecision(id, 'APPROVED');
+  const handleReject = id => { setDecisionFeedback(null); setRejectionReason(''); setRejectionId(id); };
+  const retryNotifications = async () => {
     const token = user?.token || localStorage.getItem('sah_token');
     try {
-      if (token && !String(token).startsWith('local_')) {
-        const result = await api.updateProviderStatus(p?.userId || id, 'REJECTED', token);
-        const updatedProvider = normalizeProviderForAdmin(result.profile || { ...p, status: 'rejected' });
-        const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
-        setProviders(updated); saveStoredProviders(updated);
-      } else {
-        const updated = providers.map(item => item.id === id ? { ...item, status: 'rejected', publicToggle: false } : item);
-        setProviders(updated); saveStoredProviders(updated);
+      let statuses = [];
+      for (const p of providers) {
+        const result = await api.retryProviderNotifications(p.userId || p.id, token);
+        statuses = statuses.concat(result.statuses);
       }
-      showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
-    } catch (error) {
-      const updated = providers.map(item =>
-        (item.id === id || item.userId === id)
-          ? { ...item, status: 'rejected', publicToggle: false, publicDisplay: false }
-          : item
-      );
-      setProviders(updated);
-      saveStoredProviders(updated);
-      showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
-    }
-  };
-
-  const handleRejectLocalOnly = (id) => {
-    const updated = providers.map(p => p.id === id ? { ...p, status: 'rejected' } : p);
-    setProviders(updated); saveStoredProviders(updated);
-    const p = providers.find(x => x.id === id);
-    showNotification(`${p?.name || 'Provider'} registration rejected.`, 'info');
+      showNotification(statuses.length ? 'Notifications: ' + statuses.join(', ') : 'No pending or failed notifications.', 'info');
+    } catch (error) { showNotification(error.message || 'Could not retry notifications.', 'error'); }
   };
 
   const handleBadgeSelect = (providerId, badgeType) => {
@@ -1674,6 +1650,8 @@ const AdminDashboard = () => {
           </div>
 
           {/* ── PENDING APPROVALS ── */}
+          {decisionFeedback && <div role={decisionFeedback.error ? 'alert' : 'status'} style={{padding:16,margin:'16px 0',borderRadius:8,background:decisionFeedback.error?'#fff1f0':'#ecfdf5',color:decisionFeedback.error?'#b42318':'#047857'}}>{decisionFeedback.message}</div>}
+          {decisionBusy && <p role="status">Saving provider decision...</p>}
           {activeTab === 'pending' && (
             <div className="tab-pane active" role="tabpanel">
               <p className="section-heading">
@@ -1688,7 +1666,7 @@ const AdminDashboard = () => {
               ) : (
                 <div className="adm-pending-scroll">
                   {pendingProviders.map(p => (
-                    <ExpandablePendingRow key={p.id} provider={p} onApprove={handleApprove} onReject={handleReject} />
+                    <ExpandablePendingRow decisionBusy={decisionBusy} key={p.id} provider={p} onApprove={handleApprove} onReject={handleReject} />
                   ))}
                 </div>
               )}
@@ -2138,6 +2116,15 @@ const AdminDashboard = () => {
         />
       )}
 
+      <button type="button" className="adm-btn-approve" onClick={retryNotifications}>Retry notifications</button>
+      {rejectionId && <Modal isOpen={true} onClose={() => !decisionBusy && setRejectionId(null)} title="Reject provider application">
+        <form onSubmit={event => { event.preventDefault(); if (rejectionReason.trim() && !decisionBusy) saveDecision(rejectionId, 'REJECTED', rejectionReason.trim()); }}>
+          {decisionFeedback?.error && <p role="alert">{decisionFeedback.message}</p>}
+          <label htmlFor="provider-rejection-reason">Reason for rejection</label>
+          <textarea id="provider-rejection-reason" required maxLength={5000} value={rejectionReason} onChange={event => setRejectionReason(event.target.value)} style={{width:'100%',minHeight:120}} />
+          <button type="submit" disabled={decisionBusy || !rejectionReason.trim()} className="adm-btn-reject">{decisionBusy ? 'Saving...' : 'Reject & Notify Provider'}</button>
+        </form>
+      </Modal>}
       {modalOpen && (
         <Modal isOpen={modalOpen} onClose={closeModal} title={modalContent.title}>
           <div dangerouslySetInnerHTML={{ __html: modalContent.body }} />

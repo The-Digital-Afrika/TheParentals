@@ -1,3 +1,4 @@
+import Notification from './components/common/Notification';
 import RequireRole from './components/RequireRole';
 import ProviderLanding from './pages/ProviderLanding';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -19,6 +20,7 @@ function App() {
   return (
     <BrowserRouter>
       <NotificationProvider>
+        <Notification />
         <AuthProvider>
           <Routes>
             <Route path="/" element={<HomePage />} />

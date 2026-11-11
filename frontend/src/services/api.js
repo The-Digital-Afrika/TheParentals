@@ -89,7 +89,8 @@ export const api = {
   getProviderById: (id) => apiRequest('GET', `/api/providers/${id}`, null, localStorage.getItem('sah_token')),
   createProvider: (data) => apiRequest('POST', '/api/providers', data, localStorage.getItem('sah_token')),
   updateProvider: (id, data, token) => apiRequest('PATCH', `/api/providers/${id}`, data, token),
-  updateProviderStatus: (id, status, token) => apiRequest('PATCH', `/api/providers/${id}/status`, { status }, token),
+  updateProviderStatus: (id, status, token, rejectionReason) => apiRequest('PATCH', `/api/providers/${id}/status`, { status, rejectionReason }, token),
+  retryProviderNotifications: (id, token) => apiRequest('POST', `/api/providers/${id}/notifications/retry`, {}, token),
   approveProvider: (id, token) => apiRequest('POST', `/api/providers/${id}/approve`, null, token),
   rejectProvider: (id, token) => apiRequest('POST', `/api/providers/${id}/reject`, null, token),
 

@@ -26,7 +26,7 @@ const Notification = () => {
   if (notifications.length === 0) return null;
 
   return (
-    <div id="notification-container">
+    <div id="notification-container" role="status" aria-live="polite" style={{position:"fixed",top:88,right:20,zIndex:12000,display:"grid",gap:10,pointerEvents:"none"}}>
       {notifications.map((notification) => {
         const colors = {
           success: '#10b981',
