@@ -1325,6 +1325,8 @@ const AdminDashboard = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [decisionBusy, setDecisionBusy] = useState(false);
   const [decisionFeedback, setDecisionFeedback] = useState(null);
+  const [retryEmailProvider, setRetryEmailProvider] = useState(null);
+  const [retryEmailBusy, setRetryEmailBusy] = useState(false);
   const decisionInFlight = useRef(false);
   const saveDecision = async (id, status, reason) => {
     if (decisionInFlight.current) return;
@@ -1340,7 +1342,8 @@ const AdminDashboard = () => {
       const updated = providers.map(item => (item.id === id || item.userId === id) ? updatedProvider : item);
       setProviders(updated); saveStoredProviders(updated);
       setDecisionFeedback({error:false,message: (status === 'APPROVED' ? 'Provider approved and published. ' : 'Provider rejected and hidden from the directory. ') + (result.notificationStatus === 'SENT' ? 'Email accepted for delivery.' : 'Email notification retained for later delivery.')});
-      showNotification('Decision saved. ' + (result.notificationStatus === 'SENT' ? 'Email accepted for delivery.' : 'Notification: ' + result.notificationStatus + '. Use Retry notifications if pending or failed.'), 'success');
+      setRetryEmailProvider(['PENDING', 'FAILED'].includes(result.notificationStatus) ? (p?.userId || id) : null);
+      showNotification('Decision saved. ' + (result.notificationStatus === 'SENT' ? 'Email accepted for delivery.' : 'Provider email has not been sent yet.'), 'success');
       setRejectionId(null); setRejectionReason('');
     } catch (error) {
       setDecisionFeedback({error:true,message:error.message || 'Decision could not be saved.'});
@@ -1351,15 +1354,16 @@ const AdminDashboard = () => {
   const handleApprove = id => saveDecision(id, 'APPROVED');
   const handleReject = id => { setDecisionFeedback(null); setRejectionReason(''); setRejectionId(id); };
   const retryNotifications = async () => {
+    if (!retryEmailProvider || retryEmailBusy) return;
+    setRetryEmailBusy(true);
     const token = user?.token || localStorage.getItem('sah_token');
     try {
-      let statuses = [];
-      for (const p of providers) {
-        const result = await api.retryProviderNotifications(p.userId || p.id, token);
-        statuses = statuses.concat(result.statuses);
-      }
-      showNotification(statuses.length ? 'Notifications: ' + statuses.join(', ') : 'No pending or failed notifications.', 'info');
+      const result = await api.retryProviderNotifications(retryEmailProvider, token);
+      const statuses = result.statuses;
+      if (!statuses.some(status => ['PENDING', 'FAILED'].includes(status))) setRetryEmailProvider(null);
+      showNotification(statuses.includes('SENT') ? 'Provider email accepted for delivery.' : 'Provider email status: ' + (statuses.join(', ') || 'No emails awaiting retry.'), 'info');
     } catch (error) { showNotification(error.message || 'Could not retry notifications.', 'error'); }
+    finally { setRetryEmailBusy(false); }
   };
 
   const handleBadgeSelect = (providerId, badgeType) => {
@@ -1652,6 +1656,10 @@ const AdminDashboard = () => {
           {/* ── PENDING APPROVALS ── */}
           {decisionFeedback && <div role={decisionFeedback.error ? 'alert' : 'status'} style={{padding:16,margin:'16px 0',borderRadius:8,background:decisionFeedback.error?'#fff1f0':'#ecfdf5',color:decisionFeedback.error?'#b42318':'#047857'}}>{decisionFeedback.message}</div>}
           {decisionBusy && <p role="status">Saving provider decision...</p>}
+          {retryEmailProvider && <div style={{padding:16,margin:'16px 0',borderRadius:8,background:'#fff7ed'}}>
+            <p>The decision is saved. The provider email is awaiting delivery. Retrying sends the email without changing the decision.</p>
+            <button type="button" className="adm-btn-approve" disabled={retryEmailBusy} onClick={retryNotifications}>{retryEmailBusy ? 'Retrying email...' : 'Retry provider email'}</button>
+          </div>}
           {activeTab === 'pending' && (
             <div className="tab-pane active" role="tabpanel">
               <p className="section-heading">
@@ -2116,7 +2124,6 @@ const AdminDashboard = () => {
         />
       )}
 
-      <button type="button" className="adm-btn-approve" onClick={retryNotifications}>Retry notifications</button>
       {rejectionId && <Modal isOpen={true} onClose={() => !decisionBusy && setRejectionId(null)} title="Reject provider application">
         <form onSubmit={event => { event.preventDefault(); if (rejectionReason.trim() && !decisionBusy) saveDecision(rejectionId, 'REJECTED', rejectionReason.trim()); }}>
           {decisionFeedback?.error && <p role="alert">{decisionFeedback.message}</p>}

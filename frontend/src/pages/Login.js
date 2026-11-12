@@ -7,7 +7,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useNotification } from '../contexts/NotificationContext';
 import SocialSignIn from '../components/common/SocialSignIn';
 
 const injectHead = () => {
@@ -463,7 +462,6 @@ const getRedirectPath = (userData) => {
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { showNotification } = useNotification();
 
   const [email,        setEmail]        = useState('');
   const [password,     setPassword]     = useState('');
@@ -519,7 +517,6 @@ const Login = () => {
       if (result && result.success) {
         const userData = result.user;
         setAlert({ msg: result.message || 'Login successful! Redirecting...', type: 'success' });
-        showNotification?.(result.message || 'Welcome back!', 'success');
 
         // ── Smart redirect based on role ──
         const redirectPath = getRedirectPath(userData);

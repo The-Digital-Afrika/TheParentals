@@ -266,10 +266,8 @@ const Header = ({ userType = 'guest' } = {}) => {
               </nav>
             )}
 
-            {!isHomepage && isLoggedIn && <nav className="sah-hdr-nav" aria-label="Account navigation">
-              <Link to={dashboardPath}>Dashboard</Link>
-              <Link to="/#sah-providers">Browse Directory</Link>
-              {!isProvider && !isAdmin && <a href="/client-dashboard#saved-businesses">Saved Businesses</a>}
+            {!isHomepage && isLoggedIn && !isProvider && !isAdmin && <nav className="sah-hdr-nav" aria-label="Account navigation">
+              <a href="/client-dashboard#saved-businesses">Saved Businesses</a>
             </nav>}
             {location.pathname === '/become-a-provider' && (
               <Link to="/#sah-providers" className="sah-hdr-ghost">
